@@ -20,6 +20,7 @@ export 'src/material_4_config.dart';
 export 'src/material_4_container.dart';
 export 'src/material_4_path_builder.dart';
 export 'src/material_4_stack.dart';
+export 'src/progress/progress.dart';
 export 'src/rendering/rendering.dart';
 export 'src/school_shape_presets.dart';
 export 'src/shape_animation_controller.dart';

@@ -4,8 +4,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:material_4/material_4.dart';
 
 import '../avatar/avatar_showcase_screen.dart';
+import '../progress/progress_showcase_screen.dart';
 
-/// Complete showcase screen organizing Material 4 into 11 structured sections:
+/// Complete showcase screen organizing Material 4 into 12 structured sections:
 /// 1. Basic Shapes
 /// 2. Advanced Shapes
 /// 3. Creative Borders
@@ -17,6 +18,7 @@ import '../avatar/avatar_showcase_screen.dart';
 /// 9. Interactive Components
 /// 10. Custom Configuration
 /// 11. Dynamic Avatars
+/// 12. Dynamic Progress Bars
 class Material4ShowcaseScreen extends StatefulWidget {
   final int initialSectionIndex;
 
@@ -58,9 +60,9 @@ class _Material4ShowcaseScreenState extends State<Material4ShowcaseScreen>
   void initState() {
     super.initState();
     _tabController = TabController(
-      length: 11,
+      length: 12,
       vsync: this,
-      initialIndex: widget.initialSectionIndex.clamp(0, 10),
+      initialIndex: widget.initialSectionIndex.clamp(0, 11),
     );
   }
 
@@ -112,6 +114,7 @@ class _Material4ShowcaseScreenState extends State<Material4ShowcaseScreen>
             Tab(text: '9. Interactive Components'),
             Tab(text: '10. Custom Configuration'),
             Tab(text: '11. Dynamic Avatars'),
+            Tab(text: '12. Dynamic Progress'),
           ],
         ),
       ),
@@ -129,6 +132,7 @@ class _Material4ShowcaseScreenState extends State<Material4ShowcaseScreen>
           _buildInteractiveComponentsTab(),
           _buildCustomConfigurationTab(),
           const AvatarShowcaseScreen(isEmbedded: true),
+          const ProgressBarShowcaseScreen(isEmbedded: true),
         ],
       ),
     );

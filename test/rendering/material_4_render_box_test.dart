@@ -647,5 +647,92 @@ void main() {
 
       expect(tapped, isTrue);
     });
+
+    testWidgets(
+        'Material4Container with width: double.infinity properly bounds child Row with Expanded',
+        (tester) async {
+      await tester.pumpWidget(
+        Directionality(
+          textDirection: TextDirection.ltr,
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(
+                maxWidth: 400,
+                maxHeight: 150,
+              ),
+              child: Material4Container(
+                width: double.infinity,
+                height: 90,
+                config: const Material4Config(
+                  type: Material4Type.smoothRounded,
+                  cornerRadius: 16,
+                ),
+                child: const Row(
+                  children: [
+                    Icon(Icons.star),
+                    Expanded(
+                      child: Text('Expanded child should not crash'),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      final renderBox = tester.renderObject<RenderMaterial4>(
+        find.byType(Material4RenderWidget),
+      );
+
+      expect(renderBox.size.width, equals(400.0));
+      expect(renderBox.size.height, equals(90.0));
+      expect(find.text('Expanded child should not crash'), findsOneWidget);
+    });
+
+    testWidgets(
+        'Material4Stack with width: double.infinity properly bounds child Row with Expanded',
+        (tester) async {
+      await tester.pumpWidget(
+        Directionality(
+          textDirection: TextDirection.ltr,
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(
+                maxWidth: 400,
+                maxHeight: 150,
+              ),
+              child: Material4Stack(
+                width: double.infinity,
+                height: 90,
+                config: const Material4Config(
+                  type: Material4Type.smoothRounded,
+                  cornerRadius: 16,
+                ),
+                children: const [
+                  Row(
+                    children: [
+                      Icon(Icons.star),
+                      Expanded(
+                        child: Text('Stack expanded child should not crash'),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+
+      final renderBox = tester.renderObject<RenderMultiChildMaterial4>(
+        find.byType(Material4MultiChildRenderWidget),
+      );
+
+      expect(renderBox.size.width, equals(400.0));
+      expect(renderBox.size.height, equals(90.0));
+      expect(
+          find.text('Stack expanded child should not crash'), findsOneWidget);
+    });
   });
 }

@@ -5,4 +5,3 @@ export 'avatar_shape.dart';
 export 'avatar_status.dart';
 export 'material_4_avatar.dart';
 export 'material_4_avatar_group.dart';
-

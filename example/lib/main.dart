@@ -6,6 +6,7 @@ import 'features/school/presentation/school_dashboard_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
+  GoogleFonts.config.allowRuntimeFetching = false;
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,

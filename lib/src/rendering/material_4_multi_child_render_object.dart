@@ -400,11 +400,23 @@ class RenderMultiChildMaterial4 extends RenderBox
     final w = _explicitWidth;
     final h = _explicitHeight;
 
-    final tentativeW = w ??
+    final double? resolvedExplicitW = w != null
+        ? (w.isFinite
+            ? constraints.constrainWidth(w)
+            : (constraints.hasBoundedWidth ? constraints.maxWidth : null))
+        : null;
+
+    final double? resolvedExplicitH = h != null
+        ? (h.isFinite
+            ? constraints.constrainHeight(h)
+            : (constraints.hasBoundedHeight ? constraints.maxHeight : null))
+        : null;
+
+    final tentativeW = resolvedExplicitW ??
         (constraints.hasBoundedWidth
             ? constraints.maxWidth
             : constraints.minWidth);
-    final tentativeH = h ??
+    final tentativeH = resolvedExplicitH ??
         (constraints.hasBoundedHeight
             ? constraints.maxHeight
             : constraints.minHeight);
@@ -474,8 +486,8 @@ class RenderMultiChildMaterial4 extends RenderBox
 
     // Determine final container dimensions
     double desiredW;
-    if (w != null) {
-      desiredW = w;
+    if (resolvedExplicitW != null) {
+      desiredW = resolvedExplicitW;
     } else if (constraints.hasTightWidth) {
       desiredW = constraints.maxWidth;
     } else {
@@ -486,8 +498,8 @@ class RenderMultiChildMaterial4 extends RenderBox
     }
 
     double desiredH;
-    if (h != null) {
-      desiredH = h;
+    if (resolvedExplicitH != null) {
+      desiredH = resolvedExplicitH;
     } else if (constraints.hasTightHeight) {
       desiredH = constraints.maxHeight;
     } else {
@@ -499,9 +511,9 @@ class RenderMultiChildMaterial4 extends RenderBox
 
     final targetRatio = _config.resolvedTransform.targetAspectRatio;
     if (targetRatio != null && targetRatio > 0) {
-      if (w != null && h == null) {
+      if (resolvedExplicitW != null && resolvedExplicitH == null) {
         desiredH = desiredW / targetRatio;
-      } else if (h != null && w == null) {
+      } else if (resolvedExplicitH != null && resolvedExplicitW == null) {
         desiredW = desiredH * targetRatio;
       }
     }
@@ -868,14 +880,26 @@ class RenderMultiChildMaterial4 extends RenderBox
     final w = _explicitWidth;
     final h = _explicitHeight;
 
-    double desiredW = w ?? constraints.minWidth;
-    double desiredH = h ?? constraints.minHeight;
+    final double? resolvedExplicitW = w != null
+        ? (w.isFinite
+            ? constraints.constrainWidth(w)
+            : (constraints.hasBoundedWidth ? constraints.maxWidth : null))
+        : null;
+
+    final double? resolvedExplicitH = h != null
+        ? (h.isFinite
+            ? constraints.constrainHeight(h)
+            : (constraints.hasBoundedHeight ? constraints.maxHeight : null))
+        : null;
+
+    double desiredW = resolvedExplicitW ?? constraints.minWidth;
+    double desiredH = resolvedExplicitH ?? constraints.minHeight;
 
     final targetRatio = _config.resolvedTransform.targetAspectRatio;
     if (targetRatio != null && targetRatio > 0) {
-      if (w != null && h == null) {
+      if (resolvedExplicitW != null && resolvedExplicitH == null) {
         desiredH = desiredW / targetRatio;
-      } else if (h != null && w == null) {
+      } else if (resolvedExplicitH != null && resolvedExplicitW == null) {
         desiredW = desiredH * targetRatio;
       }
     }

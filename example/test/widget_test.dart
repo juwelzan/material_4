@@ -28,22 +28,26 @@ void main() {
     expect(find.text('Folder Tab (State 1)'), findsOneWidget);
 
     // Morph to State 2: Notched Badge
-    await tester.tap(tapToMorphFinder);
+    await tester.ensureVisible(tapToMorphFinder);
+    await tester.tap(tapToMorphFinder, warnIfMissed: false);
     await tester.pumpAndSettle();
     expect(find.text('Notched Badge (State 2)'), findsOneWidget);
 
     // Morph to State 3: Ticket Scallop
-    await tester.tap(tapToMorphFinder);
+    await tester.ensureVisible(tapToMorphFinder);
+    await tester.tap(tapToMorphFinder, warnIfMissed: false);
     await tester.pumpAndSettle();
     expect(find.text('Ticket Scallop (State 3)'), findsOneWidget);
 
     // Morph to State 4: Soft Hexagon (where 38px overflow previously occurred)
-    await tester.tap(tapToMorphFinder);
+    await tester.ensureVisible(tapToMorphFinder);
+    await tester.tap(tapToMorphFinder, warnIfMissed: false);
     await tester.pumpAndSettle();
     expect(find.text('Soft Hexagon (State 4)'), findsOneWidget);
 
     // Morph back to State 1
-    await tester.tap(tapToMorphFinder);
+    await tester.ensureVisible(tapToMorphFinder);
+    await tester.tap(tapToMorphFinder, warnIfMissed: false);
     await tester.pumpAndSettle();
     expect(find.text('Folder Tab (State 1)'), findsOneWidget);
   });

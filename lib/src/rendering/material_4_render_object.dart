@@ -368,12 +368,28 @@ class RenderMaterial4 extends RenderBox
     final w = _explicitWidth;
     final h = _explicitHeight;
 
+    // Resolve explicit dimensions against incoming constraints:
+    // - If explicit dimension is finite, clamp it to incoming constraints.
+    // - If explicit dimension is infinite and constraints are bounded, resolve to maxWidth / maxHeight.
+    // - Otherwise keep as unbounded or null.
+    final double? resolvedExplicitW = w != null
+        ? (w.isFinite
+            ? constraints.constrainWidth(w)
+            : (constraints.hasBoundedWidth ? constraints.maxWidth : null))
+        : null;
+
+    final double? resolvedExplicitH = h != null
+        ? (h.isFinite
+            ? constraints.constrainHeight(h)
+            : (constraints.hasBoundedHeight ? constraints.maxHeight : null))
+        : null;
+
     // Determine target size bounds from incoming constraints without arbitrary fallbacks
-    final double tentativeWidth = w ??
+    final double tentativeWidth = resolvedExplicitW ??
         (constraints.hasBoundedWidth
             ? constraints.maxWidth
             : constraints.minWidth);
-    final double tentativeHeight = h ??
+    final double tentativeHeight = resolvedExplicitH ??
         (constraints.hasBoundedHeight
             ? constraints.maxHeight
             : constraints.minHeight);
@@ -387,14 +403,14 @@ class RenderMaterial4 extends RenderBox
               ? (_padding?.resolve(_textDirection) ?? EdgeInsets.zero)
               : insets;
 
-      final maxAvailableW = w != null
-          ? math.max(0.0, w - effectiveInsets.horizontal)
+      final maxAvailableW = resolvedExplicitW != null
+          ? math.max(0.0, resolvedExplicitW - effectiveInsets.horizontal)
           : (constraints.hasBoundedWidth
               ? math.max(0.0, constraints.maxWidth - effectiveInsets.horizontal)
               : double.infinity);
 
-      final maxAvailableH = h != null
-          ? math.max(0.0, h - effectiveInsets.vertical)
+      final maxAvailableH = resolvedExplicitH != null
+          ? math.max(0.0, resolvedExplicitH - effectiveInsets.vertical)
           : (constraints.hasBoundedHeight
               ? math.max(0.0, constraints.maxHeight - effectiveInsets.vertical)
               : double.infinity);
@@ -419,11 +435,11 @@ class RenderMaterial4 extends RenderBox
       // using the child's actual measured dimensions to ensure features (e.g. tabs,
       // scallops, corners) are not scaled to zero by sanitize()
       final safeReferenceSize = Size(
-        w ??
+        resolvedExplicitW ??
             (constraints.hasBoundedWidth
                 ? constraints.maxWidth
                 : math.max(100.0, child!.size.width)),
-        h ??
+        resolvedExplicitH ??
             (constraints.hasBoundedHeight
                 ? constraints.maxHeight
                 : math.max(100.0, child!.size.height)),
@@ -431,8 +447,8 @@ class RenderMaterial4 extends RenderBox
       final resolvedInsets = _computeEffectiveInsets(safeReferenceSize);
 
       double desiredW;
-      if (w != null) {
-        desiredW = w;
+      if (resolvedExplicitW != null) {
+        desiredW = resolvedExplicitW;
       } else if (constraints.hasTightWidth) {
         desiredW = constraints.maxWidth;
       } else {
@@ -440,8 +456,8 @@ class RenderMaterial4 extends RenderBox
       }
 
       double desiredH;
-      if (h != null) {
-        desiredH = h;
+      if (resolvedExplicitH != null) {
+        desiredH = resolvedExplicitH;
       } else if (constraints.hasTightHeight) {
         desiredH = constraints.maxHeight;
       } else {
@@ -450,9 +466,9 @@ class RenderMaterial4 extends RenderBox
 
       final targetRatio = _config.resolvedTransform.targetAspectRatio;
       if (targetRatio != null && targetRatio > 0) {
-        if (w != null && h == null) {
+        if (resolvedExplicitW != null && resolvedExplicitH == null) {
           desiredH = desiredW / targetRatio;
-        } else if (h != null && w == null) {
+        } else if (resolvedExplicitH != null && resolvedExplicitW == null) {
           desiredW = desiredH * targetRatio;
         }
       }
@@ -481,13 +497,13 @@ class RenderMaterial4 extends RenderBox
         childParentData.offset = Offset(finalInsets.left, finalInsets.top);
       }
     } else {
-      double desiredW = w ?? constraints.minWidth;
-      double desiredH = h ?? constraints.minHeight;
+      double desiredW = resolvedExplicitW ?? constraints.minWidth;
+      double desiredH = resolvedExplicitH ?? constraints.minHeight;
       final targetRatio = _config.resolvedTransform.targetAspectRatio;
       if (targetRatio != null && targetRatio > 0) {
-        if (w != null && h == null) {
+        if (resolvedExplicitW != null && resolvedExplicitH == null) {
           desiredH = desiredW / targetRatio;
-        } else if (h != null && w == null) {
+        } else if (resolvedExplicitH != null && resolvedExplicitW == null) {
           desiredW = desiredH * targetRatio;
         }
       }
@@ -501,11 +517,23 @@ class RenderMaterial4 extends RenderBox
     final w = _explicitWidth;
     final h = _explicitHeight;
 
-    final double tentativeWidth = w ??
+    final double? resolvedExplicitW = w != null
+        ? (w.isFinite
+            ? constraints.constrainWidth(w)
+            : (constraints.hasBoundedWidth ? constraints.maxWidth : null))
+        : null;
+
+    final double? resolvedExplicitH = h != null
+        ? (h.isFinite
+            ? constraints.constrainHeight(h)
+            : (constraints.hasBoundedHeight ? constraints.maxHeight : null))
+        : null;
+
+    final double tentativeWidth = resolvedExplicitW ??
         (constraints.hasBoundedWidth
             ? constraints.maxWidth
             : constraints.minWidth);
-    final double tentativeHeight = h ??
+    final double tentativeHeight = resolvedExplicitH ??
         (constraints.hasBoundedHeight
             ? constraints.maxHeight
             : constraints.minHeight);
@@ -519,14 +547,14 @@ class RenderMaterial4 extends RenderBox
               ? (_padding?.resolve(_textDirection) ?? EdgeInsets.zero)
               : insets;
 
-      final maxAvailableW = w != null
-          ? math.max(0.0, w - effectiveInsets.horizontal)
+      final maxAvailableW = resolvedExplicitW != null
+          ? math.max(0.0, resolvedExplicitW - effectiveInsets.horizontal)
           : (constraints.hasBoundedWidth
               ? math.max(0.0, constraints.maxWidth - effectiveInsets.horizontal)
               : double.infinity);
 
-      final maxAvailableH = h != null
-          ? math.max(0.0, h - effectiveInsets.vertical)
+      final maxAvailableH = resolvedExplicitH != null
+          ? math.max(0.0, resolvedExplicitH - effectiveInsets.vertical)
           : (constraints.hasBoundedHeight
               ? math.max(0.0, constraints.maxHeight - effectiveInsets.vertical)
               : double.infinity);
@@ -548,11 +576,11 @@ class RenderMaterial4 extends RenderBox
       final childSize = child!.getDryLayout(childConstraints);
 
       final safeReferenceSize = Size(
-        w ??
+        resolvedExplicitW ??
             (constraints.hasBoundedWidth
                 ? constraints.maxWidth
                 : math.max(100.0, childSize.width)),
-        h ??
+        resolvedExplicitH ??
             (constraints.hasBoundedHeight
                 ? constraints.maxHeight
                 : math.max(100.0, childSize.height)),
@@ -560,8 +588,8 @@ class RenderMaterial4 extends RenderBox
       final resolvedInsets = _computeEffectiveInsets(safeReferenceSize);
 
       double desiredW;
-      if (w != null) {
-        desiredW = w;
+      if (resolvedExplicitW != null) {
+        desiredW = resolvedExplicitW;
       } else if (constraints.hasTightWidth) {
         desiredW = constraints.maxWidth;
       } else {
@@ -569,8 +597,8 @@ class RenderMaterial4 extends RenderBox
       }
 
       double desiredH;
-      if (h != null) {
-        desiredH = h;
+      if (resolvedExplicitH != null) {
+        desiredH = resolvedExplicitH;
       } else if (constraints.hasTightHeight) {
         desiredH = constraints.maxHeight;
       } else {
@@ -579,9 +607,9 @@ class RenderMaterial4 extends RenderBox
 
       final targetRatio = _config.resolvedTransform.targetAspectRatio;
       if (targetRatio != null && targetRatio > 0) {
-        if (w != null && h == null) {
+        if (resolvedExplicitW != null && resolvedExplicitH == null) {
           desiredH = desiredW / targetRatio;
-        } else if (h != null && w == null) {
+        } else if (resolvedExplicitH != null && resolvedExplicitW == null) {
           desiredW = desiredH * targetRatio;
         }
       }
@@ -589,13 +617,13 @@ class RenderMaterial4 extends RenderBox
       final clampedSize = constraints.constrain(Size(desiredW, desiredH));
       return _config.constraints.clampSize(clampedSize);
     } else {
-      double desiredW = w ?? constraints.minWidth;
-      double desiredH = h ?? constraints.minHeight;
+      double desiredW = resolvedExplicitW ?? constraints.minWidth;
+      double desiredH = resolvedExplicitH ?? constraints.minHeight;
       final targetRatio = _config.resolvedTransform.targetAspectRatio;
       if (targetRatio != null && targetRatio > 0) {
-        if (w != null && h == null) {
+        if (resolvedExplicitW != null && resolvedExplicitH == null) {
           desiredH = desiredW / targetRatio;
-        } else if (h != null && w == null) {
+        } else if (resolvedExplicitH != null && resolvedExplicitW == null) {
           desiredW = desiredH * targetRatio;
         }
       }

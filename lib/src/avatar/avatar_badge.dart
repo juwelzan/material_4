@@ -319,4 +319,3 @@ class Material4AvatarBadge {
         size,
       );
 }
-

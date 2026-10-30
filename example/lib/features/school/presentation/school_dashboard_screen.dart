@@ -4,6 +4,7 @@ import 'package:material_4/material_4.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../app_bar/app_bar_showcase_screen.dart';
 import '../../avatar/avatar_showcase_screen.dart';
 import '../../creative_gallery/creative_showcase_screen.dart';
 import '../../showcase/material_4_showcase_screen.dart';
@@ -106,6 +107,8 @@ class _SchoolDashboardScreenState extends State<SchoolDashboardScreen> {
                   _buildInteractiveShapePlaygroundButton(),
                   const SizedBox(height: 16),
                   _buildCreativeShowcaseButton(),
+                  const SizedBox(height: 16),
+                  _buildAppBarShowcaseButton(),
                 ],
               ),
             ),
@@ -1295,6 +1298,90 @@ class _SchoolDashboardScreenState extends State<SchoolDashboardScreen> {
                       ),
                       Text(
                         'Torn paper, notebook rulings, sculpted cards & neumorphism',
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w500,
+                          color: const Color(0xFF7A7A85),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Icon(
+                  Icons.arrow_forward_ios_rounded,
+                  size: 14,
+                  color: Color(0xFF7A7A85),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAppBarShowcaseButton() {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: const Color(0xFFF0EDFF),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: const Color(0x335E43EE), width: 1.2),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0C000000),
+            blurRadius: 10,
+            offset: Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(20),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const AppBarShowcaseScreen(),
+              ),
+            );
+          },
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF5E43EE),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(
+                    Icons.view_agenda_rounded,
+                    color: Colors.white,
+                    size: 20,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Adaptive AppBar Studio',
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                          color: const Color(0xFF1E1E24),
+                        ),
+                      ),
+                      Text(
+                        'Reverse-scroll floating compact header, drawer, profile & shapes',
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
                         style: GoogleFonts.plusJakartaSans(

@@ -518,4 +518,83 @@ class ShapeNotch {
         isNormalizedPlacement,
         id,
       );
+
+  /// Linearly interpolates between two [ShapeNotch] instances.
+  static ShapeNotch lerp(ShapeNotch? a, ShapeNotch? b, double t) {
+    if (a == null && b == null) {
+      return const ShapeNotch();
+    }
+    if (a == null) return b!;
+    if (b == null) return a;
+    if (identical(a, b)) return a;
+
+    double lerpD(double v1, double v2, [double? factor]) {
+      final f = factor ?? t;
+      return v1 + (v2 - v1) * f;
+    }
+
+    final edge = t < 0.5 ? a.edge : b.edge;
+    final width = lerpD(a.width, b.width).clamp(0.0, double.infinity);
+    final posFactor = lerpD(a.positionFactor, b.positionFactor);
+    final cornerRadius =
+        lerpD(a.cornerRadius, b.cornerRadius).clamp(0.0, double.infinity);
+    final offset = lerpD(a.offset, b.offset);
+
+    final double depth;
+    final bool currentInward;
+
+    if (a.isInward == b.isInward) {
+      depth = lerpD(a.depth, b.depth).clamp(0.0, double.infinity);
+      currentInward = a.isInward;
+    } else {
+      currentInward = t < 0.5 ? a.isInward : b.isInward;
+      if (t < 0.5) {
+        depth = lerpD(a.depth, 0.0, t * 2.0).clamp(0.0, double.infinity);
+      } else {
+        depth =
+            lerpD(0.0, b.depth, (t - 0.5) * 2.0).clamp(0.0, double.infinity);
+      }
+    }
+
+    return ShapeNotch(
+      edge: edge,
+      positionFactor: posFactor,
+      width: width,
+      depth: depth,
+      cornerRadius: cornerRadius,
+      offset: offset,
+      isInward: currentInward,
+      id: t < 0.5 ? a.id : b.id,
+    );
+  }
+
+  /// Linearly interpolates between two lists of notches.
+  static List<ShapeNotch> lerpList(
+    List<ShapeNotch>? a,
+    List<ShapeNotch>? b,
+    double t,
+  ) {
+    final listA = a ?? const [];
+    final listB = b ?? const [];
+    if (listA.isEmpty && listB.isEmpty) return const [];
+
+    final maxCount = math.max(listA.length, listB.length);
+    final result = <ShapeNotch>[];
+
+    for (int i = 0; i < maxCount; i++) {
+      if (i < listA.length && i < listB.length) {
+        result.add(lerp(listA[i], listB[i], t));
+      } else if (i < listA.length) {
+        final notchA = listA[i];
+        final zeroNotch = notchA.copyWith(depth: 0.0, width: 0.0);
+        result.add(lerp(notchA, zeroNotch, t));
+      } else {
+        final notchB = listB[i];
+        final zeroNotch = notchB.copyWith(depth: 0.0, width: 0.0);
+        result.add(lerp(zeroNotch, notchB, t));
+      }
+    }
+
+    return result;
+  }
 }

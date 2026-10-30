@@ -47,57 +47,53 @@ class AnimatedDynamicShapeContainer extends ImplicitlyAnimatedWidget {
 
 class _AnimatedDynamicShapeContainerState
     extends AnimatedWidgetBaseState<AnimatedDynamicShapeContainer> {
-  Tween<double>? _cornerRadiusTween;
-  Tween<double>? _tabWidthTween;
-  Tween<double>? _tabHeightTween;
+  DynamicShapeConfigTween? _configTween;
+  Tween<double>? _widthTween;
+  Tween<double>? _heightTween;
+  EdgeInsetsGeometryTween? _paddingTween;
+  EdgeInsetsGeometryTween? _marginTween;
   Tween<double>? _borderWidthTween;
-  Tween<double>? _rotationTween;
-  Tween<double>? _scaleXTween;
-  Tween<double>? _scaleYTween;
   ColorTween? _colorTween;
   ColorTween? _borderColorTween;
 
   @override
   void forEachTween(TweenVisitor<dynamic> visitor) {
-    _cornerRadiusTween = visitor(
-      _cornerRadiusTween,
-      widget.config.cornerRadius,
-      (dynamic value) => Tween<double>(begin: value as double),
+    _configTween = visitor(
+      _configTween,
+      widget.config,
+      (dynamic value) =>
+          DynamicShapeConfigTween(begin: value as DynamicShapeConfig),
+    ) as DynamicShapeConfigTween?;
+
+    _widthTween = visitor(
+      _widthTween,
+      widget.width,
+      (dynamic value) => Tween<double>(begin: value as double?),
     ) as Tween<double>?;
 
-    _tabWidthTween = visitor(
-      _tabWidthTween,
-      widget.config.tabWidth,
-      (dynamic value) => Tween<double>(begin: value as double),
+    _heightTween = visitor(
+      _heightTween,
+      widget.height,
+      (dynamic value) => Tween<double>(begin: value as double?),
     ) as Tween<double>?;
 
-    _tabHeightTween = visitor(
-      _tabHeightTween,
-      widget.config.tabHeight,
-      (dynamic value) => Tween<double>(begin: value as double),
-    ) as Tween<double>?;
+    _paddingTween = visitor(
+      _paddingTween,
+      widget.padding,
+      (dynamic value) =>
+          EdgeInsetsGeometryTween(begin: value as EdgeInsetsGeometry?),
+    ) as EdgeInsetsGeometryTween?;
+
+    _marginTween = visitor(
+      _marginTween,
+      widget.margin,
+      (dynamic value) =>
+          EdgeInsetsGeometryTween(begin: value as EdgeInsetsGeometry?),
+    ) as EdgeInsetsGeometryTween?;
 
     _borderWidthTween = visitor(
       _borderWidthTween,
       widget.borderWidth,
-      (dynamic value) => Tween<double>(begin: value as double),
-    ) as Tween<double>?;
-
-    _rotationTween = visitor(
-      _rotationTween,
-      widget.config.rotation,
-      (dynamic value) => Tween<double>(begin: value as double),
-    ) as Tween<double>?;
-
-    _scaleXTween = visitor(
-      _scaleXTween,
-      widget.config.scaleX,
-      (dynamic value) => Tween<double>(begin: value as double),
-    ) as Tween<double>?;
-
-    _scaleYTween = visitor(
-      _scaleYTween,
-      widget.config.scaleY,
       (dynamic value) => Tween<double>(begin: value as double),
     ) as Tween<double>?;
 
@@ -116,23 +112,19 @@ class _AnimatedDynamicShapeContainerState
 
   @override
   Widget build(BuildContext context) {
-    final animatedConfig = widget.config.copyWith(
-      cornerRadius:
-          _cornerRadiusTween?.evaluate(animation) ?? widget.config.cornerRadius,
-      tabWidth: _tabWidthTween?.evaluate(animation) ?? widget.config.tabWidth,
-      tabHeight:
-          _tabHeightTween?.evaluate(animation) ?? widget.config.tabHeight,
-      rotation: _rotationTween?.evaluate(animation) ?? widget.config.rotation,
-      scaleX: _scaleXTween?.evaluate(animation) ?? widget.config.scaleX,
-      scaleY: _scaleYTween?.evaluate(animation) ?? widget.config.scaleY,
-    );
+    final bool disableAnimations =
+        MediaQuery.maybeOf(context)?.disableAnimations == true;
+
+    final animatedConfig = disableAnimations
+        ? widget.config
+        : (_configTween?.evaluate(animation) ?? widget.config);
 
     return DynamicShapeContainer(
       config: animatedConfig,
-      width: widget.width,
-      height: widget.height,
-      padding: widget.padding,
-      margin: widget.margin,
+      width: _widthTween?.evaluate(animation) ?? widget.width,
+      height: _heightTween?.evaluate(animation) ?? widget.height,
+      padding: _paddingTween?.evaluate(animation) ?? widget.padding,
+      margin: _marginTween?.evaluate(animation) ?? widget.margin,
       color: _colorTween?.evaluate(animation) ?? widget.color,
       gradient: widget.gradient,
       borderColor: _borderColorTween?.evaluate(animation) ?? widget.borderColor,
@@ -142,5 +134,18 @@ class _AnimatedDynamicShapeContainerState
       dockedBadge: widget.dockedBadge,
       child: widget.child,
     );
+  }
+}
+
+/// Specialized [Tween] for interpolating [DynamicShapeConfig] instances.
+class DynamicShapeConfigTween extends Tween<DynamicShapeConfig> {
+  DynamicShapeConfigTween({super.begin, super.end});
+
+  @override
+  DynamicShapeConfig lerp(double t) {
+    if (begin == null && end == null) return const DynamicShapeConfig();
+    if (begin == null) return end!;
+    if (end == null) return begin!;
+    return DynamicShapeConfig.lerp(begin!, end!, t);
   }
 }

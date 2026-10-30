@@ -1527,4 +1527,40 @@ class DynamicShapeConfig {
         waveLevel,
         particleCount,
       ]);
+
+  /// Linearly interpolates between two [DynamicShapeConfig] instances.
+  static DynamicShapeConfig lerp(
+    DynamicShapeConfig a,
+    DynamicShapeConfig b,
+    double t,
+  ) {
+    if (identical(a, b)) return a;
+    if (t <= 0.0) return a;
+    if (t >= 1.0) return b;
+
+    double lerpD(double v1, double v2) => v1 + (v2 - v1) * t;
+
+    final dominant = t < 0.5 ? a : b;
+
+    return dominant.copyWith(
+      cornerRadius: lerpD(a.cornerRadius, b.cornerRadius),
+      corners: ShapeCorners.lerp(a.resolvedCorners, b.resolvedCorners, t),
+      transform:
+          ShapeTransform.lerp(a.resolvedTransform, b.resolvedTransform, t),
+      notches: ShapeNotch.lerpList(a.notches, b.notches, t),
+      tabWidth: lerpD(a.tabWidth, b.tabWidth),
+      tabHeight: lerpD(a.tabHeight, b.tabHeight),
+      filletRadius: lerpD(a.filletRadius, b.filletRadius),
+      scallopRadius: lerpD(a.scallopRadius, b.scallopRadius),
+      waveAmplitude: lerpD(a.waveAmplitude, b.waveAmplitude),
+      waveCount: lerpD(a.waveCount, b.waveCount),
+      skewAngle: lerpD(a.skewAngle, b.skewAngle),
+      ribbonFoldDepth: lerpD(a.ribbonFoldDepth, b.ribbonFoldDepth),
+      borderProgress: lerpD(a.borderProgress, b.borderProgress),
+      dashPhase: lerpD(a.dashPhase, b.dashPhase),
+      neonPulseIntensity: lerpD(a.neonPulseIntensity, b.neonPulseIntensity),
+      stretchOffset:
+          Offset.lerp(a.stretchOffset, b.stretchOffset, t) ?? a.stretchOffset,
+    );
+  }
 }

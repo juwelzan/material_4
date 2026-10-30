@@ -275,4 +275,36 @@ class ShapeTransform {
         origin,
         targetAspectRatio,
       );
+
+  /// Linearly interpolates between two [ShapeTransform] specifications.
+  static ShapeTransform lerp(ShapeTransform? a, ShapeTransform? b, double t) {
+    if (a == null && b == null) return ShapeTransform.identity;
+    if (a == null) return b!;
+    if (b == null) return a;
+    if (identical(a, b)) return a;
+
+    double lerpD(double v1, double v2) => v1 + (v2 - v1) * t;
+
+    // Shortest angular arc interpolation
+    var diff = (b.rotation - a.rotation) % (2 * math.pi);
+    if (diff > math.pi) diff -= 2 * math.pi;
+    if (diff < -math.pi) diff += 2 * math.pi;
+    final rot = a.rotation + diff * t;
+
+    return ShapeTransform(
+      rotation: rot,
+      scaleX: lerpD(a.scaleX, b.scaleX),
+      scaleY: lerpD(a.scaleY, b.scaleY),
+      skewX: lerpD(a.skewX, b.skewX),
+      skewY: lerpD(a.skewY, b.skewY),
+      stretchOffset:
+          Offset.lerp(a.stretchOffset, b.stretchOffset, t) ?? Offset.zero,
+      origin: Alignment.lerp(a.origin, b.origin, t) ??
+          (t < 0.5 ? a.origin : b.origin),
+      targetAspectRatio:
+          a.targetAspectRatio != null && b.targetAspectRatio != null
+              ? lerpD(a.targetAspectRatio!, b.targetAspectRatio!)
+              : (t < 0.5 ? a.targetAspectRatio : b.targetAspectRatio),
+    );
+  }
 }

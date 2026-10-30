@@ -2,6 +2,9 @@ import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
 
+import 'animated_dynamic_shape.dart';
+import 'animation/shape_animation_config.dart';
+import 'animation/shape_animation_controller.dart';
 import 'dynamic_shape_config.dart';
 import 'dynamic_shape_path_builder.dart';
 import 'dynamic_shape_stack.dart';
@@ -139,9 +142,21 @@ class DynamicShapeContainer extends StatelessWidget {
   /// Accessibility semantic hint.
   final String? semanticHint;
 
+  /// Optional dynamic shape type preset overriding [config.type].
+  final DynamicShapeType? shape;
+
+  /// Optional animation configuration for automatic shape morphing.
+  final ShapeAnimationConfig? animation;
+
+  /// Optional shape animation controller for programmatic motion orchestration.
+  final ShapeAnimationController? controller;
+
   const DynamicShapeContainer({
     super.key,
     this.config = const DynamicShapeConfig(),
+    this.shape,
+    this.animation,
+    this.controller,
     this.child,
     this.children,
     this.width,
@@ -178,6 +193,9 @@ class DynamicShapeContainer extends StatelessWidget {
   DynamicShapeContainer.withMode({
     super.key,
     this.config = const DynamicShapeConfig(),
+    this.shape,
+    this.animation,
+    this.controller,
     this.child,
     this.children,
     required ShapeContentMode mode,
@@ -1646,6 +1664,46 @@ class DynamicShapeContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final effectiveConfig =
+        shape != null ? config.copyWith(type: shape) : config;
+
+    if (animation != null) {
+      return AnimatedDynamicShapeContainer(
+        key: key,
+        duration: animation!.duration,
+        curve: animation!.curve,
+        config: effectiveConfig,
+        width: width,
+        height: height,
+        padding: padding,
+        margin: margin,
+        color: color,
+        gradient: gradient,
+        borderColor: borderColor,
+        borderWidth: borderWidth,
+        shadows: shadows,
+        onTap: onTap,
+        dockedBadge: dockedBadge,
+        child: child,
+      );
+    }
+
+    if (controller != null) {
+      return AnimatedBuilder(
+        animation: controller!,
+        builder: (context, _) {
+          return _buildRenderTree(context, controller!.currentConfig);
+        },
+      );
+    }
+
+    return _buildRenderTree(context, effectiveConfig);
+  }
+
+  Widget _buildRenderTree(
+    BuildContext context,
+    DynamicShapeConfig activeConfig,
+  ) {
     final hasMultiChild = children != null && children!.isNotEmpty;
     Widget rendered;
 
@@ -1661,7 +1719,7 @@ class DynamicShapeContainer extends StatelessWidget {
         );
       }
       rendered = DynamicShapeMultiChildRenderWidget(
-        config: config,
+        config: activeConfig,
         color: color,
         gradient: gradient,
         borderColor: borderColor,
@@ -1670,8 +1728,8 @@ class DynamicShapeContainer extends StatelessWidget {
         clipBehavior: clipBehavior,
         contentProtection: contentProtection,
         hitTestBehavior: hitTestBehavior,
-        interaction: interaction ?? config.interaction,
-        clipConfig: clipConfig ?? config.clipConfig,
+        interaction: interaction ?? activeConfig.interaction,
+        clipConfig: clipConfig ?? activeConfig.clipConfig,
         onTap: onTap,
         onLongPress: onLongPress,
         onDoubleTap: onDoubleTap,
@@ -1705,7 +1763,7 @@ class DynamicShapeContainer extends StatelessWidget {
       }
 
       rendered = DynamicShapeRenderWidget(
-        config: config,
+        config: activeConfig,
         color: color,
         gradient: gradient,
         borderColor: borderColor,
@@ -1714,8 +1772,8 @@ class DynamicShapeContainer extends StatelessWidget {
         clipBehavior: clipBehavior,
         contentProtection: contentProtection,
         hitTestBehavior: hitTestBehavior,
-        interaction: interaction ?? config.interaction,
-        clipConfig: clipConfig ?? config.clipConfig,
+        interaction: interaction ?? activeConfig.interaction,
+        clipConfig: clipConfig ?? activeConfig.clipConfig,
         onTap: onTap,
         onLongPress: onLongPress,
         onDoubleTap: onDoubleTap,
@@ -1729,14 +1787,14 @@ class DynamicShapeContainer extends StatelessWidget {
       );
     }
 
-    if (config.isGlassmorphic) {
+    if (activeConfig.isGlassmorphic) {
       rendered = ClipPath(
-        clipper: DynamicShapeClipper(config: config),
+        clipper: DynamicShapeClipper(config: activeConfig),
         clipBehavior: clipBehavior,
         child: BackdropFilter(
           filter: ImageFilter.blur(
-            sigmaX: config.glassBlur,
-            sigmaY: config.glassBlur,
+            sigmaX: activeConfig.glassBlur,
+            sigmaY: activeConfig.glassBlur,
           ),
           child: rendered,
         ),

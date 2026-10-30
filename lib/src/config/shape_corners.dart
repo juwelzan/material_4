@@ -265,6 +265,30 @@ class ShapeCorners {
   @override
   String toString() =>
       'ShapeCorners(tl: $topLeft, tr: $topRight, bl: $bottomLeft, br: $bottomRight)';
+
+  /// Linearly interpolates between two [ShapeCorners] specifications.
+  static ShapeCorners lerp(ShapeCorners? a, ShapeCorners? b, double t) {
+    if (a == null && b == null) return ShapeCorners.zero;
+    if (a == null) return b!;
+    if (b == null) return a;
+    if (identical(a, b)) return a;
+
+    Radius lerpRad(Radius r1, Radius r2) {
+      final x = r1.x + (r2.x - r1.x) * t;
+      final y = r1.y + (r2.y - r1.y) * t;
+      return Radius.elliptical(
+        x.clamp(0.0, double.infinity),
+        y.clamp(0.0, double.infinity),
+      );
+    }
+
+    return ShapeCorners(
+      topLeft: lerpRad(a.topLeft, b.topLeft),
+      topRight: lerpRad(a.topRight, b.topRight),
+      bottomRight: lerpRad(a.bottomRight, b.bottomRight),
+      bottomLeft: lerpRad(a.bottomLeft, b.bottomLeft),
+    );
+  }
 }
 
 /// Legacy independent corner radii specification for four distinct corners.

@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/physics.dart';
 
 import 'dynamic_shape_config.dart';
+
+export 'animation/shape_morph_transition.dart';
 import 'dynamic_shape_container.dart';
 import 'dynamic_shape_path_builder.dart';
 import 'layout/shape_content_protection.dart';

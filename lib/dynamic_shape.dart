@@ -10,6 +10,7 @@ library;
 
 export 'src/adaptive_shape_card.dart';
 export 'src/animated_dynamic_shape.dart';
+export 'src/animation/animation.dart';
 export 'src/config/config.dart';
 export 'src/dynamic_shape_config.dart';
 export 'src/dynamic_shape_container.dart';

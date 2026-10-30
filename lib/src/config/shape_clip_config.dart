@@ -109,4 +109,3 @@ class ShapeClipConfig {
       'clipForeground: $clipForeground, '
       'clipOverflow: $clipOverflow)';
 }
-

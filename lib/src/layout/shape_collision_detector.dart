@@ -249,6 +249,9 @@ class ShapeCollisionDetector {
     );
   }
 
+  /// Verifies whether two rectangular child bounds overlap.
+  static bool hasOverlap(Rect a, Rect b) => a.overlaps(b);
+
   /// Attempts to resolve child overlapping according to [policy].
   ///
   /// In [ShapeCollisionPolicy.reposition] mode, shifts [candidateRect] downward

@@ -273,6 +273,9 @@ class RenderMultiChildDynamicShape extends RenderBox
   List<ShapeLayoutDiagnostic> get layoutDiagnostics =>
       List.unmodifiable(_layoutDiagnostics);
 
+  /// Convenient alias for [layoutDiagnostics].
+  List<ShapeLayoutDiagnostic> get diagnostics => layoutDiagnostics;
+
   TapGestureRecognizer? _tapRecognizer;
 
   @override
@@ -437,6 +440,32 @@ class RenderMultiChildDynamicShape extends RenderBox
 
     final clampedSize = constraints.constrain(Size(desiredW, desiredH));
     size = _config.constraints.clampSize(clampedSize);
+
+    // Final validation pass for strict mode diagnostics
+    if (_contentProtection.mode == ContentProtectionMode.strict) {
+      int idx = 0;
+      RenderBox? child = firstChild;
+      while (child != null) {
+        final childParentData =
+            child.parentData! as DynamicShapeMultiChildParentData;
+        final childRect = childParentData.offset & child.size;
+        if (!effectiveSafeBounds.contains(childRect.topLeft) ||
+            !effectiveSafeBounds.contains(childRect.bottomRight)) {
+          _layoutDiagnostics.add(
+            ShapeLayoutDiagnostic(
+              childIndex: idx,
+              message:
+                  'Child #$idx exceeds safe shape region ($effectiveSafeBounds). Content may clip.',
+              severity: ShapeDiagnosticSeverity.error,
+              candidateRect: childRect,
+              safeRegion: effectiveSafeBounds,
+            ),
+          );
+        }
+        idx++;
+        child = childParentData.nextSibling;
+      }
+    }
   }
 
   void _layoutStack({
@@ -515,24 +544,6 @@ class RenderMultiChildDynamicShape extends RenderBox
             safeRegion: safeBounds,
           ),
         );
-      }
-
-      // Strict mode boundary compliance
-      if (_contentProtection.mode == ContentProtectionMode.strict &&
-          !childParentData.allowOverflow) {
-        if (!safeBounds.contains(childRect.topLeft) ||
-            !safeBounds.contains(childRect.bottomRight)) {
-          _layoutDiagnostics.add(
-            ShapeLayoutDiagnostic(
-              childIndex: index,
-              message:
-                  'Child exceeds safe shape region ($safeBounds). Content may clip.',
-              severity: ShapeDiagnosticSeverity.error,
-              candidateRect: childRect,
-              safeRegion: safeBounds,
-            ),
-          );
-        }
       }
 
       childParentData.offset = childRect.topLeft;
@@ -858,8 +869,8 @@ class RenderMultiChildDynamicShape extends RenderBox
     while (child != null) {
       final childParentData =
           child.parentData! as DynamicShapeMultiChildParentData;
-      final childH = child.getMinIntrinsicHeight(width) +
-          childParentData.margin.vertical;
+      final childH =
+          child.getMinIntrinsicHeight(width) + childParentData.margin.vertical;
       if (_layoutStrategy == ShapeLayoutStrategy.flowVertical) {
         height += childH + _spacing;
       } else {
@@ -879,8 +890,8 @@ class RenderMultiChildDynamicShape extends RenderBox
     while (child != null) {
       final childParentData =
           child.parentData! as DynamicShapeMultiChildParentData;
-      final childH = child.getMaxIntrinsicHeight(width) +
-          childParentData.margin.vertical;
+      final childH =
+          child.getMaxIntrinsicHeight(width) + childParentData.margin.vertical;
       if (_layoutStrategy == ShapeLayoutStrategy.flowVertical) {
         height += childH + _spacing;
       } else {
@@ -964,9 +975,8 @@ class RenderMultiChildDynamicShape extends RenderBox
         _shadows!.isNotEmpty) {
       for (final shadow in _shadows!) {
         final shadowInflation = shadow.blurRadius * 2.0 + shadow.spreadRadius;
-        final shadowBounds = (Offset.zero & size)
-            .shift(shadow.offset)
-            .inflate(shadowInflation);
+        final shadowBounds =
+            (Offset.zero & size).shift(shadow.offset).inflate(shadowInflation);
         bounds = bounds.expandToInclude(shadowBounds);
       }
     }
@@ -1093,22 +1103,19 @@ class RenderMultiChildDynamicShape extends RenderBox
       child = childParentData.nextSibling;
     }
 
-    bool hasCustomZ = children.any((c) =>
-        (c.parentData! as DynamicShapeMultiChildParentData).zIndex != 0);
+    bool hasCustomZ = children.any(
+        (c) => (c.parentData! as DynamicShapeMultiChildParentData).zIndex != 0);
 
     if (hasCustomZ) {
       children.sort((a, b) {
-        final zA =
-            (a.parentData! as DynamicShapeMultiChildParentData).zIndex;
-        final zB =
-            (b.parentData! as DynamicShapeMultiChildParentData).zIndex;
+        final zA = (a.parentData! as DynamicShapeMultiChildParentData).zIndex;
+        final zB = (b.parentData! as DynamicShapeMultiChildParentData).zIndex;
         return zA.compareTo(zB);
       });
     }
 
     for (final c in children) {
-      final childParentData =
-          c.parentData! as DynamicShapeMultiChildParentData;
+      final childParentData = c.parentData! as DynamicShapeMultiChildParentData;
       context.paintChild(c, offset + childParentData.offset);
     }
   }

@@ -717,6 +717,9 @@ class ShapeSafeRegionSet {
   /// Effective safe directional insets for the container.
   final EdgeInsets insets;
 
+  /// Whether the shape geometry produces multiple partitioned safe regions.
+  bool get isMultiRegion => regions.length > 1;
+
   const ShapeSafeRegionSet({
     required this.primary,
     required this.regions,

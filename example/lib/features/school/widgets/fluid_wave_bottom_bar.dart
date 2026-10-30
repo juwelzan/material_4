@@ -107,42 +107,46 @@ class _FluidWaveBottomBarState extends State<FluidWaveBottomBar>
               bottom: bottomPadding > 0 ? bottomPadding : 12,
             ),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: List.generate(_items.length, (index) {
                 final isSelected = widget.selectedIndex == index;
                 final item = _items[index];
-                return GestureDetector(
-                  onTap: () => widget.onItemSelected(index),
-                  behavior: HitTestBehavior.opaque,
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 250),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 14,
-                      vertical: 6,
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          item.icon,
-                          size: 22,
-                          color: isSelected
-                              ? const Color(0xFF5E43EE)
-                              : const Color(0xFF9E9EA7),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          item.label,
-                          style: GoogleFonts.plusJakartaSans(
-                            fontSize: 11,
-                            fontWeight:
-                                isSelected ? FontWeight.w700 : FontWeight.w500,
+                return Expanded(
+                  child: GestureDetector(
+                    onTap: () => widget.onItemSelected(index),
+                    behavior: HitTestBehavior.opaque,
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 250),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 4,
+                        vertical: 6,
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            item.icon,
+                            size: 22,
                             color: isSelected
-                                ? const Color(0xFF222222)
+                                ? const Color(0xFF5E43EE)
                                 : const Color(0xFF9E9EA7),
                           ),
-                        ),
-                      ],
+                          const SizedBox(height: 4),
+                          Text(
+                            item.label,
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 11,
+                              fontWeight: isSelected
+                                  ? FontWeight.w700
+                                  : FontWeight.w500,
+                              color: isSelected
+                                  ? const Color(0xFF222222)
+                                  : const Color(0xFF9E9EA7),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 );

@@ -214,9 +214,12 @@ class ShapeSafeRegion {
         break;
 
       case DynamicShapeType.hexagonSoft:
-        final hexAllowance = size.width * 0.12 + strokeOffset;
-        left = math.max(left, hexAllowance);
-        right = math.max(right, hexAllowance);
+        final hexCorner =
+            math.min(config.cornerRadius, 14.0) * 0.45 + strokeOffset;
+        left = math.max(left, hexCorner);
+        right = math.max(right, hexCorner);
+        top = math.max(top, size.height * 0.08 + strokeOffset);
+        bottom = math.max(bottom, size.height * 0.08 + strokeOffset);
         break;
 
       case DynamicShapeType.chamferDiagonal:

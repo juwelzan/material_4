@@ -351,12 +351,16 @@ class _SchoolDashboardScreenState extends State<SchoolDashboardScreen> {
                       color: Color(0xDDFFFFFF),
                     ),
                     const SizedBox(width: 4),
-                    Text(
-                      '10:30 AM - 11:15 AM',
-                      style: GoogleFonts.plusJakartaSans(
-                        color: Colors.white.withValues(alpha: 0.90),
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
+                    Flexible(
+                      child: Text(
+                        '10:30 AM - 11:15 AM',
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                        style: GoogleFonts.plusJakartaSans(
+                          color: Colors.white.withValues(alpha: 0.90),
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ],
@@ -704,12 +708,16 @@ class _SchoolDashboardScreenState extends State<SchoolDashboardScreen> {
               children: [
                 Row(
                   children: [
-                    Text(
-                      titles[_morphStep],
-                      style: GoogleFonts.plusJakartaSans(
-                        fontSize: 13.5,
-                        fontWeight: FontWeight.w800,
-                        color: const Color(0xFF1E1E24),
+                    Flexible(
+                      child: Text(
+                        titles[_morphStep],
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 13.5,
+                          fontWeight: FontWeight.w800,
+                          color: const Color(0xFF1E1E24),
+                        ),
                       ),
                     ),
                     const SizedBox(width: 6),
@@ -736,6 +744,8 @@ class _SchoolDashboardScreenState extends State<SchoolDashboardScreen> {
                 const SizedBox(height: 2),
                 Text(
                   'Smooth implicit path interpolation with zero lag',
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
                   style: GoogleFonts.plusJakartaSans(
                     fontSize: 11,
                     fontWeight: FontWeight.w500,
@@ -812,6 +822,8 @@ class _SchoolDashboardScreenState extends State<SchoolDashboardScreen> {
                     children: [
                       Text(
                         'Grade 11 Science Exhibition',
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
                         style: GoogleFonts.plusJakartaSans(
                           fontSize: 13.5,
                           fontWeight: FontWeight.w700,
@@ -820,6 +832,8 @@ class _SchoolDashboardScreenState extends State<SchoolDashboardScreen> {
                       ),
                       Text(
                         '1st Place Project • 2 Days Remaining',
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
                         style: GoogleFonts.plusJakartaSans(
                           fontSize: 11,
                           fontWeight: FontWeight.w500,
@@ -867,6 +881,8 @@ class _SchoolDashboardScreenState extends State<SchoolDashboardScreen> {
               children: [
                 Text(
                   'Final Term Hall Pass #9281',
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
                   style: GoogleFonts.plusJakartaSans(
                     fontSize: 13.5,
                     fontWeight: FontWeight.w700,
@@ -875,6 +891,8 @@ class _SchoolDashboardScreenState extends State<SchoolDashboardScreen> {
                 ),
                 Text(
                   'Verified • Ready to Print',
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
                   style: GoogleFonts.plusJakartaSans(
                     fontSize: 11,
                     fontWeight: FontWeight.w500,
@@ -932,6 +950,8 @@ class _SchoolDashboardScreenState extends State<SchoolDashboardScreen> {
               children: [
                 Text(
                   'Digital Library Pass',
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
                   style: GoogleFonts.plusJakartaSans(
                     fontSize: 13.5,
                     fontWeight: FontWeight.w800,
@@ -940,6 +960,8 @@ class _SchoolDashboardScreenState extends State<SchoolDashboardScreen> {
                 ),
                 Text(
                   'Guilloche Security Watermark • 4 Books Checked Out',
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
                   style: GoogleFonts.plusJakartaSans(
                     fontSize: 11,
                     fontWeight: FontWeight.w500,
@@ -999,6 +1021,8 @@ class _SchoolDashboardScreenState extends State<SchoolDashboardScreen> {
                     children: [
                       Text(
                         'Dynamic Shape & Texture Studio',
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
                         style: GoogleFonts.plusJakartaSans(
                           fontSize: 13,
                           fontWeight: FontWeight.w700,
@@ -1007,6 +1031,8 @@ class _SchoolDashboardScreenState extends State<SchoolDashboardScreen> {
                       ),
                       Text(
                         '13 shapes, 7 borders, 5 patterns, glass & inner shadows',
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
                         style: GoogleFonts.plusJakartaSans(
                           fontSize: 11,
                           fontWeight: FontWeight.w500,
@@ -1460,12 +1486,14 @@ class _ShapePlaygroundModalState extends State<_ShapePlaygroundModal> {
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                    Slider(
-                      value: _cornerRadius,
-                      min: 10,
-                      max: 40,
-                      activeColor: const Color(0xFF5E43EE),
-                      onChanged: (val) => setState(() => _cornerRadius = val),
+                    Expanded(
+                      child: Slider(
+                        value: _cornerRadius,
+                        min: 10,
+                        max: 40,
+                        activeColor: const Color(0xFF5E43EE),
+                        onChanged: (val) => setState(() => _cornerRadius = val),
+                      ),
                     ),
                   ],
                 ),
@@ -1481,12 +1509,14 @@ class _ShapePlaygroundModalState extends State<_ShapePlaygroundModal> {
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                    Slider(
-                      value: _tabWidth,
-                      min: 30,
-                      max: 140,
-                      activeColor: const Color(0xFF5E43EE),
-                      onChanged: (val) => setState(() => _tabWidth = val),
+                    Expanded(
+                      child: Slider(
+                        value: _tabWidth,
+                        min: 30,
+                        max: 140,
+                        activeColor: const Color(0xFF5E43EE),
+                        onChanged: (val) => setState(() => _tabWidth = val),
+                      ),
                     ),
                   ],
                 ),
@@ -1502,12 +1532,14 @@ class _ShapePlaygroundModalState extends State<_ShapePlaygroundModal> {
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                    Slider(
-                      value: _tabHeight,
-                      min: 10,
-                      max: 60,
-                      activeColor: const Color(0xFF5E43EE),
-                      onChanged: (val) => setState(() => _tabHeight = val),
+                    Expanded(
+                      child: Slider(
+                        value: _tabHeight,
+                        min: 10,
+                        max: 60,
+                        activeColor: const Color(0xFF5E43EE),
+                        onChanged: (val) => setState(() => _tabHeight = val),
+                      ),
                     ),
                   ],
                 ),
@@ -1524,12 +1556,14 @@ class _ShapePlaygroundModalState extends State<_ShapePlaygroundModal> {
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                      Slider(
-                        value: _dashLength,
-                        min: 3,
-                        max: 20,
-                        activeColor: const Color(0xFF5E43EE),
-                        onChanged: (val) => setState(() => _dashLength = val),
+                      Expanded(
+                        child: Slider(
+                          value: _dashLength,
+                          min: 3,
+                          max: 20,
+                          activeColor: const Color(0xFF5E43EE),
+                          onChanged: (val) => setState(() => _dashLength = val),
+                        ),
                       ),
                     ],
                   ),
@@ -1543,12 +1577,14 @@ class _ShapePlaygroundModalState extends State<_ShapePlaygroundModal> {
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                      Slider(
-                        value: _dashGap,
-                        min: 2,
-                        max: 12,
-                        activeColor: const Color(0xFF5E43EE),
-                        onChanged: (val) => setState(() => _dashGap = val),
+                      Expanded(
+                        child: Slider(
+                          value: _dashGap,
+                          min: 2,
+                          max: 12,
+                          activeColor: const Color(0xFF5E43EE),
+                          onChanged: (val) => setState(() => _dashGap = val),
+                        ),
                       ),
                     ],
                   ),

@@ -121,3 +121,4 @@ class Material4ProgressTrack {
     );
   }
 }
+

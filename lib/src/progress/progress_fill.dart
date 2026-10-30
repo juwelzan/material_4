@@ -209,3 +209,4 @@ class Material4ProgressFill {
     );
   }
 }
+

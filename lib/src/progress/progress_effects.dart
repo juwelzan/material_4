@@ -169,3 +169,4 @@ class Material4ProgressEffects {
     );
   }
 }
+

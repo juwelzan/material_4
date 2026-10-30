@@ -142,3 +142,4 @@ class Material4ProgressAnimation {
     );
   }
 }
+

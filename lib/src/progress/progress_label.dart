@@ -190,3 +190,4 @@ class Material4ProgressLabel {
     );
   }
 }
+

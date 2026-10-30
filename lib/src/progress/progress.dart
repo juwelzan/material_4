@@ -10,3 +10,4 @@ export 'progress_presets.dart';
 export 'progress_shape.dart';
 export 'progress_style.dart';
 export 'progress_track.dart';
+

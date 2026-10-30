@@ -764,3 +764,4 @@ class Material4ProgressPainter extends CustomPainter {
         oldDelegate.trackFallbackColor != trackFallbackColor;
   }
 }
+

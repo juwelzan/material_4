@@ -263,58 +263,6 @@ class _AdaptiveShapeCardState extends State<AdaptiveShapeCard>
 
       case DynamicShapeType.customBezier:
         return const EdgeInsets.symmetric(horizontal: 16, vertical: 12);
-
-      case DynamicShapeType.asymmetricCard:
-        return const EdgeInsets.symmetric(horizontal: 18, vertical: 14);
-
-      case DynamicShapeType.capsule:
-        return const EdgeInsets.symmetric(horizontal: 24, vertical: 12);
-
-      case DynamicShapeType.waveEdge:
-        return anchor == ShapeAnchor.bottomCenter
-            ? const EdgeInsets.only(left: 16, right: 16, top: 12, bottom: 22)
-            : const EdgeInsets.only(left: 16, right: 16, top: 22, bottom: 12);
-
-      case DynamicShapeType.cloud:
-        return const EdgeInsets.only(left: 20, right: 20, top: 20, bottom: 16);
-
-      case DynamicShapeType.speechBubble:
-        return anchor == ShapeAnchor.bottomRight || anchor == ShapeAnchor.bottomLeft
-            ? const EdgeInsets.only(left: 16, right: 16, top: 12, bottom: 22)
-            : const EdgeInsets.only(left: 16, right: 16, top: 22, bottom: 12);
-
-      case DynamicShapeType.shield:
-        return const EdgeInsets.only(left: 18, right: 18, top: 14, bottom: 22);
-
-      case DynamicShapeType.diamond:
-        return const EdgeInsets.symmetric(horizontal: 24, vertical: 20);
-
-      case DynamicShapeType.octagon:
-        return const EdgeInsets.symmetric(horizontal: 20, vertical: 14);
-
-      case DynamicShapeType.waveCut:
-        return const EdgeInsets.only(left: 16, right: 24, top: 12, bottom: 20);
-
-      case DynamicShapeType.concaveRounded:
-        return const EdgeInsets.symmetric(horizontal: 22, vertical: 16);
-
-      case DynamicShapeType.convexRounded:
-        return const EdgeInsets.symmetric(horizontal: 20, vertical: 14);
-
-      case DynamicShapeType.squircle:
-        return const EdgeInsets.symmetric(horizontal: 18, vertical: 14);
-
-      case DynamicShapeType.parallelogram:
-        return const EdgeInsets.symmetric(horizontal: 26, vertical: 12);
-
-      case DynamicShapeType.ribbon:
-        return const EdgeInsets.symmetric(horizontal: 24, vertical: 12);
-
-      case DynamicShapeType.bookmark:
-        return const EdgeInsets.only(left: 16, right: 16, top: 14, bottom: 24);
-
-      case DynamicShapeType.customBezier:
-        return const EdgeInsets.symmetric(horizontal: 16, vertical: 12);
     }
   }
 

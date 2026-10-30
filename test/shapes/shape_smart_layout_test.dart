@@ -1,7 +1,6 @@
+import 'package:dynamic_shape/dynamic_shape.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:test_app/core/shapes/dynamic_shape_config.dart';
-import 'package:test_app/core/shapes/shape_smart_layout.dart';
 
 void main() {
   group('Phase 5: Smart Layout Engine Tests', () {

@@ -1,11 +1,8 @@
 import 'dart:ui';
 
+import 'package:dynamic_shape/dynamic_shape.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:test_app/core/shapes/dynamic_shape_config.dart';
-import 'package:test_app/core/shapes/dynamic_shape_container.dart';
-import 'package:test_app/core/shapes/dynamic_shape_path_builder.dart';
-import 'package:test_app/core/shapes/shape_border_painter.dart';
 
 void main() {
   group('Phase 2: Border Engine Comprehensive Tests', () {

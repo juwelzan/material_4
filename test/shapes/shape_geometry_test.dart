@@ -1,9 +1,6 @@
+import 'package:dynamic_shape/dynamic_shape.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:test_app/core/shapes/adaptive_shape_card.dart';
-import 'package:test_app/core/shapes/dynamic_shape_config.dart';
-import 'package:test_app/core/shapes/dynamic_shape_container.dart';
-import 'package:test_app/core/shapes/dynamic_shape_path_builder.dart';
 
 void main() {
   group('Phase 1: Shape Geometry Engine Tests', () {

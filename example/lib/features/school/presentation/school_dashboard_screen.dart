@@ -1,13 +1,9 @@
 import 'dart:async';
 
+import 'package:dynamic_shape/dynamic_shape.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../../../core/shapes/adaptive_shape_card.dart';
-import '../../../core/shapes/animated_dynamic_shape.dart';
-import '../../../core/shapes/dynamic_shape_config.dart';
-import '../../../core/shapes/dynamic_shape_container.dart';
-import '../../../core/shapes/shape_pattern.dart';
 import '../widgets/fluid_wave_bottom_bar.dart';
 import '../widgets/timeline_track_painter.dart';
 import '../widgets/wave_background_painter.dart';

@@ -1,8 +1,6 @@
+import 'package:dynamic_shape/dynamic_shape.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:test_app/core/shapes/dynamic_shape_config.dart';
-import 'package:test_app/core/shapes/school_shape_presets.dart';
-import 'package:test_app/core/shapes/shape_dev_tools.dart';
 
 void main() {
   group('Phase 8 & 9: Developer Tools & School Presets Tests', () {

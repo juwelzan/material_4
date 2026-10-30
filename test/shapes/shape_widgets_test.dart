@@ -1,7 +1,6 @@
+import 'package:dynamic_shape/dynamic_shape.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:test_app/core/shapes/dynamic_shape_config.dart';
-import 'package:test_app/core/shapes/shape_widgets.dart';
 
 void main() {
   group('Phase 6: Widget Library Comprehensive Tests', () {

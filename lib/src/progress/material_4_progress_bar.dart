@@ -12,11 +12,16 @@ import 'progress_interaction.dart';
 import 'progress_controller.dart';
 import 'progress_presets.dart';
 import 'progress_painter.dart';
+import 'wave_line/wave_line.dart';
+
+/// Convenient alias for [Material4ProgressBar] matching user naming preference.
+typedef Material4Progress = Material4ProgressBar;
 
 /// Material 4 — Universal Dynamic Progress Bar System.
 ///
 /// Provides a unified, ultra-flexible progress indicator supporting linear,
-/// circular, and creative styles (wave, liquid, segmented, neon, glass, sculpted).
+/// circular, creative styles (wave, liquid, segmented, neon, glass, sculpted),
+/// and advanced animated wave lines (zigzag, organic sine, DNA, ribbon, pulse).
 /// Features interruptible value animations, shape morphing, interactive seeking,
 /// and full accessibility semantics.
 class Material4ProgressBar extends StatefulWidget {
@@ -28,6 +33,9 @@ class Material4ProgressBar extends StatefulWidget {
 
   /// Visual presentation style preset.
   final Material4ProgressStyle style;
+
+  /// Advanced animated wave line configuration when [style.isWaveLine] is true.
+  final Material4WaveLineConfig? waveLine;
 
   /// Contour shape geometry of the progress container and fill.
   final Material4ProgressShape shape;
@@ -71,6 +79,7 @@ class Material4ProgressBar extends StatefulWidget {
     this.value,
     this.secondaryValue,
     this.style = Material4ProgressStyle.capsuleLinear,
+    this.waveLine,
     this.shape = const Material4ProgressShape.raw(
       id: 'capsule',
       pathBuilder: _defaultCapsulePath,
@@ -445,6 +454,108 @@ class Material4ProgressBar extends StatefulWidget {
     );
   }
 
+  /// Factory for an animated Zigzag Wave progress line.
+  factory Material4ProgressBar.zigzag({
+    Key? key,
+    double? value,
+    Material4ProgressStyle style = Material4ProgressStyle.smoothZigzagWave,
+    Material4WaveLineConfig waveLine = Material4WaveLineConfig.sharpZigzag,
+    double height = 28.0,
+    double? width,
+    Color color = const Color(0xFF6366F1),
+    Color? trackColor,
+    Material4ProgressLabel? label,
+    Material4ProgressController? controller,
+    String? semanticLabel,
+  }) {
+    return Material4ProgressBar(
+      key: key,
+      value: value,
+      style: style,
+      waveLine: waveLine.copyWith(
+        trackColor: trackColor ?? waveLine.trackColor,
+      ),
+      track: Material4ProgressTrack(
+        color: trackColor ?? color.withValues(alpha: 0.15),
+        thickness: height,
+      ),
+      fill: Material4ProgressFill(color: color),
+      label: label,
+      height: height,
+      width: width,
+      controller: controller,
+      semanticLabel: semanticLabel,
+    );
+  }
+
+  /// Factory for an animated Organic Harmonic Wave progress line.
+  factory Material4ProgressBar.waveLine({
+    Key? key,
+    double? value,
+    Material4ProgressStyle style = Material4ProgressStyle.smoothSineWave,
+    Material4WaveLineConfig waveLine = Material4WaveLineConfig.smoothSine,
+    double height = 28.0,
+    double? width,
+    Color color = const Color(0xFF00B0FF),
+    Color? trackColor,
+    Material4ProgressLabel? label,
+    Material4ProgressController? controller,
+    String? semanticLabel,
+  }) {
+    return Material4ProgressBar(
+      key: key,
+      value: value,
+      style: style,
+      waveLine: waveLine.copyWith(
+        trackColor: trackColor ?? waveLine.trackColor,
+      ),
+      track: Material4ProgressTrack(
+        color: trackColor ?? color.withValues(alpha: 0.15),
+        thickness: height,
+      ),
+      fill: Material4ProgressFill(color: color),
+      label: label,
+      height: height,
+      width: width,
+      controller: controller,
+      semanticLabel: semanticLabel,
+    );
+  }
+
+  /// Factory for a Creative Animated Line progress indicator (snake, ribbon, pulse, neon, DNA, etc.).
+  factory Material4ProgressBar.creativeLine({
+    Key? key,
+    double? value,
+    required Material4ProgressStyle style,
+    Material4WaveLineConfig waveLine = const Material4WaveLineConfig(),
+    double height = 32.0,
+    double? width,
+    Color color = const Color(0xFF8B5CF6),
+    Color? trackColor,
+    Material4ProgressLabel? label,
+    Material4ProgressController? controller,
+    String? semanticLabel,
+  }) {
+    return Material4ProgressBar(
+      key: key,
+      value: value,
+      style: style,
+      waveLine: waveLine.copyWith(
+        trackColor: trackColor ?? waveLine.trackColor,
+      ),
+      track: Material4ProgressTrack(
+        color: trackColor ?? color.withValues(alpha: 0.15),
+        thickness: height,
+      ),
+      fill: Material4ProgressFill(color: color),
+      label: label,
+      height: height,
+      width: width,
+      controller: controller,
+      semanticLabel: semanticLabel,
+    );
+  }
+
   @override
   State<Material4ProgressBar> createState() => _Material4ProgressBarState();
 }
@@ -474,6 +585,7 @@ class _Material4ProgressBarState extends State<Material4ProgressBar>
   bool _isDragging = false;
 
   bool get _needsContinuousPhase =>
+      widget.style.isWaveLine ||
       widget.effects.shimmer ||
       widget.effects.breathing ||
       widget.effects.pulse ||
@@ -520,11 +632,34 @@ class _Material4ProgressBarState extends State<Material4ProgressBar>
   }
 
   void _setupPhaseController() {
+    final isPaused = widget.waveLine?.paused ?? false;
+    final duration = widget.waveLine?.duration ?? const Duration(milliseconds: 2000);
+
     if (_needsContinuousPhase && _phaseController == null) {
       _phaseController = AnimationController(
         vsync: this,
-        duration: const Duration(milliseconds: 2000),
-      )..repeat();
+        duration: duration,
+      );
+      if (!isPaused && widget.animation.autoPlay) {
+        if (widget.waveLine?.pingPong == true) {
+          _phaseController?.repeat(reverse: true);
+        } else {
+          _phaseController?.repeat();
+        }
+      }
+    } else if (_needsContinuousPhase && _phaseController != null) {
+      if (_phaseController!.duration != duration) {
+        _phaseController!.duration = duration;
+      }
+      if (isPaused && _phaseController!.isAnimating) {
+        _phaseController?.stop();
+      } else if (!isPaused && !_phaseController!.isAnimating && widget.animation.autoPlay) {
+        if (widget.waveLine?.pingPong == true) {
+          _phaseController?.repeat(reverse: true);
+        } else {
+          _phaseController?.repeat();
+        }
+      }
     } else if (!_needsContinuousPhase && _phaseController != null) {
       _phaseController?.dispose();
       _phaseController = null;
@@ -774,17 +909,25 @@ class _Material4ProgressBarState extends State<Material4ProgressBar>
         if (_indeterminateController != null) _indeterminateController!,
       ]),
       builder: (context, _) {
+        final disableAnimations = widget.animation.reducedMotion ||
+            (MediaQuery.maybeOf(context)?.disableAnimations ?? false);
+        final animProgress =
+            disableAnimations ? 0.0 : (_phaseController?.value ?? 0.0);
+        final indetProgress =
+            disableAnimations ? 0.0 : (_indeterminateController?.value ?? 0.0);
+
         final painter = Material4ProgressPainter(
           value: effectiveValue,
           secondaryValue: widget.secondaryValue,
           style: widget.style,
+          waveLine: widget.waveLine,
           shape: _activeShape,
           track: widget.track,
           fill: widget.fill,
           effects: widget.effects,
           interaction: widget.interaction,
-          animationProgress: _phaseController?.value ?? 0.0,
-          indeterminateProgress: _indeterminateController?.value ?? 0.0,
+          animationProgress: animProgress,
+          indeterminateProgress: indetProgress,
           primaryColor: effectivePrimary,
           trackFallbackColor: effectiveTrack,
         );
@@ -795,13 +938,13 @@ class _Material4ProgressBarState extends State<Material4ProgressBar>
             widget.width ??
                 (widget.style.isCircular
                     ? 48.0
-                    : widget.style.isSegmented
-                        ? double.infinity
-                        : double.infinity),
+                    : double.infinity),
             widget.height ??
-                (widget.style.isCircular
-                    ? 48.0
-                    : widget.track.thickness ?? 8.0),
+                (widget.style.isWaveLine
+                    ? math.max(28.0, (widget.waveLine?.amplitude ?? 6.0) * 3.5)
+                    : widget.style.isCircular
+                        ? 48.0
+                        : widget.track.thickness ?? 8.0),
           ),
         );
 

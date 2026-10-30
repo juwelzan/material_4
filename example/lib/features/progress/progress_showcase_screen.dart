@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:material_4/material_4.dart';
+import 'wave_line_showcase_screen.dart';
 
 /// Complete showcase screen and gallery for the Material 4 Universal Dynamic Progress Bar System.
 ///
@@ -382,8 +383,8 @@ Material4ProgressBar(
             index: '05',
             title: 'Wave Progress Gallery',
             subtitle:
-                'Sinusoidal harmonic crest dynamically undulating along progress progression.',
-            tag: 'FLUID WAVE',
+                'Sinusoidal harmonic crests & 35 new advanced animated wave/zigzag styles.',
+            tag: 'FLUID WAVE & 35 STYLES',
             tagColor: const Color(0xFF06B6D4),
             preview: Column(
               children: [
@@ -396,31 +397,54 @@ Material4ProgressBar(
                     waveAmplitude: 4.0,
                   ),
                 ),
-                const SizedBox(height: 14),
+                const SizedBox(height: 12),
                 _buildDemoRow(
-                  'High-Frequency Wave',
-                  Material4ProgressBar(
-                    value: 0.50,
-                    style: Material4ProgressStyle.waveLinear,
-                    height: 22,
-                    fill: const Material4ProgressFill(
-                      color: Color(0xFF0284C7),
-                      waveAmplitude: 5.0,
-                      waveFrequency: 3.5,
-                    ),
-                    track: const Material4ProgressTrack(
-                      color: Color(0x1A0284C7),
-                      thickness: 22,
+                  'Sharp Zigzag Wave',
+                  Material4ProgressBar.zigzag(
+                    value: 0.70,
+                    style: Material4ProgressStyle.sharpZigzag,
+                    color: const Color(0xFF8B5CF6),
+                    height: 24,
+                    waveLine: const Material4WaveLineConfig(
+                      amplitude: 6.0,
+                      frequency: 4.0,
+                      thickness: 2.5,
                     ),
                   ),
                 ),
+                const SizedBox(height: 12),
+                OutlinedButton.icon(
+                  icon: const Icon(Icons.waves_rounded, size: 16),
+                  label: const Text('Launch Dedicated Wave Line Studio (35 Styles)'),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: const Color(0xFF06B6D4),
+                    side: const BorderSide(color: Color(0xFF06B6D4)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  ),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const WaveLineShowcaseScreen(),
+                      ),
+                    );
+                  },
+                ),
               ],
             ),
-            codeSnippet: '''Material4ProgressBar.wave(
-  value: 0.65,
-  height: 20,
+            codeSnippet: '''// Dedicated Wave Line Factory
+Material4ProgressBar.waveLine(
+  value: 0.60,
+  style: Material4ProgressStyle.smoothSineWave,
   color: const Color(0xFF06B6D4),
-  waveAmplitude: 4.0,
+  waveLine: const Material4WaveLineConfig(
+    amplitude: 6.0,
+    frequency: 3.0,
+    thickness: 3.0,
+  ),
 )''',
           ),
           const SizedBox(height: 16),

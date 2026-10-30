@@ -8,6 +8,7 @@ import '../../app_bar/app_bar_showcase_screen.dart';
 import '../../avatar/avatar_showcase_screen.dart';
 import '../../creative_gallery/creative_showcase_screen.dart';
 import '../../progress/progress_showcase_screen.dart';
+import '../../progress/wave_line_showcase_screen.dart';
 import '../../showcase/material_4_showcase_screen.dart';
 import '../widgets/fluid_wave_bottom_bar.dart';
 import '../widgets/timeline_track_painter.dart';
@@ -106,6 +107,8 @@ class _SchoolDashboardScreenState extends State<SchoolDashboardScreen> {
                   _buildAvatarShowcaseLauncherButton(),
                   const SizedBox(height: 16),
                   _buildProgressShowcaseLauncherButton(),
+                  const SizedBox(height: 16),
+                  _buildWaveLineShowcaseLauncherButton(),
                   const SizedBox(height: 16),
                   _buildInteractiveShapePlaygroundButton(),
                   const SizedBox(height: 16),
@@ -1225,6 +1228,93 @@ class _SchoolDashboardScreenState extends State<SchoolDashboardScreen> {
                       const SizedBox(height: 2),
                       Text(
                         '11 Presets: 48+ Styles, Linear, Rings, Waves, Fluid & Equalizer',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white.withValues(alpha: 0.85),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Icon(
+                  Icons.arrow_forward_ios_rounded,
+                  size: 14,
+                  color: Colors.white,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// 9d. Dynamic Animated Wave Line Studio Launcher
+  Widget _buildWaveLineShowcaseLauncherButton() {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFF6366F1), Color(0xFF00E5FF)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x336366F1),
+            blurRadius: 14,
+            offset: Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(20),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const WaveLineShowcaseScreen(),
+              ),
+            );
+          },
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: const Icon(
+                    Icons.waves_rounded,
+                    color: Colors.white,
+                    size: 22,
+                  ),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Material 4 Wave & Zigzag Line Studio',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        '35 Styles: Zigzags, Organic Waves, ECG Pulse, DNA Helix & Neon',
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: GoogleFonts.plusJakartaSans(

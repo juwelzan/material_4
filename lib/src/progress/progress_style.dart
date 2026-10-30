@@ -183,7 +183,119 @@ enum Material4ProgressStyle {
   organicShape,
 
   /// Sculpted 3D embossed container with light-reactive specular depth.
-  sculptedSurface;
+  sculptedSurface,
+
+  // =========================================================================
+  // 4. Advanced Animated Wave & Line Styles
+  // =========================================================================
+
+  // A. Zigzag Wave Lines
+  /// Smooth rounded wave transitioning continuously into a zigzag crest.
+  smoothZigzagWave,
+
+  /// Crisp, sharp triangular wave vertices with configurable peak angles.
+  sharpZigzag,
+
+  /// Zigzag path with rounded fillets at vertices and crest troughs.
+  roundedZigzag,
+
+  /// Dual interlocking or mirrored zigzag strands creating dimensional depth.
+  doubleZigzag,
+
+  /// Endlessly propagating zigzag line with smooth phase translation.
+  continuousZigzag,
+
+  /// Zigzag with alternating tooth amplitudes and asymmetrical slope gradients.
+  alternatingZigzag,
+
+  /// Elastic zigzag with harmonic spring tension causing peaks to oscillate.
+  elasticZigzag,
+
+  /// Fluid horizontal drift where the zigzag pattern rolls smoothly.
+  flowingZigzag,
+
+  /// Zigzag that continuously morphs between sinusoidal curves and sharp teeth.
+  morphingZigzag,
+
+  /// Multi-tier parallel offset zigzag ribbons with staggered phases.
+  multiLayerZigzag,
+
+  // B. Organic Wave Lines
+  /// Classic harmonic sinusoidal wave line with natural phase translation.
+  smoothSineWave,
+
+  /// Dual harmonic waves with distinct frequencies intersecting gracefully.
+  doubleWave,
+
+  /// Triple harmonic frequency waves layered with chromatic opacity gradients.
+  tripleWave,
+
+  /// Rolling viscous wave line exhibiting fluid surface tension.
+  liquidWave,
+
+  /// Asymmetric ocean swell wave with steep crests and broad gentle troughs.
+  oceanWave,
+
+  /// Gentle rolling wave line with subtle low-amplitude harmonic motion.
+  softRollingWave,
+
+  /// Natural organic wave modulated by Perlin/harmonic noise variations.
+  organicFlowWave,
+
+  /// Asymmetrical wave where crest ascent angle differs from descent angle.
+  asymmetricWave,
+
+  /// Organic fluid wave line modulated by pseudo-random seed perturbations.
+  randomizedOrganicWave,
+
+  /// Harmonic wave line whose amplitude and frequencies morph smoothly over time.
+  morphingWave,
+
+  // C. Creative Animated Lines
+  /// Serpentine path winding with slithering motion along the progress vector.
+  snakeLine,
+
+  /// Dual undulating ribbon contours with variable cross-sectional thickness.
+  ribbonFlow,
+
+  /// Electrocardiogram (ECG) pulse spikes traveling along the baseline.
+  pulseLine,
+
+  /// Wave line whose stroke thickness and amplitude expand and contract rhythmically.
+  breathingLine,
+
+  /// Sequence of discrete beads or dots undulating in harmonic wave formation.
+  movingDotsLine,
+
+  /// Continuous stream of luminous particles following a wave trajectory.
+  particleFlowLine,
+
+  /// Wave line accompanied by satellite beads orbiting around its peaks.
+  orbitingDotLine,
+
+  /// Wave line with a flowing chromatic gradient traveling along its contour.
+  gradientFlowLine,
+
+  /// Specular light glare traversing continuously along the wave ridges.
+  shimmerWave,
+
+  /// High-intensity laser wave with radiant chromatic core and multi-pass glow.
+  neonWave,
+
+  /// Wave line with physical inertia and elastic rebound on progress transitions.
+  elasticFlowLine,
+
+  /// Intertwined lemniscate / figure-8 looping harmonic wave motif.
+  infinityFlowLine,
+
+  /// Double-helix DNA strands with periodic base-pair connecting rungs.
+  dnaDoubleHelixLine,
+
+  /// Acoustic synthesizer voice waveform displaying vocal frequencies.
+  audioWaveformLine,
+
+  /// Dynamic multi-frequency audio equalizer amplitude wave line.
+  equalizerLine;
 
   /// Whether this style renders in a linear (straight-line) configuration.
   bool get isLinear => switch (this) {
@@ -260,7 +372,9 @@ enum Material4ProgressStyle {
       };
 
   /// Whether this style involves fluid wave dynamics.
-  bool get isWaveOrLiquid => switch (this) {
+  bool get isWaveOrLiquid =>
+      isWaveLine ||
+      switch (this) {
         waveLinear || liquidLinear || liquid || wave || fluid || bubble => true,
         _ => false,
       };
@@ -286,7 +400,101 @@ enum Material4ProgressStyle {
 
   /// Whether this style features high-intensity luminescence or neon glows.
   bool get isNeonOrGlow => switch (this) {
-        glowLinear || neonLinear || neonRing || glowRing => true,
+        glowLinear || neonLinear || neonRing || glowRing || neonWave => true,
+        _ => false,
+      };
+
+  /// Whether this style renders as an animated wave, zigzag, or creative line.
+  bool get isWaveLine => switch (this) {
+        smoothZigzagWave ||
+        sharpZigzag ||
+        roundedZigzag ||
+        doubleZigzag ||
+        continuousZigzag ||
+        alternatingZigzag ||
+        elasticZigzag ||
+        flowingZigzag ||
+        morphingZigzag ||
+        multiLayerZigzag ||
+        smoothSineWave ||
+        doubleWave ||
+        tripleWave ||
+        liquidWave ||
+        oceanWave ||
+        softRollingWave ||
+        organicFlowWave ||
+        asymmetricWave ||
+        randomizedOrganicWave ||
+        morphingWave ||
+        snakeLine ||
+        ribbonFlow ||
+        pulseLine ||
+        breathingLine ||
+        movingDotsLine ||
+        particleFlowLine ||
+        orbitingDotLine ||
+        gradientFlowLine ||
+        shimmerWave ||
+        neonWave ||
+        elasticFlowLine ||
+        infinityFlowLine ||
+        dnaDoubleHelixLine ||
+        audioWaveformLine ||
+        equalizerLine =>
+          true,
+        _ => false,
+      };
+
+  /// Whether this style belongs to the Zigzag Wave Line family.
+  bool get isZigzagLine => switch (this) {
+        smoothZigzagWave ||
+        sharpZigzag ||
+        roundedZigzag ||
+        doubleZigzag ||
+        continuousZigzag ||
+        alternatingZigzag ||
+        elasticZigzag ||
+        flowingZigzag ||
+        morphingZigzag ||
+        multiLayerZigzag =>
+          true,
+        _ => false,
+      };
+
+  /// Whether this style belongs to the Organic Harmonic Wave family.
+  bool get isOrganicWaveLine => switch (this) {
+        smoothSineWave ||
+        doubleWave ||
+        tripleWave ||
+        liquidWave ||
+        oceanWave ||
+        softRollingWave ||
+        organicFlowWave ||
+        asymmetricWave ||
+        randomizedOrganicWave ||
+        morphingWave =>
+          true,
+        _ => false,
+      };
+
+  /// Whether this style belongs to the Creative Animated Line family.
+  bool get isCreativeLineStyle => switch (this) {
+        snakeLine ||
+        ribbonFlow ||
+        pulseLine ||
+        breathingLine ||
+        movingDotsLine ||
+        particleFlowLine ||
+        orbitingDotLine ||
+        gradientFlowLine ||
+        shimmerWave ||
+        neonWave ||
+        elasticFlowLine ||
+        infinityFlowLine ||
+        dnaDoubleHelixLine ||
+        audioWaveformLine ||
+        equalizerLine =>
+          true,
         _ => false,
       };
 }

@@ -7,6 +7,7 @@ import 'progress_track.dart';
 import 'progress_fill.dart';
 import 'progress_effects.dart';
 import 'progress_interaction.dart';
+import 'wave_line/wave_line.dart';
 
 /// Master canvas painter rendering all 48+ Material 4 progress bar styles.
 class Material4ProgressPainter extends CustomPainter {
@@ -18,6 +19,9 @@ class Material4ProgressPainter extends CustomPainter {
 
   /// Active progress style.
   final Material4ProgressStyle style;
+
+  /// Advanced animated wave line configuration when style is a wave line.
+  final Material4WaveLineConfig? waveLine;
 
   /// Vector shape geometry definition.
   final Material4ProgressShape shape;
@@ -48,6 +52,7 @@ class Material4ProgressPainter extends CustomPainter {
     required this.value,
     this.secondaryValue,
     required this.style,
+    this.waveLine,
     required this.shape,
     required this.track,
     required this.fill,
@@ -79,7 +84,22 @@ class Material4ProgressPainter extends CustomPainter {
     _paintTrackShadows(canvas, size);
 
     // 2. Dispatch to specific style renderer
-    if (style.isCircular) {
+    if (style.isWaveLine) {
+      WaveLinePainter.paintWaveLine(
+        canvas: canvas,
+        size: size,
+        value: value,
+        style: style,
+        config: waveLine ?? const Material4WaveLineConfig(),
+        track: track,
+        fill: fill,
+        effects: effects,
+        animationProgress: animationProgress,
+        indeterminateProgress: indeterminateProgress,
+        primaryColor: primaryColor,
+        trackFallbackColor: trackFallbackColor,
+      );
+    } else if (style.isCircular) {
       _paintCircularProgress(canvas, size);
     } else if (style == Material4ProgressStyle.step ||
         style == Material4ProgressStyle.timeline) {
@@ -753,6 +773,7 @@ class Material4ProgressPainter extends CustomPainter {
     return oldDelegate.value != value ||
         oldDelegate.secondaryValue != secondaryValue ||
         oldDelegate.style != style ||
+        oldDelegate.waveLine != waveLine ||
         oldDelegate.shape != shape ||
         oldDelegate.track != track ||
         oldDelegate.fill != fill ||

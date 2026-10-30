@@ -5,8 +5,9 @@ import 'package:material_4/material_4.dart';
 
 import '../avatar/avatar_showcase_screen.dart';
 import '../progress/progress_showcase_screen.dart';
+import '../progress/wave_line_showcase_screen.dart';
 
-/// Complete showcase screen organizing Material 4 into 12 structured sections:
+/// Complete showcase screen organizing Material 4 into 13 structured sections:
 /// 1. Basic Shapes
 /// 2. Advanced Shapes
 /// 3. Creative Borders
@@ -19,6 +20,7 @@ import '../progress/progress_showcase_screen.dart';
 /// 10. Custom Configuration
 /// 11. Dynamic Avatars
 /// 12. Dynamic Progress Bars
+/// 13. Animated Wave Lines
 class Material4ShowcaseScreen extends StatefulWidget {
   final int initialSectionIndex;
 
@@ -60,9 +62,9 @@ class _Material4ShowcaseScreenState extends State<Material4ShowcaseScreen>
   void initState() {
     super.initState();
     _tabController = TabController(
-      length: 12,
+      length: 13,
       vsync: this,
-      initialIndex: widget.initialSectionIndex.clamp(0, 11),
+      initialIndex: widget.initialSectionIndex.clamp(0, 12),
     );
   }
 
@@ -115,6 +117,7 @@ class _Material4ShowcaseScreenState extends State<Material4ShowcaseScreen>
             Tab(text: '10. Custom Configuration'),
             Tab(text: '11. Dynamic Avatars'),
             Tab(text: '12. Dynamic Progress'),
+            Tab(text: '13. Animated Wave Lines'),
           ],
         ),
       ),
@@ -133,6 +136,7 @@ class _Material4ShowcaseScreenState extends State<Material4ShowcaseScreen>
           _buildCustomConfigurationTab(),
           const AvatarShowcaseScreen(isEmbedded: true),
           const ProgressBarShowcaseScreen(isEmbedded: true),
+          const WaveLineShowcaseScreen(isEmbedded: true),
         ],
       ),
     );

@@ -77,6 +77,52 @@ void main() {
     expect(find.text('Ticket'), findsOneWidget);
     expect(find.text('Star'), findsOneWidget);
 
+    // Scroll to Card 14: Automatic Infinite Shape Morphing
+    await tester.scrollUntilVisible(
+      find.text('14. Automatic Infinite Shape Morphing'),
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pump(const Duration(milliseconds: 100));
+    expect(find.text('14. Automatic Infinite Shape Morphing'), findsOneWidget);
+
+    // Scroll to Card 15: Programmatic Controller Studio
+    await tester.scrollUntilVisible(
+      find.text('15. Programmatic Controller Studio'),
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pump(const Duration(milliseconds: 100));
+    expect(find.text('15. Programmatic Controller Studio'), findsOneWidget);
+    expect(find.text('Next'), findsOneWidget);
+    expect(find.text('Prev'), findsOneWidget);
+    expect(find.text('Play'), findsOneWidget);
+
+    // Tap 'Next' on programmatic controller studio
+    await tester.tap(find.text('Next'));
+    await tester.pump(const Duration(milliseconds: 100));
+
+    // Scroll to Card 16: Living Avatar Studio
+    await tester.scrollUntilVisible(
+      find.text('16. Living Avatar Studio (Breathing, Floating & Glow)'),
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pump(const Duration(milliseconds: 100));
+    expect(find.text('16. Living Avatar Studio (Breathing, Floating & Glow)'),
+        findsOneWidget);
+    expect(find.text('Breathing'), findsOneWidget);
+    expect(find.text('Floating'), findsOneWidget);
+
+    // Scroll to Card 17: Morphing & Living Group Avatar
+    await tester.scrollUntilVisible(
+      find.text('17. Morphing & Living Group Avatar'),
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pump(const Duration(milliseconds: 100));
+    expect(find.text('17. Morphing & Living Group Avatar'), findsOneWidget);
+
     // Scroll to the visible Copy Code button and tap it
     final copyButton = find.text('Copy Code').last;
     await tester.scrollUntilVisible(
@@ -85,7 +131,6 @@ void main() {
       scrollable: find.byType(Scrollable).first,
     );
     await tester.tap(copyButton);
-    await tester.pump();
     await tester.pump(const Duration(milliseconds: 300));
     expect(find.byType(SnackBar), findsOneWidget);
   });

@@ -190,6 +190,11 @@ class ShapeAnimationController extends ChangeNotifier {
         borderProgress: _pulseController.value,
         neonPulseIntensity: 0.8 + _pulseController.value * 0.6,
       );
+    } else if (_strokeDrawController.isAnimating ||
+        _strokeDrawController.value < 1.0) {
+      base = base.copyWith(
+        borderProgress: _strokeDrawController.value,
+      );
     }
 
     return base;

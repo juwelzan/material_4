@@ -487,7 +487,7 @@ class DynamicShapeConfig {
     this.constraints = const ShapeConstraints(),
     this.bezierConfig,
     this.customBezierBuilder,
-    this.borderProgress = 0.0,
+    this.borderProgress = 1.0,
     this.dashPhase = 0.0,
     this.multiLayerBorders,
     this.cornerBorderLength = 24.0,

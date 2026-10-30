@@ -7,20 +7,25 @@ import '../shape_pattern.dart';
 
 /// Canvas drawing coordinator for [RenderDynamicShape].
 ///
-/// Encapsulates direct rendering routines for background fills, procedural effects,
-/// patterns, inner/inset shadows, shimmer beams, and composite border profiles
-/// without relying on a separate [CustomPainter] widget layer.
+/// Encapsulates modular direct rendering routines for the complete 8-step painting pipeline:
+/// - Stage 2: Outer shadows (Neo-3D hard block, soft drop shadows, ambient glow halo)
+/// - Stage 3: Shape background fills & procedural background effects
+/// - Stage 4: Procedural pattern textures (stripes, dots, grid, waves)
+/// - Stage 5: Tactile inset inner shadows (claymorphic / sculpted depth)
+/// - Stage 6: Composite border profiles (all 20 border styles, stroke alignments, and reveals)
+/// - Stage 7: Foreground decorations (holographic shimmer light sweep)
 class DynamicShapePainter {
   const DynamicShapePainter._();
 
-  /// Executes full shape painting pipeline directly onto [canvas].
-  static void paintShape({
+  /// Stage 2: Outer Shadows.
+  ///
+  /// Renders Neo-3D brutalist offset blocks, soft multi-layer drop shadows,
+  /// or ambient colored outer glow halos.
+  static void paintOuterShadows({
     required Canvas canvas,
     required Size size,
     required Path path,
     required DynamicShapeConfig config,
-    Color? color,
-    Gradient? gradient,
     Color borderColor = const Color(0x18000000),
     double borderWidth = 1.0,
     List<BoxShadow>? shadows,
@@ -38,7 +43,7 @@ class DynamicShapePainter {
       canvas.restore();
     }
 
-    // 2. Soft Drop Shadows (if provided and not neo3d)
+    // 2. Soft Multi-Layer Drop Shadows (if provided and not neo3d)
     if (config.borderStyle != BorderStyleType.neo3d &&
         shadows != null &&
         shadows.isNotEmpty) {
@@ -63,8 +68,33 @@ class DynamicShapePainter {
         ..maskFilter = MaskFilter.blur(BlurStyle.normal, config.glowBlurRadius);
       canvas.drawPath(path, glowPaint);
     }
+  }
 
-    // 4. Background Fill & Next-Gen Procedural Effects
+  /// Stage 3: Shape Background & Procedural Background Effects.
+  ///
+  /// Renders glassmorphic backdrop tints, solid color fills, linear/radial/sweep gradients,
+  /// and all procedural effects (meshGradient, noise, liquidGradient, animatedWaves, particles, aurora, etc.).
+  static void paintBackground({
+    required Canvas canvas,
+    required Size size,
+    required Path path,
+    required DynamicShapeConfig config,
+    Color? color,
+    Gradient? gradient,
+  }) {
+    if (size.width <= 0 || size.height <= 0) return;
+
+    // Glassmorphic Frosted Tint
+    if (config.isGlassmorphic) {
+      canvas.save();
+      canvas.clipPath(path);
+      final tintPaint = Paint()
+        ..color = config.glassTint ?? Colors.white.withValues(alpha: 0.15);
+      canvas.drawPath(path, tintPaint);
+      canvas.restore();
+    }
+
+    // Core Background Fill & Next-Gen Procedural Effects
     ShapeBackgroundRenderer.renderBackground(
       canvas: canvas,
       size: size,
@@ -73,40 +103,70 @@ class DynamicShapePainter {
       baseColor: color,
       baseGradient: gradient,
     );
+  }
 
-    // 5. Procedural Pattern Textures (Stripes, Dots, Grid, Waves)
-    if (config.pattern != ShapePattern.none) {
-      final patternColor = config.patternColor ??
-          (color != null
-              ? (color.computeLuminance() > 0.5
-                  ? Colors.black.withValues(alpha: 0.06)
-                  : Colors.white.withValues(alpha: 0.12))
-              : const Color(0x0F000000));
+  /// Stage 4: Background Patterns.
+  ///
+  /// Renders procedural pattern textures (stripes, dots, grid, waves) clipped to the shape contour.
+  static void paintPatterns({
+    required Canvas canvas,
+    required Size size,
+    required Path path,
+    required DynamicShapeConfig config,
+    Color? color,
+  }) {
+    if (size.width <= 0 || size.height <= 0) return;
+    if (config.pattern == ShapePattern.none) return;
 
-      ShapePatternRenderer.drawPattern(
-        canvas: canvas,
-        clipPath: path,
-        size: size,
-        pattern: config.pattern,
-        color: patternColor,
-        spacing: config.patternSpacing,
-        strokeWidth: config.patternStrokeWidth,
-      );
+    final patternColor = config.patternColor ??
+        (color != null
+            ? (color.computeLuminance() > 0.5
+                ? Colors.black.withValues(alpha: 0.06)
+                : Colors.white.withValues(alpha: 0.12))
+            : const Color(0x0F000000));
+
+    ShapePatternRenderer.drawPattern(
+      canvas: canvas,
+      clipPath: path,
+      size: size,
+      pattern: config.pattern,
+      color: patternColor,
+      spacing: config.patternSpacing,
+      strokeWidth: config.patternStrokeWidth,
+    );
+  }
+
+  /// Stage 5: Background Effects & Inner Shadows.
+  ///
+  /// Renders tactile inset inner shadows for claymorphic and sculpted depth effects.
+  static void paintInnerShadows({
+    required Canvas canvas,
+    required Size size,
+    required Path path,
+    required DynamicShapeConfig config,
+  }) {
+    if (size.width <= 0 || size.height <= 0) return;
+    if (config.innerShadows == null || config.innerShadows!.isEmpty) return;
+
+    for (final innerShadow in config.innerShadows!) {
+      _drawInnerShadow(canvas, path, innerShadow, size);
     }
+  }
 
-    // 6. Tactile Inset Inner Shadow (Claymorphic / Sculpted Depth)
-    if (config.innerShadows != null && config.innerShadows!.isNotEmpty) {
-      for (final innerShadow in config.innerShadows!) {
-        _drawInnerShadow(canvas, path, innerShadow, size);
-      }
-    }
+  /// Stage 6: Distinctive Borders.
+  ///
+  /// Renders the shape border along the contour according to [config.borderStyle] (all 20 styles),
+  /// stroke alignment, and animated borderProgress / dashPhase.
+  static void paintBorders({
+    required Canvas canvas,
+    required Size size,
+    required Path path,
+    required DynamicShapeConfig config,
+    Color borderColor = const Color(0x18000000),
+    double borderWidth = 1.0,
+  }) {
+    if (size.width <= 0 || size.height <= 0) return;
 
-    // 7. Holographic Shimmer Light Sweep
-    if (config.isShimmering) {
-      _drawShimmer(canvas, path, size, config.shimmerProgress);
-    }
-
-    // 8. Unique Border Rendering based on BorderStyleType
     ShapeBorderPainter.paintBorder(
       canvas: canvas,
       size: size,
@@ -114,6 +174,95 @@ class DynamicShapePainter {
       config: config,
       borderColor: borderColor,
       borderWidth: borderWidth,
+    );
+  }
+
+  /// Stage 7: Foreground Decorations.
+  ///
+  /// Renders holographic shimmer light sweep across the shape surface.
+  static void paintForegroundDecorations({
+    required Canvas canvas,
+    required Size size,
+    required Path path,
+    required DynamicShapeConfig config,
+  }) {
+    if (size.width <= 0 || size.height <= 0) return;
+    if (!config.isShimmering) return;
+
+    _drawShimmer(canvas, path, size, config.shimmerProgress);
+  }
+
+  /// Executes full shape canvas drawing pipeline (stages 2 through 7).
+  ///
+  /// Legacy adapters and external painters can call this to reproduce the complete
+  /// Canvas drawing pass without managing the individual sub-stages.
+  static void paintShape({
+    required Canvas canvas,
+    required Size size,
+    required Path path,
+    required DynamicShapeConfig config,
+    Color? color,
+    Gradient? gradient,
+    Color borderColor = const Color(0x18000000),
+    double borderWidth = 1.0,
+    List<BoxShadow>? shadows,
+  }) {
+    if (size.width <= 0 || size.height <= 0) return;
+
+    // Stage 2: Outer Shadows
+    paintOuterShadows(
+      canvas: canvas,
+      size: size,
+      path: path,
+      config: config,
+      borderColor: borderColor,
+      borderWidth: borderWidth,
+      shadows: shadows,
+    );
+
+    // Stage 3: Shape Background & Procedural Effects
+    paintBackground(
+      canvas: canvas,
+      size: size,
+      path: path,
+      config: config,
+      color: color,
+      gradient: gradient,
+    );
+
+    // Stage 4: Background Patterns
+    paintPatterns(
+      canvas: canvas,
+      size: size,
+      path: path,
+      config: config,
+      color: color,
+    );
+
+    // Stage 5: Inner Shadows
+    paintInnerShadows(
+      canvas: canvas,
+      size: size,
+      path: path,
+      config: config,
+    );
+
+    // Stage 6: Borders
+    paintBorders(
+      canvas: canvas,
+      size: size,
+      path: path,
+      config: config,
+      borderColor: borderColor,
+      borderWidth: borderWidth,
+    );
+
+    // Stage 7: Foreground Decorations
+    paintForegroundDecorations(
+      canvas: canvas,
+      size: size,
+      path: path,
+      config: config,
     );
   }
 
@@ -141,7 +290,11 @@ class DynamicShapePainter {
   }
 
   static void _drawShimmer(
-      Canvas canvas, Path path, Size size, double progress) {
+    Canvas canvas,
+    Path path,
+    Size size,
+    double progress,
+  ) {
     canvas.save();
     canvas.clipPath(path);
 

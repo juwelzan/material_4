@@ -72,7 +72,13 @@ class ShapeBorderPainter {
     switch (config.borderStyle) {
       // 1. Original 7 Border Styles (100% Backwards Compatible)
       case BorderStyleType.solid:
-        _drawSolid(canvas, path, borderColor, borderWidth);
+        _drawSolid(
+          canvas,
+          path,
+          borderColor,
+          borderWidth,
+          config.borderProgress,
+        );
         break;
 
       case BorderStyleType.dashed:
@@ -85,11 +91,19 @@ class ShapeBorderPainter {
           config.dashGap,
           0.0,
           null,
+          config.borderProgress,
         );
         break;
 
       case BorderStyleType.dotted:
-        _drawDotted(canvas, path, borderColor, borderWidth, config.dashGap);
+        _drawDotted(
+          canvas,
+          path,
+          borderColor,
+          borderWidth,
+          config.dashGap,
+          config.borderProgress,
+        );
         break;
 
       case BorderStyleType.doubleStroke:
@@ -112,6 +126,7 @@ class ShapeBorderPainter {
           borderWidth,
           config.glowBlurRadius,
           config.glowColor,
+          config.borderProgress,
         );
         break;
 
@@ -175,7 +190,7 @@ class ShapeBorderPainter {
         break;
 
       case BorderStyleType.noiseTextured:
-        _drawNoiseTextured(canvas, path, borderColor, borderWidth);
+        _drawNoiseTextured(canvas, path, config, borderColor, borderWidth);
         break;
 
       case BorderStyleType.handDrawn:
@@ -192,14 +207,29 @@ class ShapeBorderPainter {
     Canvas canvas,
     Path path,
     Color borderColor,
-    double borderWidth,
-  ) {
+    double borderWidth, [
+    double borderProgress = 1.0,
+  ]) {
+    final progress = borderProgress.clamp(0.0, 1.0);
+    if (progress <= 0.0 || borderWidth <= 0) return;
+
     final paint = Paint()
       ..style = PaintingStyle.stroke
       ..strokeWidth = borderWidth
+      ..strokeCap = StrokeCap.round
       ..color = borderColor
       ..isAntiAlias = true;
-    canvas.drawPath(path, paint);
+
+    if (progress >= 1.0) {
+      canvas.drawPath(path, paint);
+      return;
+    }
+
+    for (final metric in path.computeMetrics()) {
+      if (metric.length <= 0) continue;
+      final subPath = metric.extractPath(0.0, metric.length * progress);
+      canvas.drawPath(subPath, paint);
+    }
   }
 
   static void _drawDashed(
@@ -210,8 +240,12 @@ class ShapeBorderPainter {
     double dashLength,
     double dashGap,
     double phaseOffset,
-    Shader? shader,
-  ) {
+    Shader? shader, [
+    double borderProgress = 1.0,
+  ]) {
+    final progress = borderProgress.clamp(0.0, 1.0);
+    if (progress <= 0.0 || borderWidth <= 0) return;
+
     final dashPaint = Paint()
       ..style = PaintingStyle.stroke
       ..strokeWidth = borderWidth
@@ -226,7 +260,17 @@ class ShapeBorderPainter {
 
     final totalCycle = dashLength + dashGap;
     if (totalCycle <= 0) {
-      canvas.drawPath(path, dashPaint);
+      if (progress >= 1.0) {
+        canvas.drawPath(path, dashPaint);
+      } else {
+        for (final metric in path.computeMetrics()) {
+          if (metric.length <= 0) continue;
+          canvas.drawPath(
+            metric.extractPath(0.0, metric.length * progress),
+            dashPaint,
+          );
+        }
+      }
       return;
     }
 
@@ -234,10 +278,11 @@ class ShapeBorderPainter {
 
     for (final metric in path.computeMetrics()) {
       if (metric.length <= 0) continue;
+      final maxDistance = metric.length * progress;
       double distance = -normalizedPhase;
-      while (distance < metric.length) {
+      while (distance < maxDistance) {
         final start = math.max(0.0, distance);
-        final end = math.min(metric.length, distance + dashLength);
+        final end = math.min(maxDistance, distance + dashLength);
         if (end > start) {
           final dashSubPath = metric.extractPath(start, end);
           canvas.drawPath(dashSubPath, dashPaint);
@@ -252,8 +297,12 @@ class ShapeBorderPainter {
     Path path,
     Color borderColor,
     double borderWidth,
-    double dotGap,
-  ) {
+    double dotGap, [
+    double borderProgress = 1.0,
+  ]) {
+    final progress = borderProgress.clamp(0.0, 1.0);
+    if (progress <= 0.0 || borderWidth <= 0) return;
+
     final dotPaint = Paint()
       ..style = PaintingStyle.fill
       ..color = borderColor
@@ -264,8 +313,9 @@ class ShapeBorderPainter {
 
     for (final metric in path.computeMetrics()) {
       if (metric.length <= 0) continue;
+      final maxDistance = metric.length * progress;
       double distance = 0.0;
-      while (distance < metric.length) {
+      while (distance < maxDistance) {
         final tangent = metric.getTangentForOffset(distance);
         if (tangent != null) {
           canvas.drawCircle(tangent.position, dotRadius, dotPaint);
@@ -284,15 +334,9 @@ class ShapeBorderPainter {
     double borderWidth,
   ) {
     // Outer Primary Stroke
-    _drawSolid(canvas, path, borderColor, borderWidth);
+    _drawSolid(canvas, path, borderColor, borderWidth, config.borderProgress);
 
     // Inner Delicate Stroke
-    final innerPaint = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = config.innerBorderWidth
-      ..color = config.innerBorderColor ?? borderColor.withValues(alpha: 0.45)
-      ..isAntiAlias = true;
-
     final gap = config.innerBorderGap;
     if (size.width > gap * 2 && size.height > gap * 2) {
       canvas.save();
@@ -300,7 +344,13 @@ class ShapeBorderPainter {
       final scaleY = (size.height - gap * 2) / size.height;
       canvas.translate(gap, gap);
       canvas.scale(scaleX, scaleY);
-      canvas.drawPath(path, innerPaint);
+      _drawSolid(
+        canvas,
+        path,
+        config.innerBorderColor ?? borderColor.withValues(alpha: 0.45),
+        config.innerBorderWidth,
+        config.borderProgress,
+      );
       canvas.restore();
     }
   }
@@ -313,9 +363,13 @@ class ShapeBorderPainter {
     Color borderColor,
     double borderWidth,
   ) {
+    final progress = config.borderProgress.clamp(0.0, 1.0);
+    if (progress <= 0.0 || borderWidth <= 0) return;
+
     final paint = Paint()
       ..style = PaintingStyle.stroke
       ..strokeWidth = borderWidth
+      ..strokeCap = StrokeCap.round
       ..isAntiAlias = true;
 
     if (config.borderGradient != null) {
@@ -327,7 +381,16 @@ class ShapeBorderPainter {
       paint.shader = defaultGrad.createShader(Offset.zero & size);
     }
 
-    canvas.drawPath(path, paint);
+    if (progress >= 1.0) {
+      canvas.drawPath(path, paint);
+      return;
+    }
+
+    for (final metric in path.computeMetrics()) {
+      if (metric.length <= 0) continue;
+      final subPath = metric.extractPath(0.0, metric.length * progress);
+      canvas.drawPath(subPath, paint);
+    }
   }
 
   static void _drawNeo3D(
@@ -338,18 +401,18 @@ class ShapeBorderPainter {
     double borderWidth,
   ) {
     // Bold Solid Outline
-    _drawSolid(canvas, path, borderColor, borderWidth);
+    _drawSolid(canvas, path, borderColor, borderWidth, config.borderProgress);
 
     // Hard Offset 3D Shadow Line
-    final shadowPaint = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = borderWidth
-      ..color = config.neoColor
-      ..isAntiAlias = true;
-
     canvas.save();
     canvas.translate(config.neoOffset.dx, config.neoOffset.dy);
-    canvas.drawPath(path, shadowPaint);
+    _drawSolid(
+      canvas,
+      path,
+      config.neoColor,
+      borderWidth,
+      config.borderProgress,
+    );
     canvas.restore();
   }
 
@@ -359,8 +422,12 @@ class ShapeBorderPainter {
     Color borderColor,
     double borderWidth,
     double blurRadius,
-    Color? glowColor,
-  ) {
+    Color? glowColor, [
+    double borderProgress = 1.0,
+  ]) {
+    final progress = borderProgress.clamp(0.0, 1.0);
+    if (progress <= 0.0 || borderWidth <= 0) return;
+
     final effectiveGlowColor = glowColor ?? borderColor;
 
     // Blurred Glow Outer Halo
@@ -371,11 +438,22 @@ class ShapeBorderPainter {
         ..color = effectiveGlowColor.withValues(alpha: 0.5)
         ..maskFilter = MaskFilter.blur(BlurStyle.normal, blurRadius)
         ..isAntiAlias = true;
-      canvas.drawPath(path, glowPaint);
+
+      if (progress >= 1.0) {
+        canvas.drawPath(path, glowPaint);
+      } else {
+        for (final metric in path.computeMetrics()) {
+          if (metric.length <= 0) continue;
+          canvas.drawPath(
+            metric.extractPath(0.0, metric.length * progress),
+            glowPaint,
+          );
+        }
+      }
     }
 
     // Sharp Core Stroke
-    _drawSolid(canvas, path, borderColor, borderWidth);
+    _drawSolid(canvas, path, borderColor, borderWidth, progress);
   }
 
   // =========================================================================
@@ -784,7 +862,8 @@ class ShapeBorderPainter {
     canvas.restore();
 
     // Core Neutral Mid-Tone Stroke
-    _drawSolid(canvas, path, borderColor, borderWidth * 0.8);
+    _drawSolid(
+        canvas, path, borderColor, borderWidth * 0.8, config.borderProgress);
   }
 
   static void _drawInnerStroke(
@@ -797,7 +876,13 @@ class ShapeBorderPainter {
   ) {
     canvas.save();
     canvas.clipPath(path);
-    _drawSolid(canvas, path, borderColor, borderWidth * 2.0);
+    _drawSolid(
+      canvas,
+      path,
+      borderColor,
+      borderWidth * 2.0,
+      config.borderProgress,
+    );
     canvas.restore();
   }
 
@@ -816,18 +901,31 @@ class ShapeBorderPainter {
       ..addRect(outerRect)
       ..addPath(path, Offset.zero);
     canvas.clipPath(inversePath);
-    _drawSolid(canvas, path, borderColor, borderWidth * 2.0);
+    _drawSolid(
+      canvas,
+      path,
+      borderColor,
+      borderWidth * 2.0,
+      config.borderProgress,
+    );
     canvas.restore();
   }
 
   static void _drawNoiseTextured(
     Canvas canvas,
     Path path,
+    DynamicShapeConfig config,
     Color borderColor,
     double borderWidth,
   ) {
     // 1. Soft Base Under-Stroke
-    _drawSolid(canvas, path, borderColor.withValues(alpha: 0.4), borderWidth);
+    _drawSolid(
+      canvas,
+      path,
+      borderColor.withValues(alpha: 0.4),
+      borderWidth,
+      config.borderProgress,
+    );
 
     // 2. Micro-Stippled Noise Grains along Path Metrics
     final grainPaint = Paint()

@@ -6,6 +6,8 @@ import 'package:flutter/physics.dart';
 import 'dynamic_shape_config.dart';
 import 'dynamic_shape_container.dart';
 import 'dynamic_shape_path_builder.dart';
+import 'layout/shape_content_protection.dart';
+import 'rendering/dynamic_shape_render_widget.dart';
 
 /// Tactile pressable container that reacts to touch with realistic spring physics,
 /// slight scale squish, and smooth release rebound.
@@ -376,25 +378,34 @@ class ShapeBorderDrawReveal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CustomPaint(
-      foregroundPainter: _StrokeRevealPainter(
-        config: config,
-        progress: progress.clamp(0.0, 1.0),
-        borderColor: borderColor,
-        borderWidth: borderWidth,
+    return DynamicShapeRenderWidget(
+      config: config.copyWith(
+        borderProgress: progress.clamp(0.0, 1.0),
       ),
-      child: SizedBox(width: size.width, height: size.height, child: child),
+      borderColor: borderColor,
+      borderWidth: borderWidth,
+      width: size.width,
+      height: size.height,
+      contentProtection: const ShapeContentProtection(autoPadding: false),
+      clipBehavior: Clip.none,
+      child: child,
     );
   }
 }
 
-class _StrokeRevealPainter extends CustomPainter {
+/// Legacy stroke reveal painter preserved for backward compatibility.
+///
+/// Use [DynamicShapeRenderWidget] or [RenderDynamicShape] directly.
+@Deprecated(
+  'Use DynamicShapeRenderWidget or RenderDynamicShape direct rendering instead.',
+)
+class StrokeRevealPainter extends CustomPainter {
   final DynamicShapeConfig config;
   final double progress;
   final Color borderColor;
   final double borderWidth;
 
-  _StrokeRevealPainter({
+  StrokeRevealPainter({
     required this.config,
     required this.progress,
     required this.borderColor,
@@ -426,7 +437,7 @@ class _StrokeRevealPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant _StrokeRevealPainter oldDelegate) {
+  bool shouldRepaint(covariant StrokeRevealPainter oldDelegate) {
     return oldDelegate.progress != progress ||
         oldDelegate.config != config ||
         oldDelegate.borderColor != borderColor ||

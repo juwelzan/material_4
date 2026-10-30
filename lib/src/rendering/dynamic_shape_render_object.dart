@@ -1,7 +1,6 @@
 import 'dart:math' as math;
 
 import 'package:flutter/gestures.dart';
-import 'package:flutter/material.dart' show Colors;
 import 'package:flutter/rendering.dart';
 
 import '../dynamic_shape_config.dart';
@@ -590,46 +589,252 @@ class RenderDynamicShape extends RenderBox
   }
 
   // =========================================================================
-  // Painting & Direct Canvas Rendering
+  // Painting & Direct Canvas Rendering Pipeline
   // =========================================================================
+
+  @override
+  Rect get paintBounds {
+    var bounds = Offset.zero & size;
+
+    // 1. Account for stroke alignment (outside or center)
+    if (_borderWidth > 0 && _borderColor.a > 0) {
+      final double strokeOverflow;
+      switch (_config.strokeAlign) {
+        case ShapeStrokeAlign.outside:
+          strokeOverflow = _borderWidth;
+          break;
+        case ShapeStrokeAlign.center:
+          strokeOverflow = _borderWidth / 2.0;
+          break;
+        case ShapeStrokeAlign.inside:
+          strokeOverflow = 0.0;
+          break;
+      }
+      if (strokeOverflow > 0) {
+        bounds = bounds.inflate(strokeOverflow);
+      }
+    }
+
+    // 2. Account for multi-layer borders if present
+    if (_config.borderStyle == BorderStyleType.multiLayer &&
+        _config.multiLayerBorders != null) {
+      double maxLayerOffset = 0.0;
+      for (final layer in _config.multiLayerBorders!) {
+        final totalExtent = layer.offset + layer.width;
+        if (totalExtent > maxLayerOffset) {
+          maxLayerOffset = totalExtent;
+        }
+      }
+      if (maxLayerOffset > 0) {
+        bounds = bounds.inflate(maxLayerOffset);
+      }
+    }
+
+    // 3. Neo-Brutalism 3D offset block
+    if (_config.borderStyle == BorderStyleType.neo3d) {
+      final neoBounds = (Offset.zero & size).shift(_config.neoOffset);
+      bounds = bounds.expandToInclude(neoBounds);
+    }
+
+    // 4. Ambient colored glow halo
+    if (_config.borderStyle == BorderStyleType.glow) {
+      final glowInflation =
+          (_borderWidth * 1.25) + (_config.glowBlurRadius * 2.0);
+      bounds =
+          bounds.expandToInclude((Offset.zero & size).inflate(glowInflation));
+    }
+
+    // 5. Neon pulse bloom halo
+    if (_config.borderStyle == BorderStyleType.neonPulse) {
+      final intensity = _config.neonPulseIntensity.clamp(0.1, 3.0);
+      final neonInflation =
+          (_borderWidth * 1.75 * intensity) + (16.0 * intensity * 2.0);
+      bounds =
+          bounds.expandToInclude((Offset.zero & size).inflate(neonInflation));
+    }
+
+    // 6. Outer drop shadows
+    if (_config.borderStyle != BorderStyleType.neo3d &&
+        _shadows != null &&
+        _shadows!.isNotEmpty) {
+      for (final shadow in _shadows!) {
+        final shadowInflation = shadow.blurRadius * 2.0 + shadow.spreadRadius;
+        final shadowBounds =
+            (Offset.zero & size).shift(shadow.offset).inflate(shadowInflation);
+        bounds = bounds.expandToInclude(shadowBounds);
+      }
+    }
+
+    // 7. Child visible overflow
+    if (child != null &&
+        _contentProtection.mode == ContentProtectionMode.visibleOverflow) {
+      final childParentData = child!.parentData as DynamicShapeParentData?;
+      if (childParentData != null) {
+        final childBounds = child!.paintBounds.shift(childParentData.offset);
+        bounds = bounds.expandToInclude(childBounds);
+      }
+    }
+
+    return bounds;
+  }
+
+  @override
+  Rect get paintBounds {
+    var bounds = Offset.zero & size;
+
+    // 1. Account for stroke alignment (outside or center)
+    if (_borderWidth > 0 && _borderColor.a > 0) {
+      final double strokeOverflow;
+      switch (_config.strokeAlign) {
+        case ShapeStrokeAlign.outside:
+          strokeOverflow = _borderWidth;
+          break;
+        case ShapeStrokeAlign.center:
+          strokeOverflow = _borderWidth / 2.0;
+          break;
+        case ShapeStrokeAlign.inside:
+          strokeOverflow = 0.0;
+          break;
+      }
+      if (strokeOverflow > 0) {
+        bounds = bounds.inflate(strokeOverflow);
+      }
+    }
+
+    // 2. Account for multi-layer borders if present
+    if (_config.borderStyle == BorderStyleType.multiLayer &&
+        _config.multiLayerBorders != null) {
+      double maxLayerOffset = 0.0;
+      for (final layer in _config.multiLayerBorders!) {
+        final totalExtent = layer.offset + layer.width;
+        if (totalExtent > maxLayerOffset) {
+          maxLayerOffset = totalExtent;
+        }
+      }
+      if (maxLayerOffset > 0) {
+        bounds = bounds.inflate(maxLayerOffset);
+      }
+    }
+
+    // 3. Neo-Brutalism 3D offset block
+    if (_config.borderStyle == BorderStyleType.neo3d) {
+      final neoBounds = (Offset.zero & size).shift(_config.neoOffset);
+      bounds = bounds.expandToInclude(neoBounds);
+    }
+
+    // 4. Ambient colored glow halo
+    if (_config.borderStyle == BorderStyleType.glow) {
+      final glowInflation =
+          (_borderWidth * 1.25) + (_config.glowBlurRadius * 2.0);
+      bounds =
+          bounds.expandToInclude((Offset.zero & size).inflate(glowInflation));
+    }
+
+    // 5. Neon pulse bloom halo
+    if (_config.borderStyle == BorderStyleType.neonPulse) {
+      final intensity = _config.neonPulseIntensity.clamp(0.1, 3.0);
+      final neonInflation =
+          (_borderWidth * 1.75 * intensity) + (16.0 * intensity * 2.0);
+      bounds =
+          bounds.expandToInclude((Offset.zero & size).inflate(neonInflation));
+    }
+
+    // 6. Outer drop shadows
+    if (_config.borderStyle != BorderStyleType.neo3d &&
+        _shadows != null &&
+        _shadows!.isNotEmpty) {
+      for (final shadow in _shadows!) {
+        final shadowInflation = shadow.blurRadius * 2.0 + shadow.spreadRadius;
+        final shadowBounds = (Offset.zero & size)
+            .shift(shadow.offset)
+            .inflate(shadowInflation);
+        bounds = bounds.expandToInclude(shadowBounds);
+      }
+    }
+
+    // 7. Child visible overflow
+    if (child != null &&
+        _contentProtection.mode == ContentProtectionMode.visibleOverflow) {
+      final childParentData = child!.parentData as DynamicShapeParentData?;
+      if (childParentData != null) {
+        final childBounds = child!.paintBounds.shift(childParentData.offset);
+        bounds = bounds.expandToInclude(childBounds);
+      }
+    }
+
+    return bounds;
+  }
 
   @override
   void paint(PaintingContext context, Offset offset) {
     if (size.width <= 0 || size.height <= 0) return;
 
+    // Stage 1: Calculate or retrieve shape geometry
     final path = currentPath;
     final canvas = context.canvas;
 
     canvas.save();
     canvas.translate(offset.dx, offset.dy);
 
-    // 1. Render Glassmorphic Backdrop Blur if requested
-    if (_config.isGlassmorphic) {
-      canvas.save();
-      canvas.clipPath(path);
-      // Paint subtle frosted tint before backdrop filter
-      final tintPaint = Paint()
-        ..color = _config.glassTint ?? Colors.white.withValues(alpha: 0.15);
-      canvas.drawPath(path, tintPaint);
-      canvas.restore();
-    }
+    // Stage 2: Outer shadows (Neo-3D hard block, soft drop shadows, glow halo)
+    DynamicShapePainter.paintOuterShadows(
+      canvas: canvas,
+      size: size,
+      path: path,
+      config: _config,
+      borderColor: _borderColor,
+      borderWidth: _borderWidth,
+      shadows: _shadows,
+    );
 
-    // 2. Direct Canvas Rendering: Backgrounds, Shadows, Glow, Patterns, Borders
-    DynamicShapePainter.paintShape(
+    // Stage 3: Shape background & procedural background effects
+    DynamicShapePainter.paintBackground(
       canvas: canvas,
       size: size,
       path: path,
       config: _config,
       color: _color,
       gradient: _gradient,
+    );
+
+    // Stage 4: Background patterns (stripes, dots, grid, waves)
+    DynamicShapePainter.paintPatterns(
+      canvas: canvas,
+      size: size,
+      path: path,
+      config: _config,
+      color: _color,
+    );
+
+    // Stage 5: Background effects & inner shadows (tactile inset shadows)
+    DynamicShapePainter.paintInnerShadows(
+      canvas: canvas,
+      size: size,
+      path: path,
+      config: _config,
+    );
+
+    // Stage 6: Distinctive borders (all 20 border styles with stroke alignment & reveal)
+    DynamicShapePainter.paintBorders(
+      canvas: canvas,
+      size: size,
+      path: path,
+      config: _config,
       borderColor: _borderColor,
       borderWidth: _borderWidth,
-      shadows: _shadows,
+    );
+
+    // Stage 7: Foreground decorations (holographic shimmer light sweep)
+    DynamicShapePainter.paintForegroundDecorations(
+      canvas: canvas,
+      size: size,
+      path: path,
+      config: _config,
     );
 
     canvas.restore();
 
-    // 3. Child Painting with Selective Clipping
+    // Stage 8: Child painting with selective clipping
     if (child != null) {
       final childParentData = child!.parentData! as DynamicShapeParentData;
       final childOffset = offset + childParentData.offset;

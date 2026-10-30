@@ -140,6 +140,57 @@ NotebookCard(
 
 ```dart
 AdaptiveShapeCard(
+  type: DynamicShapeType.ticketScallop,
+  scallopRadius: 18.0,
+  child: const Text('Guaranteed unclipped text inside ticket cutouts'),
+)
+```
+
+---
+
+## 🎨 Phase 7.2: Advanced Material Cards & Creative UI Components
+
+Phase 7.2 introduces a complete suite of physical material cards, sculpted 3D surfaces, and modern editorial components powered natively by the RenderBox rendering engine.
+
+### Universal Component: `MaterialDynamicCard`
+
+A master card that orchestrates physical materials, parametric geometry, independent icon and content relief surfaces, responsive spring physics, and full Bengali/RTL script support:
+
+```dart
+MaterialDynamicCard(
+  material: DynamicMaterial.clay,
+  icon: Icons.auto_awesome,
+  iconPosition: CardIconPosition.leading,
+  iconSurface: CardSurfaceType.raised,
+  contentSurface: CardSurfaceType.flat,
+  title: 'প্রাকৃতিক আর্কিটেকচার',
+  subtitle: 'বাংলা ও আন্তর্জাতিক টেক্সট সাপোর্ট',
+  badge: 'NEW',
+  interaction: const CardInteractionConfig(
+    enablePressScale: true,
+    enableHoverElevation: true,
+  ),
+  onTap: () => print('Card pressed with spring physics!'),
+)
+```
+
+### Specialized Card Suites
+
+| Category | Available Cards |
+| :--- | :--- |
+| **Paper-Based Cards (12)** | `LayeredPaperCard`, `TornPaperCard`, `FoldedPaperCard`, `StickyNoteCard`, `VintagePaperCard`, `NotebookCard`, `KraftPaperCard`, `RecycledPaperCard`, `ParchmentCard`, `PaperStackCard`, `PaperCutoutCard`, `PaperTicketCard` |
+| **Sculpted Surface Cards (11)** | `EmbossedCard`, `DebossedCard`, `NeumorphicCard`, `SoftRaisedCard`, `HardRaisedCard`, `RecessedCard`, `FloatingSurfaceCard`, `ClayCard`, `CeramicCard`, `OrganicSurfaceCard`, `LayeredMaterialCard` |
+| **Modern Creative Cards (14)** | `GlassCard`, `GradientCard`, `GlowCard`, `NeonCard`, `MeshGradientCard`, `FloatingCard`, `OrganicBlobCard`, `AsymmetricCard`, `CutCornerCard`, `NotchedCard`, `TicketCard`, `MagazineCard`, `EditorialCard`, `MinimalSurfaceCard` |
+| **Special Purpose Cards (12)** | `ProfileCard`, `FeatureCard`, `ActionCard`, `StatisticsCard`, `NotificationCard`, `InformationCard`, `MenuCard`, `CategoryCard`, `ProductCard`, `DashboardCard`, `ExpandableCard`, `SelectableCard` |
+
+### Physical Material Models (`DynamicMaterial`)
+
+Choose from 12 distinct physical substrates with realistic directional lighting, roughness, and specular sheen:
+- `paper`, `cardstock`, `clay`, `ceramic`, `glass`, `plastic`, `metal`, `softFabric`, `stone`, `rubber`, `matte`, `glossy`.
+
+
+```dart
+AdaptiveShapeCard(
   title: 'Physics & Astronomy',
   subtitle: 'Room 304 • Prof. Sarah Connor',
   icon: Icons.auto_awesome,

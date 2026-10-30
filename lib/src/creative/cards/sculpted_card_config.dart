@@ -322,4 +322,3 @@ class SculptedPlateConfig {
         customShapeConfig,
       ]);
 }
-

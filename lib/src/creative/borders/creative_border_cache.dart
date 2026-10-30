@@ -33,4 +33,3 @@ class CreativeBorderCache {
     _pathCache.clear();
   }
 }
-

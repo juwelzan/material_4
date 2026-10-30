@@ -33,4 +33,3 @@ class PaperPatternCache {
     _cache.clear();
   }
 }
-

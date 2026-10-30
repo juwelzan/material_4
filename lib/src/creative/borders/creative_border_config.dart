@@ -408,6 +408,84 @@ class CreativeBorderConfig {
     );
   }
 
+  /// Factory preset: Artisanal Deckled Edge Border.
+  factory CreativeBorderConfig.deckledEdge({
+    BorderEdges edges = BorderEdges.all,
+    Color color = const Color(0xFFD7CCC8),
+    double tearIntensity = 0.5,
+    double width = 4.0,
+  }) {
+    return CreativeBorderConfig(
+      style: CreativeBorderStyle.deckledEdge,
+      edges: edges,
+      color: color,
+      tearIntensity: tearIntensity,
+      width: width,
+    );
+  }
+
+  /// Factory preset: Perforated Tear-off Ticket Border.
+  factory CreativeBorderConfig.perforated({
+    BorderEdges edges = BorderEdges.all,
+    Color color = const Color(0x33000000),
+    double spacing = 8.0,
+    double width = 1.5,
+  }) {
+    return CreativeBorderConfig(
+      style: CreativeBorderStyle.perforated,
+      edges: edges,
+      color: color,
+      spacing: spacing,
+      width: width,
+    );
+  }
+
+  /// Factory preset: Naturally Rough Paper Border.
+  factory CreativeBorderConfig.roughPaper({
+    BorderEdges edges = BorderEdges.all,
+    Color color = const Color(0xFFD2C7B8),
+    double tearIntensity = 0.4,
+    double width = 3.0,
+  }) {
+    return CreativeBorderConfig(
+      style: CreativeBorderStyle.roughPaper,
+      edges: edges,
+      color: color,
+      tearIntensity: tearIntensity,
+      width: width,
+    );
+  }
+
+  /// Factory preset: Sharp Triangular Zigzag Cut.
+  factory CreativeBorderConfig.zigzagCut({
+    BorderEdges edges = BorderEdges.all,
+    Color color = const Color(0xFFB0BEC5),
+    double patternSize = 8.0,
+    double width = 4.0,
+  }) {
+    return CreativeBorderConfig(
+      style: CreativeBorderStyle.zigzagCut,
+      edges: edges,
+      color: color,
+      patternSize: patternSize,
+      width: width,
+    );
+  }
+
+  /// Factory preset: Folded 3D Paper Border.
+  factory CreativeBorderConfig.foldedPaper({
+    BorderEdges edges = BorderEdges.all,
+    Color color = const Color(0xFFE0E0E0),
+    double width = 3.0,
+  }) {
+    return CreativeBorderConfig(
+      style: CreativeBorderStyle.foldedPaper,
+      edges: edges,
+      color: color,
+      width: width,
+    );
+  }
+
   CreativeBorderConfig copyWith({
     CreativeBorderStyle? style,
     BorderEdges? edges,

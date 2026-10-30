@@ -3,6 +3,58 @@ import 'package:flutter/rendering.dart';
 
 import '../dynamic_shape_config.dart';
 
+/// Collision handling policy when sibling children or boundaries conflict.
+enum ShapeCollisionPolicy {
+  /// Allow child overlapping without modification (e.g. decorative stacked layers).
+  allow,
+
+  /// Issue a diagnostic warning while leaving child coordinates untouched.
+  warn,
+
+  /// Nudge/reposition child along the layout axis to the next collision-free coordinate.
+  reposition,
+
+  /// Constrain or clip child dimensions to strictly prevent overlapping.
+  prevent,
+}
+
+/// Diagnostic severity classification.
+enum ShapeDiagnosticSeverity {
+  info,
+  warning,
+  error,
+}
+
+/// Diagnostic report describing child placement issues, collisions, or boundary breaches.
+class ShapeLayoutDiagnostic {
+  /// Index of the child within the parent container.
+  final int childIndex;
+
+  /// Diagnostic explanation message.
+  final String message;
+
+  /// Severity level of this diagnostic.
+  final ShapeDiagnosticSeverity severity;
+
+  /// Candidate rectangle where child was attempted to be placed.
+  final Rect? candidateRect;
+
+  /// Safe boundary rect against which placement was tested.
+  final Rect? safeRegion;
+
+  const ShapeLayoutDiagnostic({
+    required this.childIndex,
+    required this.message,
+    this.severity = ShapeDiagnosticSeverity.warning,
+    this.candidateRect,
+    this.safeRegion,
+  });
+
+  @override
+  String toString() =>
+      'ShapeLayoutDiagnostic(#$childIndex: $message, severity: $severity)';
+}
+
 /// Comprehensive collision analysis report.
 class ShapeCollisionReport {
   /// Whether any collisions, boundary breaches, or child-to-child overlaps were detected.
@@ -194,6 +246,92 @@ class ShapeCollisionDetector {
       hasCollision: collisions.isNotEmpty,
       collisions: collisions,
       overlappingRegion: overlap,
+    );
+  }
+
+  /// Attempts to resolve child overlapping according to [policy].
+  ///
+  /// In [ShapeCollisionPolicy.reposition] mode, shifts [candidateRect] downward
+  /// (or rightward) by increments of [spacing] until it no longer overlaps [placedRects]
+  /// or hits [safeBounds]. Returns the resolved rect and whether it was repositioned.
+  static ({Rect rect, bool repositioned, bool collisionAvoided})
+      resolveChildPosition({
+    required Rect candidateRect,
+    required List<Rect> placedRects,
+    required Rect safeBounds,
+    ShapeCollisionPolicy policy = ShapeCollisionPolicy.reposition,
+    double spacing = 8.0,
+    Axis direction = Axis.vertical,
+  }) {
+    if (policy == ShapeCollisionPolicy.allow || placedRects.isEmpty) {
+      return (
+        rect: candidateRect,
+        repositioned: false,
+        collisionAvoided: true,
+      );
+    }
+
+    bool hasOverlap = false;
+    for (final placed in placedRects) {
+      if (candidateRect.overlaps(placed)) {
+        hasOverlap = true;
+        break;
+      }
+    }
+
+    if (!hasOverlap) {
+      return (
+        rect: candidateRect,
+        repositioned: false,
+        collisionAvoided: true,
+      );
+    }
+
+    if (policy == ShapeCollisionPolicy.warn) {
+      return (
+        rect: candidateRect,
+        repositioned: false,
+        collisionAvoided: false,
+      );
+    }
+
+    if (policy == ShapeCollisionPolicy.reposition) {
+      var current = candidateRect;
+      const maxAttempts = 20;
+      for (int i = 0; i < maxAttempts; i++) {
+        if (direction == Axis.vertical) {
+          current = current.shift(Offset(0, spacing));
+        } else {
+          current = current.shift(Offset(spacing, 0));
+        }
+
+        // Must remain inside safeBounds
+        if (!safeBounds.contains(current.topLeft) ||
+            !safeBounds.contains(current.bottomRight)) {
+          break; // cannot reposition further inside safeBounds
+        }
+
+        bool collision = false;
+        for (final placed in placedRects) {
+          if (current.overlaps(placed)) {
+            collision = true;
+            break;
+          }
+        }
+        if (!collision) {
+          return (
+            rect: current,
+            repositioned: true,
+            collisionAvoided: true,
+          );
+        }
+      }
+    }
+
+    return (
+      rect: candidateRect,
+      repositioned: false,
+      collisionAvoided: false,
     );
   }
 

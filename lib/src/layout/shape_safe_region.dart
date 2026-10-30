@@ -513,6 +513,143 @@ class ShapeSafeRegion {
     return Rect.fromLTWH(insets.left, insets.top, w, h);
   }
 
+  /// Computes the complete set of safe content regions for [config] on [size].
+  ///
+  /// For shapes where complex geometry, inward notches, ticket cutouts, stepped corners,
+  /// or tabs partition the available interior into multiple discrete pockets,
+  /// [ShapeSafeRegionSet] provides both the primary inscribed rect and all sub-regions.
+  static ShapeSafeRegionSet computeSafeRegionSet({
+    required Size size,
+    required DynamicShapeConfig config,
+    EdgeInsets basePadding = EdgeInsets.zero,
+    double borderWidth = 1.0,
+    TextDirection textDirection = TextDirection.ltr,
+  }) {
+    final insets = computeSafeInsets(
+      size: size,
+      config: config,
+      basePadding: basePadding,
+      borderWidth: borderWidth,
+      textDirection: textDirection,
+    );
+
+    final primary = computeInscribedBounds(
+      size: size,
+      config: config,
+      basePadding: basePadding,
+      borderWidth: borderWidth,
+      textDirection: textDirection,
+    );
+
+    final regions = <Rect>[primary];
+    final isRtl = textDirection == TextDirection.rtl;
+    final strokeOffset = borderWidth > 0 ? borderWidth : 1.0;
+
+    // 1. Inward notch partitioning into flanking pockets
+    if (config.notches != null && config.notches!.isNotEmpty) {
+      for (final notch in config.notches!) {
+        if (!notch.isInward) continue;
+        final targetEdge = isRtl ? _mirrorEdge(notch.edge) : notch.edge;
+        final edgeLength =
+            (targetEdge == ShapeEdge.top || targetEdge == ShapeEdge.bottom)
+                ? size.width
+                : size.height;
+        final notchCenter = edgeLength * notch.positionFactor + notch.offset;
+        final notchLeft = notchCenter - (notch.width / 2.0);
+        final notchRight = notchCenter + (notch.width / 2.0);
+
+        if (targetEdge == ShapeEdge.top) {
+          if (notchLeft > insets.left + 24.0) {
+            regions.add(Rect.fromLTRB(
+              insets.left,
+              insets.top,
+              notchLeft - strokeOffset,
+              size.height - insets.bottom,
+            ));
+          }
+          if (notchRight < size.width - insets.right - 24.0) {
+            regions.add(Rect.fromLTRB(
+              notchRight + strokeOffset,
+              insets.top,
+              size.width - insets.right,
+              size.height - insets.bottom,
+            ));
+          }
+        } else if (targetEdge == ShapeEdge.bottom) {
+          if (notchLeft > insets.left + 24.0) {
+            regions.add(Rect.fromLTRB(
+              insets.left,
+              insets.top,
+              notchLeft - strokeOffset,
+              size.height - insets.bottom,
+            ));
+          }
+          if (notchRight < size.width - insets.right - 24.0) {
+            regions.add(Rect.fromLTRB(
+              notchRight + strokeOffset,
+              insets.top,
+              size.width - insets.right,
+              size.height - insets.bottom,
+            ));
+          }
+        }
+      }
+    }
+
+    // 2. Preset-specific region partitioning
+    switch (config.type) {
+      case DynamicShapeType.ticketScallop:
+        final scallopY = size.height * 0.5;
+        final scallopR = config.scallopRadius + strokeOffset;
+        if (scallopY - scallopR > insets.top + 16.0) {
+          regions.add(Rect.fromLTRB(
+            insets.left,
+            insets.top,
+            size.width - insets.right,
+            scallopY - scallopR,
+          ));
+        }
+        if (scallopY + scallopR < size.height - insets.bottom - 16.0) {
+          regions.add(Rect.fromLTRB(
+            insets.left,
+            scallopY + scallopR,
+            size.width - insets.right,
+            size.height - insets.bottom,
+          ));
+        }
+        break;
+
+      case DynamicShapeType.folderTab:
+        final tabH = config.tabHeight + strokeOffset;
+        regions.add(Rect.fromLTWH(
+          insets.left,
+          0.0,
+          config.tabWidth,
+          tabH,
+        ));
+        break;
+
+      case DynamicShapeType.steppedCorner:
+        final w = config.tabWidth;
+        final h = config.tabHeight;
+        if (config.anchor == ShapeAnchor.bottomRight) {
+          regions.add(Rect.fromLTWH(0, size.height - h, size.width - w, h));
+        } else if (config.anchor == ShapeAnchor.topRight) {
+          regions.add(Rect.fromLTWH(0, 0, size.width - w, h));
+        }
+        break;
+
+      default:
+        break;
+    }
+
+    return ShapeSafeRegionSet(
+      primary: primary,
+      regions: regions.where((r) => r.width > 8.0 && r.height > 8.0).toList(),
+      insets: insets,
+    );
+  }
+
   /// Verifies whether [point] lies within the safe interior of [config] on [size].
   static bool isWithinSafeRegion({
     required Offset point,
@@ -563,4 +700,65 @@ class ShapeSafeRegion {
         return anchor;
     }
   }
+}
+
+/// A comprehensive collection of safe content regions within a dynamic shape contour.
+///
+/// Complex shapes (notched cards, ticket scallops, folder tabs, stepped corners)
+/// may offer multiple discrete compartments for child widgets. [ShapeSafeRegionSet]
+/// provides access to both the primary inscribed rect and all sub-regions.
+class ShapeSafeRegionSet {
+  /// The primary (largest continuous) rectangular safe content area.
+  final Rect primary;
+
+  /// All distinct safe regions identified within the shape geometry.
+  final List<Rect> regions;
+
+  /// Effective safe directional insets for the container.
+  final EdgeInsets insets;
+
+  const ShapeSafeRegionSet({
+    required this.primary,
+    required this.regions,
+    required this.insets,
+  });
+
+  /// The largest region by area among [regions].
+  Rect get largestRegion => regions.isNotEmpty
+      ? regions.reduce(
+          (a, b) => (a.width * a.height) >= (b.width * b.height) ? a : b)
+      : primary;
+
+  /// Finds the best safe region capable of hosting [size].
+  ///
+  /// Searches for a region whose width and height can accommodate [size].
+  /// If multiple match, picks the one closest in size or area.
+  /// Falls back to [largestRegion] if none fully fit.
+  Rect findBestRegionForSize(Size size) {
+    if (regions.isEmpty) return primary;
+    Rect? best;
+    double bestArea = double.infinity;
+    for (final region in regions) {
+      if (region.width >= size.width && region.height >= size.height) {
+        final area = region.width * region.height;
+        if (area < bestArea) {
+          bestArea = area;
+          best = region;
+        }
+      }
+    }
+    return best ?? largestRegion;
+  }
+
+  /// Checks if [point] lies inside any of the safe regions.
+  bool contains(Offset point) {
+    for (final region in regions) {
+      if (region.contains(point)) return true;
+    }
+    return primary.contains(point);
+  }
+
+  @override
+  String toString() =>
+      'ShapeSafeRegionSet(primary: $primary, count: ${regions.length}, insets: $insets)';
 }

@@ -4,8 +4,11 @@ import 'package:flutter/material.dart';
 
 import 'dynamic_shape_config.dart';
 import 'dynamic_shape_path_builder.dart';
+import 'dynamic_shape_stack.dart';
+import 'layout/shape_collision_detector.dart';
 import 'layout/shape_content_protection.dart';
 import 'rendering/dynamic_shape_hit_test.dart';
+import 'rendering/dynamic_shape_multi_child_render_widget.dart';
 import 'rendering/dynamic_shape_painter.dart';
 import 'rendering/dynamic_shape_render_widget.dart';
 import 'shape_pattern.dart';
@@ -80,6 +83,11 @@ class DynamicShapeCustomPainter extends CustomPainter {
 /// its geometry, patterns, frosted glassmorphism, inner shadows, and border styling.
 class DynamicShapeContainer extends StatelessWidget {
   final Widget? child;
+
+  /// Optional multiple children. When provided and non-empty, [RenderMultiChildDynamicShape]
+  /// is used for intelligent geometry-aware multi-child layout.
+  final List<Widget>? children;
+
   final DynamicShapeConfig config;
   final double? width;
   final double? height;
@@ -102,6 +110,15 @@ class DynamicShapeContainer extends StatelessWidget {
   /// Optional child alignment inside the container's safe content area.
   final AlignmentGeometry? alignment;
 
+  /// Layout strategy governing multi-child positioning when [children] is provided.
+  final ShapeLayoutStrategy layoutStrategy;
+
+  /// Inter-child spacing for flow layouts.
+  final double childrenSpacing;
+
+  /// Collision policy governing behavior when multiple children overlap.
+  final ShapeCollisionPolicy collisionPolicy;
+
   /// Optional accessory/badge to dock into the notch or tab
   final Widget? dockedBadge;
   final Alignment badgeAlignment;
@@ -111,10 +128,14 @@ class DynamicShapeContainer extends StatelessWidget {
     super.key,
     this.config = const DynamicShapeConfig(),
     this.child,
+    this.children,
     this.width,
     this.height,
     this.padding,
     this.alignment,
+    this.layoutStrategy = ShapeLayoutStrategy.stack,
+    this.childrenSpacing = 8.0,
+    this.collisionPolicy = ShapeCollisionPolicy.reposition,
     this.margin,
     this.color,
     this.gradient,
@@ -137,11 +158,15 @@ class DynamicShapeContainer extends StatelessWidget {
     super.key,
     this.config = const DynamicShapeConfig(),
     this.child,
+    this.children,
     required ShapeContentMode mode,
     this.width,
     this.height,
     this.padding,
     this.alignment,
+    this.layoutStrategy = ShapeLayoutStrategy.stack,
+    this.childrenSpacing = 8.0,
+    this.collisionPolicy = ShapeCollisionPolicy.reposition,
     this.margin,
     this.color,
     this.gradient,
@@ -1594,40 +1619,76 @@ class DynamicShapeContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget content = child ?? const SizedBox.shrink();
+    final hasMultiChild = children != null && children!.isNotEmpty;
+    Widget rendered;
 
-    // If a docked badge is specified
-    if (dockedBadge != null) {
-      content = Stack(
-        children: [
-          content,
-          Positioned.fill(
-            child: Align(
-              alignment: badgeAlignment,
-              child: Padding(padding: badgePadding, child: dockedBadge!),
-            ),
+    if (hasMultiChild) {
+      final multiChildren = List<Widget>.from(children!);
+      if (dockedBadge != null) {
+        multiChildren.add(
+          ShapeChild.aligned(
+            alignment: badgeAlignment,
+            margin: badgePadding,
+            child: dockedBadge!,
           ),
-        ],
+        );
+      }
+      rendered = DynamicShapeMultiChildRenderWidget(
+        config: config,
+        color: color,
+        gradient: gradient,
+        borderColor: borderColor,
+        borderWidth: borderWidth,
+        shadows: shadows,
+        clipBehavior: clipBehavior,
+        contentProtection: contentProtection,
+        hitTestBehavior: hitTestBehavior,
+        onTap: onTap,
+        padding: padding,
+        alignment: alignment ?? Alignment.center,
+        width: width,
+        height: height,
+        layoutStrategy: layoutStrategy,
+        spacing: childrenSpacing,
+        collisionPolicy: collisionPolicy,
+        children: multiChildren,
+      );
+    } else {
+      Widget content = child ?? const SizedBox.shrink();
+
+      // If a docked badge is specified
+      if (dockedBadge != null) {
+        content = Stack(
+          children: [
+            content,
+            Positioned.fill(
+              child: Align(
+                alignment: badgeAlignment,
+                child: Padding(padding: badgePadding, child: dockedBadge!),
+              ),
+            ),
+          ],
+        );
+      }
+
+      rendered = DynamicShapeRenderWidget(
+        config: config,
+        color: color,
+        gradient: gradient,
+        borderColor: borderColor,
+        borderWidth: borderWidth,
+        shadows: shadows,
+        clipBehavior: clipBehavior,
+        contentProtection: contentProtection,
+        hitTestBehavior: hitTestBehavior,
+        onTap: onTap,
+        padding: padding,
+        alignment: alignment,
+        width: width,
+        height: height,
+        child: content,
       );
     }
-
-    Widget rendered = DynamicShapeRenderWidget(
-      config: config,
-      color: color,
-      gradient: gradient,
-      borderColor: borderColor,
-      borderWidth: borderWidth,
-      shadows: shadows,
-      clipBehavior: clipBehavior,
-      contentProtection: contentProtection,
-      hitTestBehavior: hitTestBehavior,
-      onTap: onTap,
-      padding: padding,
-      alignment: alignment,
-      width: width,
-      height: height,
-      child: content,
-    );
 
     if (config.isGlassmorphic) {
       rendered = ClipPath(

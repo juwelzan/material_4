@@ -11,12 +11,15 @@ A next-generation, high-performance universal dynamic shape and contour engine f
 ## ✨ Features
 
 - **28+ Parameter-Driven Geometries**: Full catalog of mathematically smooth vector paths including folder tabs, ticket scallops, postage stamps, asymmetric cards, hexagonal seals, and custom Bézier contours.
-- **20 Border Renderers**: Solid, dashed, dotted, neon pulse, multi-layer offsets, metallic finishes (gold, silver, bronze, platinum, copper, titanium), rainbow prisms, and hand-drawn sketch strokes.
-- **Backgrounds & Procedural Patterns**: 12 canvas background effects (aurora, mesh gradients, cyber grids, particle constellations) and textured pattern fills.
+- **38 Creative Borders**: Realistic torn paper with cellulose fibers and drop shadow, deckled edges, perforated coupons, charred burnt boundaries, stamps, stitches, neon tubes, art deco, ropes, chains, and double/triple lines.
+- **20 Physical Paper Backgrounds**: Authentic tactile materials including vintage parchment, brown kraft paper, cold-press watercolor, handmade cotton, old newspaper, blueprint, sticky notes, and canvas.
+- **Notebook & Repeating Patterns**: College ruled lines, red margins, dot grids, engineering quad graphs, music manuscripts, penmanship guidelines, plus 21 repeating geometric patterns.
+- **SculptedIconCard Component**: Signature card with a physically elevated/embossed/neumorphic 3D icon plate seated over a pristine, flat, readable text surface. Supports 13 positions, 15 surface styles, and Bengali/RTL text.
+- **17 Reusable Card Presets**: `TornPaperCard`, `NotebookCard`, `StickyNoteCard`, `VintagePaperCard`, `CouponCard`, `TicketCard`, `EmbossedCard`, `DebossedCard`, `NeumorphicCard`, `ClayCard`, `GlassIconCard`, etc.
 - **Adaptive Insets & Smart Layout**: Shape-aware padding ensures text, icons, and buttons are never clipped or overlapped. Includes RTL automatic mirroring and WCAG touch target validation (min 48×48 dp).
 - **Physics & Motion Engine**: Spring rebounds, hover magnets, swipe-to-morph interactions, holographic shimmer sweeps, and accessibility reduced-motion compliance.
 - **Ready-to-Use Widget Suite**: High-level components including `AnimatedShapeCard`, `ShapeProgress`, `ShapeAppBar`, `ShapeNavigationBar`, `ShapeBottomSheet`, `ShapeDialog`, and `ShapeTooltip`.
-- **Interactive Developer Studio**: Built-in `ShapePlayground` for visual parameter tweaking and instant Dart/JSON code export.
+- **Interactive Developer Studio**: Built-in `ShapePlayground` and dedicated `CreativeShowcaseScreen` gallery.
 - **Zero Jitter & Low-End Optimized**: Hardware-accelerated with bounded LRU path caching designed to run at 60–120 FPS even on low-RAM devices (500MB–1GB RAM).
 
 ---
@@ -90,7 +93,48 @@ DynamicShapeContainer.metallic(
 );
 ```
 
-### 3. Collision-Free Adaptive Shape Card
+### 3. Sculpted Icon Card (Signature Feature)
+
+A physically elevated 3D sculpted icon plate over a flat, legible text surface with full RTL & Bengali language support:
+
+```dart
+SculptedIconCard.embossed(
+  icon: Icons.school_rounded,
+  title: 'Academic Portal',
+  subtitle: 'Grade 11 Honors Physics',
+  description: 'Access lecture recordings, problem sets, and syllabus guidelines.',
+  badge: 'Active Term',
+  iconPosition: SculptedIconPosition.topLeft,
+  onTap: () => print('Card tapped!'),
+)
+```
+
+### 4. Realistic Torn Paper Card
+
+Procedural ripped paper edges with stochastic microscopic cellulose fibers and depth shadow:
+
+```dart
+TornPaperCard(
+  tearIntensity: 0.7,
+  edges: BorderEdges.all,
+  child: const Text('Ripped paper document content'),
+)
+```
+
+### 5. Notebook Ruling & Margins
+
+Authentic college-ruled notebook paper with a vertical red margin rule:
+
+```dart
+NotebookCard(
+  child: const Padding(
+    padding: EdgeInsets.only(left: 48, top: 12),
+    child: Text('Lecture notes with clean margin separation'),
+  ),
+)
+```
+
+### 6. Collision-Free Adaptive Shape Card
 
 `AdaptiveShapeCard` automatically calculates safe inner margins so text and icons are never clipped by notches, tabs, or scallops:
 
@@ -108,7 +152,7 @@ AdaptiveShapeCard(
 )
 ```
 
-### 4. Production-Ready School Presets
+### 7. Production-Ready School Presets
 
 ```dart
 SchoolShapePresets.attendanceCard(
@@ -118,7 +162,7 @@ SchoolShapePresets.attendanceCard(
 )
 ```
 
-### 5. Interactive Dev Studio Playground
+### 8. Interactive Dev Studio Playground
 
 Embed the playground in your debug build or storybook:
 

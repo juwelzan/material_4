@@ -4,6 +4,7 @@ import 'package:dynamic_shape/dynamic_shape.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../creative_gallery/creative_showcase_screen.dart';
 import '../widgets/fluid_wave_bottom_bar.dart';
 import '../widgets/timeline_track_painter.dart';
 import '../widgets/wave_background_painter.dart';
@@ -97,6 +98,8 @@ class _SchoolDashboardScreenState extends State<SchoolDashboardScreen> {
                   _buildFrostedLibraryCard(),
                   const SizedBox(height: 16),
                   _buildInteractiveShapePlaygroundButton(),
+                  const SizedBox(height: 16),
+                  _buildCreativeShowcaseButton(),
                 ],
               ),
             ),
@@ -1031,6 +1034,91 @@ class _SchoolDashboardScreenState extends State<SchoolDashboardScreen> {
                       ),
                       Text(
                         '13 shapes, 7 borders, 5 patterns, glass & inner shadows',
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w500,
+                          color: const Color(0xFF7A7A85),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Icon(
+                  Icons.arrow_forward_ios_rounded,
+                  size: 14,
+                  color: Color(0xFF7A7A85),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// 11. Creative & Tactile Studio Launcher (Phase 7.1)
+  Widget _buildCreativeShowcaseButton() {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: const Color(0xFFFBF8F2),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: const Color(0x338D6E63), width: 1.2),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0C000000),
+            blurRadius: 10,
+            offset: Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(20),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const CreativeShowcaseScreen(),
+              ),
+            );
+          },
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFFECC8),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(
+                    Icons.palette_rounded,
+                    color: Color(0xFF8D6E63),
+                    size: 20,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Creative & Tactile Studio',
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                          color: const Color(0xFF1E1E24),
+                        ),
+                      ),
+                      Text(
+                        'Torn paper, notebook rulings, sculpted cards & neumorphism',
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
                         style: GoogleFonts.plusJakartaSans(

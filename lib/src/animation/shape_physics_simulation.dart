@@ -176,4 +176,3 @@ class ShapePhysicsSimulation {
   String toString() =>
       'ShapePhysicsSimulation(mass: $mass, stiffness: $stiffness, damping: $damping, velocity: $initialVelocity)';
 }
-

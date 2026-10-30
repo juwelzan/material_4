@@ -4,6 +4,8 @@ import 'package:flutter/foundation.dart' show listEquals;
 import 'package:flutter/material.dart' show BoxShadow, Gradient;
 
 import 'config/config.dart';
+import 'creative/borders/creative_border_config.dart';
+import 'creative/paper/paper_background_config.dart';
 import 'rendering/dynamic_shape_interaction.dart';
 import 'shape_pattern.dart';
 
@@ -442,6 +444,15 @@ class DynamicShapeConfig {
   /// Shape-aware interaction, hit-testing, and pointer routing configuration.
   final DynamicShapeInteraction? interaction;
 
+  /// Creative border configuration (torn paper, deckled edge, stamps, stitch, neon, etc.).
+  final CreativeBorderConfig? creativeBorder;
+
+  /// Tactile paper-inspired background material configuration (20 paper styles).
+  final PaperBackgroundConfig? paperBackground;
+
+  /// Creative stationery or repeating pattern configuration.
+  final CreativePatternConfig? creativePattern;
+
   const DynamicShapeConfig({
     this.type = DynamicShapeType.smoothRounded,
     this.borderStyle = BorderStyleType.solid,
@@ -512,6 +523,9 @@ class DynamicShapeConfig {
     this.particleCount = 12,
     this.clipConfig,
     this.interaction,
+    this.creativeBorder,
+    this.paperBackground,
+    this.creativePattern,
   })  : _cornerRadii = cornerRadii,
         _rotation = rotation,
         _scaleX = scaleX,
@@ -1175,6 +1189,9 @@ class DynamicShapeConfig {
     int? particleCount,
     ShapeClipConfig? clipConfig,
     DynamicShapeInteraction? interaction,
+    CreativeBorderConfig? creativeBorder,
+    PaperBackgroundConfig? paperBackground,
+    CreativePatternConfig? creativePattern,
   }) {
     return DynamicShapeConfig(
       type: type ?? this.type,
@@ -1248,6 +1265,9 @@ class DynamicShapeConfig {
       particleCount: particleCount ?? this.particleCount,
       clipConfig: clipConfig ?? this.clipConfig,
       interaction: interaction ?? this.interaction,
+      creativeBorder: creativeBorder ?? this.creativeBorder,
+      paperBackground: paperBackground ?? this.paperBackground,
+      creativePattern: creativePattern ?? this.creativePattern,
     );
   }
 
@@ -1455,7 +1475,10 @@ class DynamicShapeConfig {
           backgroundProgress == other.backgroundProgress &&
           noiseOpacity == other.noiseOpacity &&
           waveLevel == other.waveLevel &&
-          particleCount == other.particleCount;
+          particleCount == other.particleCount &&
+          creativeBorder == other.creativeBorder &&
+          paperBackground == other.paperBackground &&
+          creativePattern == other.creativePattern;
 
   @override
   int get hashCode => Object.hashAll([
@@ -1526,6 +1549,9 @@ class DynamicShapeConfig {
         noiseOpacity,
         waveLevel,
         particleCount,
+        creativeBorder,
+        paperBackground,
+        creativePattern,
       ]);
 
   /// Linearly interpolates between two [DynamicShapeConfig] instances.
@@ -1559,6 +1585,10 @@ class DynamicShapeConfig {
       borderProgress: lerpD(a.borderProgress, b.borderProgress),
       dashPhase: lerpD(a.dashPhase, b.dashPhase),
       neonPulseIntensity: lerpD(a.neonPulseIntensity, b.neonPulseIntensity),
+      creativeBorder:
+          CreativeBorderConfig.lerp(a.creativeBorder, b.creativeBorder, t),
+      paperBackground: t < 0.5 ? a.paperBackground : b.paperBackground,
+      creativePattern: t < 0.5 ? a.creativePattern : b.creativePattern,
       stretchOffset:
           Offset.lerp(a.stretchOffset, b.stretchOffset, t) ?? a.stretchOffset,
     );

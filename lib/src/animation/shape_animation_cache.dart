@@ -68,4 +68,3 @@ class ShapeAnimationCache {
   /// Current number of entries stored in the cache.
   int get length => _cache.length;
 }
-

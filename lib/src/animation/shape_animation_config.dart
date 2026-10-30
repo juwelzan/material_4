@@ -150,4 +150,3 @@ class ShapeAnimationConfig {
   String toString() =>
       'ShapeAnimationConfig(duration: ${duration.inMilliseconds}ms, curve: $curve, morphing: $enableMorphing, physics: $physics)';
 }
-

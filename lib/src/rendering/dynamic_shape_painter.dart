@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 
+import '../creative/borders/creative_border_painter.dart';
+import '../creative/paper/paper_texture_renderer.dart';
+import '../creative/paper/repeating_patterns.dart';
+import '../creative/paper/stationery_patterns.dart';
 import '../dynamic_shape_config.dart';
 import '../shape_background_renderer.dart';
 import '../shape_border_painter.dart';
@@ -103,6 +107,16 @@ class DynamicShapePainter {
       baseColor: color,
       baseGradient: gradient,
     );
+
+    // Tactile Physical Paper Material (Phase 7.1)
+    if (config.paperBackground != null) {
+      PaperTextureRenderer.renderPaperBackground(
+        canvas: canvas,
+        size: size,
+        clipPath: path,
+        config: config.paperBackground!,
+      );
+    }
   }
 
   /// Stage 4: Background Patterns.
@@ -116,6 +130,27 @@ class DynamicShapePainter {
     Color? color,
   }) {
     if (size.width <= 0 || size.height <= 0) return;
+
+    // Creative Stationery & Repeating Patterns (Phase 7.1)
+    if (config.creativePattern != null) {
+      final cp = config.creativePattern!;
+      if (cp.stationeryType != null) {
+        StationeryPatternRenderer.renderStationeryPattern(
+          canvas: canvas,
+          size: size,
+          clipPath: path,
+          config: cp,
+        );
+      } else if (cp.repeatingType != null) {
+        CreativeRepeatingPatternRenderer.renderRepeatingPattern(
+          canvas: canvas,
+          size: size,
+          clipPath: path,
+          config: cp,
+        );
+      }
+    }
+
     if (config.pattern == ShapePattern.none) return;
 
     final patternColor = config.patternColor ??
@@ -166,6 +201,17 @@ class DynamicShapePainter {
     double borderWidth = 1.0,
   }) {
     if (size.width <= 0 || size.height <= 0) return;
+
+    // Advanced Creative Border Engine (Phase 7.1)
+    if (config.creativeBorder != null) {
+      CreativeBorderPainter.paintCreativeBorder(
+        canvas: canvas,
+        size: size,
+        path: path,
+        config: config.creativeBorder!,
+      );
+      return;
+    }
 
     ShapeBorderPainter.paintBorder(
       canvas: canvas,

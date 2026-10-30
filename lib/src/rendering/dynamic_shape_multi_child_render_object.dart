@@ -1032,6 +1032,21 @@ class RenderMultiChildDynamicShape extends RenderBox
           bounds.expandToInclude((Offset.zero & size).inflate(neonInflation));
     }
 
+    // Creative border expansion (Phase 7.1)
+    if (_config.creativeBorder != null) {
+      final cb = _config.creativeBorder!;
+      final borderExtent =
+          cb.width + (cb.tearShadow ? cb.tearShadowBlur * 2.0 : 0.0);
+      bounds = bounds.inflate(borderExtent);
+      if (cb.shadow != null) {
+        final s = cb.shadow!;
+        final shadowInflation = s.blurRadius * 2.0 + s.spreadRadius;
+        final shadowBounds =
+            (Offset.zero & size).shift(s.offset).inflate(shadowInflation);
+        bounds = bounds.expandToInclude(shadowBounds);
+      }
+    }
+
     // 6. Outer drop shadows
     if (_config.borderStyle != BorderStyleType.neo3d &&
         _shadows != null &&

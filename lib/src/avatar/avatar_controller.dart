@@ -139,3 +139,4 @@ class Material4AvatarController extends ChangeNotifier {
     notifyListeners();
   }
 }
+

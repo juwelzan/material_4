@@ -105,28 +105,33 @@ class Material4AppBarAction {
           Positioned(
             top: -2,
             right: -2,
-            child: badge ??
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-                  constraints:
-                      const BoxConstraints(minWidth: 16, minHeight: 16),
-                  decoration: BoxDecoration(
-                    color: badgeColor ?? Theme.of(context).colorScheme.error,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Center(
-                    child: Text(
-                      badgeCount! > 99 ? '99+' : badgeCount.toString(),
-                      style: TextStyle(
-                        color: badgeTextColor ?? Colors.white,
-                        fontSize: 9,
-                        fontWeight: FontWeight.w700,
-                        height: 1.0,
+            child: AnimatedScale(
+              scale: 1.0,
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.easeOutBack,
+              child: badge ??
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                    constraints:
+                        const BoxConstraints(minWidth: 16, minHeight: 16),
+                    decoration: BoxDecoration(
+                      color: badgeColor ?? Theme.of(context).colorScheme.error,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Center(
+                      child: Text(
+                        badgeCount! > 99 ? '99+' : badgeCount.toString(),
+                        style: TextStyle(
+                          color: badgeTextColor ?? Colors.white,
+                          fontSize: 9,
+                          fontWeight: FontWeight.w700,
+                          height: 1.0,
+                        ),
                       ),
                     ),
                   ),
-                ),
+            ),
           ),
         ],
       );
@@ -134,7 +139,7 @@ class Material4AppBarAction {
 
     return IconButton(
       icon: iconWidget,
-      tooltip: tooltip,
+      tooltip: tooltip ?? semanticLabel,
       onPressed: onPressed,
     );
   }

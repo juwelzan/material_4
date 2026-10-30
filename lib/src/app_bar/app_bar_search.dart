@@ -232,8 +232,12 @@ class _Material4SearchFieldWidgetState
               ),
             ),
           ),
-          if (widget.search.clearable && _hasText)
-            GestureDetector(
+          AnimatedCrossFade(
+            duration: const Duration(milliseconds: 180),
+            crossFadeState: (widget.search.clearable && _hasText)
+                ? CrossFadeState.showFirst
+                : CrossFadeState.showSecond,
+            firstChild: GestureDetector(
               onTap: () {
                 _controller.clear();
                 widget.search.onChanged?.call('');
@@ -248,9 +252,9 @@ class _Material4SearchFieldWidgetState
                   color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                 ),
               ),
-            )
-          else if (widget.search.trailing != null)
-            widget.search.trailing!,
+            ),
+            secondChild: widget.search.trailing ?? const SizedBox.shrink(),
+          ),
         ],
       ),
     );

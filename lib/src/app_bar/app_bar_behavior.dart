@@ -6,6 +6,9 @@ enum AppBarScrollState {
   /// Header is fully expanded at or near the top of the scrollable.
   expanded,
 
+  /// Header is actively transitioning back towards expanded state.
+  expanding,
+
   /// Header is actively transitioning between expanded and collapsed states.
   collapsing,
 
@@ -15,8 +18,14 @@ enum AppBarScrollState {
   /// Compact header is floating above content in response to reverse scrolling.
   floating,
 
+  /// Header is actively animating off-screen downwards.
+  hiding,
+
   /// Compact header is fully hidden off-screen during downward scroll.
   hidden,
+
+  /// Header is actively animating into view on reverse scroll.
+  revealing,
 }
 
 /// Configuration class defining the scroll physics, transition thresholds,
@@ -54,6 +63,15 @@ class Material4AppBarBehavior {
   /// Whether the header snaps to the nearest stable state (fully expanded or compact).
   final bool snap;
 
+  /// Resistance factor dampening collapse motion near top boundaries. Default 1.0 (linear).
+  final double collapseResistance;
+
+  /// Direction hysteresis threshold (in logical px/s) preventing scroll flip on micro-vibrations.
+  final double velocityHysteresis;
+
+  /// Momentum tracking damping factor (0.0 to 1.0) for exponential velocity smoothing.
+  final double momentumDamping;
+
   /// Creates a [Material4AppBarBehavior] instance.
   const Material4AppBarBehavior({
     this.collapseOnScroll = true,
@@ -65,6 +83,9 @@ class Material4AppBarBehavior {
     this.fastScrollVelocityThreshold = 650.0,
     this.pinned = true,
     this.snap = false,
+    this.collapseResistance = 1.0,
+    this.velocityHysteresis = 15.0,
+    this.momentumDamping = 0.85,
   });
 
   /// Standard pinned behavior where the header collapses smoothly and remains pinned.
@@ -118,6 +139,9 @@ class Material4AppBarBehavior {
     double? fastScrollVelocityThreshold,
     bool? pinned,
     bool? snap,
+    double? collapseResistance,
+    double? velocityHysteresis,
+    double? momentumDamping,
   }) {
     return Material4AppBarBehavior(
       collapseOnScroll: collapseOnScroll ?? this.collapseOnScroll,
@@ -132,6 +156,9 @@ class Material4AppBarBehavior {
           fastScrollVelocityThreshold ?? this.fastScrollVelocityThreshold,
       pinned: pinned ?? this.pinned,
       snap: snap ?? this.snap,
+      collapseResistance: collapseResistance ?? this.collapseResistance,
+      velocityHysteresis: velocityHysteresis ?? this.velocityHysteresis,
+      momentumDamping: momentumDamping ?? this.momentumDamping,
     );
   }
 
@@ -147,7 +174,10 @@ class Material4AppBarBehavior {
         other.reverseScrollThreshold == reverseScrollThreshold &&
         other.fastScrollVelocityThreshold == fastScrollVelocityThreshold &&
         other.pinned == pinned &&
-        other.snap == snap;
+        other.snap == snap &&
+        other.collapseResistance == collapseResistance &&
+        other.velocityHysteresis == velocityHysteresis &&
+        other.momentumDamping == momentumDamping;
   }
 
   @override
@@ -161,6 +191,8 @@ class Material4AppBarBehavior {
         fastScrollVelocityThreshold,
         pinned,
         snap,
+        collapseResistance,
+        velocityHysteresis,
+        momentumDamping,
       );
 }
-

@@ -398,62 +398,147 @@ class _AppBarShowcaseScreenState extends State<AppBarShowcaseScreen>
       'Multi-Row Header with Tab Bar',
     ];
 
-    return ListView.builder(
+    final animationPresets = Material4AnimationPreset.values;
+
+    return ListView(
       padding: const EdgeInsets.all(18),
-      itemCount: presets.length,
-      itemBuilder: (context, index) {
-        return Padding(
+      children: [
+        Padding(
           padding: const EdgeInsets.only(bottom: 12),
-          child: Material4Container(
-            config: const Material4Config(
-              type: Material4Type.smoothRounded,
-              cornerRadius: 16,
+          child: Text(
+            'Layout & Surface Catalog',
+            style: GoogleFonts.plusJakartaSans(
+              fontWeight: FontWeight.w800,
+              fontSize: 16,
+              color: const Color(0xFF1E1E24),
             ),
-            color: Colors.white,
-            shadows: const [
-              BoxShadow(
-                color: Color(0x0A000000),
-                blurRadius: 10,
-                offset: Offset(0, 3),
+          ),
+        ),
+        ...presets.asMap().entries.map((entry) {
+          final index = entry.key;
+          final title = entry.value;
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: Material4Container(
+              config: const Material4Config(
+                type: Material4Type.smoothRounded,
+                cornerRadius: 16,
               ),
-            ],
-            child: ListTile(
-              leading: Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF5E43EE).withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(12),
+              color: Colors.white,
+              shadows: const [
+                BoxShadow(
+                  color: Color(0x0A000000),
+                  blurRadius: 10,
+                  offset: Offset(0, 3),
                 ),
-                child: Center(
-                  child: Text(
-                    '${index + 1}',
-                    style: GoogleFonts.plusJakartaSans(
-                      fontWeight: FontWeight.w800,
-                      color: const Color(0xFF5E43EE),
+              ],
+              child: ListTile(
+                leading: Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF5E43EE).withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Center(
+                    child: Text(
+                      '${index + 1}',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontWeight: FontWeight.w800,
+                        color: const Color(0xFF5E43EE),
+                      ),
                     ),
                   ),
                 ),
-              ),
-              title: Text(
-                presets[index],
-                style: GoogleFonts.plusJakartaSans(
-                  fontWeight: FontWeight.w700,
-                  fontSize: 14,
+                title: Text(
+                  title,
+                  style: GoogleFonts.plusJakartaSans(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 14,
+                  ),
                 ),
-              ),
-              subtitle: Text(
-                'Full layout geometry, surface & animation fidelity',
-                style: GoogleFonts.plusJakartaSans(
-                  fontSize: 11,
-                  color: const Color(0xFF7A7A85),
+                subtitle: Text(
+                  'Full layout geometry, surface & animation fidelity',
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 11,
+                    color: const Color(0xFF7A7A85),
+                  ),
                 ),
+                trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 14),
               ),
-              trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 14),
+            ),
+          );
+        }),
+        const SizedBox(height: 16),
+        Padding(
+          padding: const EdgeInsets.only(bottom: 12),
+          child: Text(
+            '9 Coordinated Animation Presets',
+            style: GoogleFonts.plusJakartaSans(
+              fontWeight: FontWeight.w800,
+              fontSize: 16,
+              color: const Color(0xFF1E1E24),
             ),
           ),
-        );
-      },
+        ),
+        ...animationPresets.map((preset) {
+          final anim = Material4AppBarAnimation.fromPreset(preset);
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 10),
+            child: Material4Container(
+              config: const Material4Config(
+                type: Material4Type.smoothRounded,
+                cornerRadius: 14,
+              ),
+              color: Colors.white,
+              shadows: const [
+                BoxShadow(
+                  color: Color(0x06000000),
+                  blurRadius: 6,
+                  offset: Offset(0, 2),
+                ),
+              ],
+              child: ListTile(
+                leading: Container(
+                  width: 38,
+                  height: 38,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF5E43EE).withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(
+                    Icons.animation_rounded,
+                    color: Color(0xFF5E43EE),
+                    size: 20,
+                  ),
+                ),
+                title: Text(
+                  'Preset: ${preset.name.toUpperCase()}',
+                  style: GoogleFonts.plusJakartaSans(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 13,
+                  ),
+                ),
+                subtitle: Text(
+                  'Duration: ${anim.duration.inMilliseconds}ms • Curve: ${anim.curve.runtimeType}',
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 11,
+                    color: const Color(0xFF7A7A85),
+                  ),
+                ),
+                trailing: Text(
+                  anim.interruptible ? 'Interruptible' : 'Locked',
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    color: const Color(0xFF10B981),
+                  ),
+                ),
+              ),
+            ),
+          );
+        }),
+      ],
     );
   }
 

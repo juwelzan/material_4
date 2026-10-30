@@ -402,5 +402,112 @@ void main() {
       expect(find.text('Replaced Screen'), findsOneWidget);
       expect(find.text('Disposal Test'), findsNothing);
     });
+
+    testWidgets('Respects reduced motion preference (disableAnimations: true)',
+        (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: MediaQuery(
+            data: const MediaQueryData(
+              disableAnimations: true,
+            ),
+            child: Scaffold(
+              body: CustomScrollView(
+                slivers: [
+                  Material4SliverAppBar.dashboard(
+                    title: 'Reduced Motion App Bar',
+                    profile: const Material4AppBarProfile(initials: 'RM'),
+                    animation: const Material4AppBarAnimation(
+                      reducedMotionAware: true,
+                    ),
+                  ),
+                  SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) => Text('Item $index'),
+                      childCount: 20,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text('Reduced Motion App Bar'), findsWidgets);
+      // Instant collapse without animation stutter
+      await tester.drag(find.text('Item 1'), const Offset(0, -300));
+      await tester.pump();
+      expect(find.text('Reduced Motion App Bar'), findsWidgets);
+    });
+
+    testWidgets('Seamlessly handles mid-animation interruption without jumping',
+        (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: CustomScrollView(
+              slivers: [
+                Material4SliverAppBar.dashboard(
+                  title: 'Interruption Test',
+                  profile: const Material4AppBarProfile(initials: 'IT'),
+                  behavior: Material4AppBarBehavior.floatingOnReverse,
+                  animation: const Material4AppBarAnimation(
+                    duration: Duration(milliseconds: 300),
+                  ),
+                ),
+                SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) => SizedBox(
+                      height: 60,
+                      child: Text('Row $index'),
+                    ),
+                    childCount: 40,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+
+      // 1. Scroll down to trigger collapse
+      await tester.drag(find.text('Row 2'), const Offset(0, -250));
+      await tester.pump(const Duration(milliseconds: 100));
+
+      // 2. Interrupt immediately with reverse scroll mid-way
+      await tester.drag(find.text('Row 5'), const Offset(0, 50));
+      await tester.pump(const Duration(milliseconds: 50));
+
+      // 3. Reverse again down
+      await tester.drag(find.text('Row 5'), const Offset(0, -50));
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('Renders all 9 animation presets cleanly on sliver header',
+        (tester) async {
+      for (final preset in Material4AnimationPreset.values) {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: CustomScrollView(
+                slivers: [
+                  Material4SliverAppBar(
+                    title: Text('Preset: ${preset.name}'),
+                    animation: Material4AppBarAnimation.fromPreset(preset),
+                  ),
+                  SliverToBoxAdapter(child: Text('Content for ${preset.name}')),
+                ],
+              ),
+            ),
+          ),
+        );
+
+        expect(find.text('Preset: ${preset.name}'), findsWidgets);
+        expect(tester.takeException(), isNull);
+      }
+    });
   });
 }

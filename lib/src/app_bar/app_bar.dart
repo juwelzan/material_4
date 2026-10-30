@@ -8,4 +8,3 @@ export 'app_bar_search.dart';
 export 'app_bar_style.dart';
 export 'material_4_app_bar.dart';
 export 'material_4_sliver_app_bar.dart';
-

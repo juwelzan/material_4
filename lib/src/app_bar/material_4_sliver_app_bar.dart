@@ -14,6 +14,100 @@ import 'app_bar_profile.dart';
 import 'app_bar_search.dart';
 import 'app_bar_style.dart';
 
+/// Timeline interpolation coordinator for [Material4SliverAppBar].
+///
+/// Converts continuous scroll [collapseRatio] and [floatingProgress] into
+/// synchronized, collision-free animation factors for titles, subtitles,
+/// avatars, drawer buttons, search bars, and surface shadows.
+@immutable
+class Material4AppBarTimeline {
+  /// Collapse ratio from 0.0 (fully expanded) to 1.0 (fully collapsed).
+  final double collapseRatio;
+
+  /// Floating header reveal progress from 0.0 (hidden/off-screen) to 1.0 (fully revealed).
+  final double floatingProgress;
+
+  /// Animation tuning and presets configuration.
+  final Material4AppBarAnimation animation;
+
+  /// Whether animations are disabled via accessibility / reduced motion settings.
+  final bool isReducedMotion;
+
+  /// Creates a [Material4AppBarTimeline] instance.
+  const Material4AppBarTimeline({
+    required this.collapseRatio,
+    required this.floatingProgress,
+    required this.animation,
+    this.isReducedMotion = false,
+  });
+
+  /// Opacity for expanded header content (fades out smoothly between 0.0 and 0.65).
+  double get expandedOpacity {
+    if (isReducedMotion || !animation.fadeEnabled) {
+      return collapseRatio >= 0.5 ? 0.0 : 1.0;
+    }
+    return (1.0 - (collapseRatio / 0.65)).clamp(0.0, 1.0);
+  }
+
+  /// Vertical slide offset for expanded header content.
+  double get expandedSlideY {
+    if (isReducedMotion || !animation.slideEnabled) return 0.0;
+    return -collapseRatio * 24.0;
+  }
+
+  /// Subtitle opacity: fades out quickly between 0.0 and 0.38 to eliminate collisions.
+  double get subtitleOpacity {
+    if (isReducedMotion || !animation.fadeEnabled) {
+      return collapseRatio >= 0.35 ? 0.0 : 1.0;
+    }
+    return (1.0 - (collapseRatio / 0.38)).clamp(0.0, 1.0);
+  }
+
+  /// Compact bar overall opacity.
+  double get compactBarOpacity {
+    if (floatingProgress > 0.0) {
+      return floatingProgress.clamp(0.0, 1.0);
+    }
+    if (isReducedMotion || !animation.fadeEnabled) {
+      return collapseRatio >= 0.95 ? 1.0 : 0.0;
+    }
+    if (collapseRatio <= 0.60) return 0.0;
+    return ((collapseRatio - 0.60) / 0.40).clamp(0.0, 1.0);
+  }
+
+  /// Horizontal slide offset for the left drawer / leading widget.
+  double get drawerSlideX {
+    if (isReducedMotion || !animation.slideEnabled) return 0.0;
+    if (floatingProgress > 0.0) {
+      return (1.0 - floatingProgress) * -18.0;
+    }
+    return 0.0;
+  }
+
+  /// Horizontal slide offset for the compact profile avatar on reverse-scroll reveal.
+  double get compactProfileSlideX {
+    if (isReducedMotion || !animation.slideEnabled) return 0.0;
+    if (floatingProgress > 0.0) {
+      return (1.0 - floatingProgress) * 18.0;
+    }
+    return 0.0;
+  }
+
+  /// Scale factor for the compact profile avatar.
+  double get compactProfileScale {
+    if (isReducedMotion || !animation.scaleEnabled) return 1.0;
+    if (floatingProgress > 0.0) {
+      return 0.85 + (floatingProgress * 0.15);
+    }
+    return 1.0;
+  }
+
+  /// Surface elevation interpolation.
+  double elevation(double base, double collapsed) {
+    return lerpDouble(base, collapsed, collapseRatio) ?? base;
+  }
+}
+
 /// An intelligent, scroll-aware, responsive, and adaptive Sliver AppBar for Material 4.
 ///
 /// Supports smooth scroll-synchronized expansion and collapse, organic/sculpted
@@ -113,6 +207,7 @@ class Material4SliverAppBar extends StatefulWidget {
     double collapsedHeight = 64.0,
     Material4AppBarBehavior behavior =
         Material4AppBarBehavior.floatingOnReverse,
+    Material4AppBarAnimation animation = const Material4AppBarAnimation(),
   }) {
     return Material4SliverAppBar(
       key: key,
@@ -138,6 +233,7 @@ class Material4SliverAppBar extends StatefulWidget {
       expandedHeight: expandedHeight,
       collapsedHeight: collapsedHeight,
       behavior: behavior,
+      animation: animation,
       style: style ??
           const Material4AppBarStyle(
             backgroundColor: Color(0xFFF7F5F2),
@@ -160,6 +256,7 @@ class Material4SliverAppBar extends StatefulWidget {
     double expandedHeight = 240.0,
     double collapsedHeight = 64.0,
     Material4AppBarBehavior behavior = Material4AppBarBehavior.pinnedAlways,
+    Material4AppBarAnimation animation = const Material4AppBarAnimation(),
   }) {
     return Material4SliverAppBar(
       key: key,
@@ -172,6 +269,7 @@ class Material4SliverAppBar extends StatefulWidget {
       expandedHeight: expandedHeight,
       collapsedHeight: collapsedHeight,
       behavior: behavior,
+      animation: animation,
       style: style ?? const Material4AppBarStyle(),
     );
   }
@@ -189,6 +287,7 @@ class Material4SliverAppBar extends StatefulWidget {
     Color? backgroundColor,
     Color? foregroundColor,
     Gradient? gradient,
+    Material4AppBarAnimation animation = const Material4AppBarAnimation(),
   }) {
     return Material4SliverAppBar(
       key: key,
@@ -200,6 +299,7 @@ class Material4SliverAppBar extends StatefulWidget {
       expandedHeight: expandedHeight,
       collapsedHeight: collapsedHeight,
       behavior: Material4AppBarBehavior.floatingOnReverse,
+      animation: animation,
       style: Material4AppBarStyle.organic(
         backgroundColor: backgroundColor ?? const Color(0xFF5E43EE),
         foregroundColor: foregroundColor ?? Colors.white,
@@ -230,6 +330,7 @@ class Material4SliverAppBar extends StatefulWidget {
     double backdropBlur = 18.0,
     Color? backgroundColor,
     Color? foregroundColor,
+    Material4AppBarAnimation animation = const Material4AppBarAnimation(),
   }) {
     return Material4SliverAppBar(
       key: key,
@@ -241,6 +342,7 @@ class Material4SliverAppBar extends StatefulWidget {
       expandedHeight: expandedHeight,
       collapsedHeight: collapsedHeight,
       behavior: Material4AppBarBehavior.floatingOnReverse,
+      animation: animation,
       style: Material4AppBarStyle.glass(
         backdropBlur: backdropBlur,
         backgroundColor: backgroundColor,
@@ -296,6 +398,17 @@ class _Material4SliverAppBarState extends State<Material4SliverAppBar>
       );
       _coordinator.addListener(_onCoordinatorUpdate);
     }
+    if (oldWidget.animation.duration != widget.animation.duration) {
+      _floatingAnimController.duration = widget.animation.duration;
+    }
+    if (oldWidget.animation.curve != widget.animation.curve ||
+        oldWidget.animation.reverseCurve != widget.animation.reverseCurve) {
+      _floatingAnim = CurvedAnimation(
+        parent: _floatingAnimController,
+        curve: widget.animation.curve,
+        reverseCurve: widget.animation.reverseCurve,
+      );
+    }
     if (oldWidget.scrollController != widget.scrollController) {
       oldWidget.scrollController?.removeListener(_onExternalScroll);
       widget.scrollController?.addListener(_onExternalScroll);
@@ -307,7 +420,6 @@ class _Material4SliverAppBarState extends State<Material4SliverAppBar>
         widget.scrollController!.hasClients) {
       final pos = widget.scrollController!.position;
       final delta = pos.pixels - _coordinator.currentOffset;
-      // Synthesize update notification handling
       _coordinator.handleScrollNotification(
         ScrollUpdateNotification(
           metrics: pos,
@@ -319,18 +431,34 @@ class _Material4SliverAppBarState extends State<Material4SliverAppBar>
   }
 
   void _onCoordinatorUpdate() {
+    final bool isReducedMotion = widget.animation.reducedMotionAware &&
+        (MediaQuery.maybeOf(context)?.disableAnimations ?? false);
+
+    if (isReducedMotion || widget.animation.duration == Duration.zero) {
+      _floatingAnimController.value =
+          _coordinator.isFloatingRevealed ? 1.0 : 0.0;
+      if (mounted) setState(() {});
+      return;
+    }
+
     if (_coordinator.isFloatingRevealed) {
-      if (_floatingAnimController.status != AnimationStatus.forward &&
-          _floatingAnimController.status != AnimationStatus.completed) {
-        _floatingAnimController.forward();
+      if (_floatingAnimController.value < 1.0) {
+        _floatingAnimController.animateTo(
+          1.0,
+          duration: widget.animation.duration,
+          curve: widget.animation.curve,
+        );
       }
     } else {
-      if (_floatingAnimController.status != AnimationStatus.reverse &&
-          _floatingAnimController.status != AnimationStatus.dismissed) {
-        _floatingAnimController.reverse();
+      if (_floatingAnimController.value > 0.0) {
+        _floatingAnimController.animateTo(
+          0.0,
+          duration: widget.animation.duration,
+          curve: widget.animation.reverseCurve,
+        );
       }
     }
-    setState(() {});
+    if (mounted) setState(() {});
   }
 
   @override
@@ -348,27 +476,32 @@ class _Material4SliverAppBarState extends State<Material4SliverAppBar>
       onNotification: (notification) {
         return _coordinator.handleScrollNotification(notification);
       },
-      child: SliverPersistentHeader(
-        pinned: widget.behavior.pinned,
-        floating: false,
-        delegate: _Material4SliverHeaderDelegate(
-          expandedHeight: widget.expandedHeight,
-          collapsedHeight: widget.collapsedHeight,
-          title: widget.title,
-          subtitle: widget.subtitle,
-          expandedContent: widget.expandedContent,
-          profile: widget.profile,
-          drawer: widget.drawer,
-          actions: widget.actions,
-          search: widget.search,
-          behavior: widget.behavior,
-          style: widget.style,
-          animation: widget.animation,
-          coordinator: _coordinator,
-          floatingAnimation: _floatingAnim,
-          leading: widget.leading,
-          centerTitle: widget.centerTitle,
-        ),
+      child: AnimatedBuilder(
+        animation: _floatingAnim,
+        builder: (context, _) {
+          return SliverPersistentHeader(
+            pinned: widget.behavior.pinned,
+            floating: false,
+            delegate: _Material4SliverHeaderDelegate(
+              expandedHeight: widget.expandedHeight,
+              collapsedHeight: widget.collapsedHeight,
+              title: widget.title,
+              subtitle: widget.subtitle,
+              expandedContent: widget.expandedContent,
+              profile: widget.profile,
+              drawer: widget.drawer,
+              actions: widget.actions,
+              search: widget.search,
+              behavior: widget.behavior,
+              style: widget.style,
+              animation: widget.animation,
+              coordinator: _coordinator,
+              floatingAnimation: _floatingAnim,
+              leading: widget.leading,
+              centerTitle: widget.centerTitle,
+            ),
+          );
+        },
       ),
     );
   }
@@ -428,7 +561,9 @@ class _Material4SliverHeaderDelegate extends SliverPersistentHeaderDelegate {
         oldDelegate.drawer != drawer ||
         oldDelegate.actions != actions ||
         oldDelegate.style != style ||
-        oldDelegate.behavior != behavior;
+        oldDelegate.behavior != behavior ||
+        oldDelegate.animation != animation ||
+        oldDelegate.floatingAnimation.value != floatingAnimation.value;
   }
 
   @override
@@ -438,6 +573,8 @@ class _Material4SliverHeaderDelegate extends SliverPersistentHeaderDelegate {
     bool overlapsContent,
   ) {
     final topPadding = MediaQuery.of(context).padding.top;
+    final isReducedMotion = animation.reducedMotionAware &&
+        (MediaQuery.maybeOf(context)?.disableAnimations ?? false);
     final maxDistance = maxExtent - minExtent;
     final double collapseRatio =
         maxDistance > 0 ? (shrinkOffset / maxDistance).clamp(0.0, 1.0) : 1.0;
@@ -445,6 +582,13 @@ class _Material4SliverHeaderDelegate extends SliverPersistentHeaderDelegate {
     final isFullyCollapsed = collapseRatio >= 1.0;
     final isFloating = coordinator.isFloatingRevealed && isFullyCollapsed;
     final floatingProgress = floatingAnimation.value;
+
+    final timeline = Material4AppBarTimeline(
+      collapseRatio: collapseRatio,
+      floatingProgress: isFloating ? floatingProgress : 0.0,
+      animation: animation,
+      isReducedMotion: isReducedMotion,
+    );
 
     final theme = Theme.of(context);
     final effectiveFgColor = isFullyCollapsed
@@ -470,23 +614,28 @@ class _Material4SliverHeaderDelegate extends SliverPersistentHeaderDelegate {
             _buildBackgroundSurface(
               context: context,
               collapseRatio: collapseRatio,
+              timeline: timeline,
               isFullyCollapsed: isFullyCollapsed,
               isFloating: isFloating,
               floatingProgress: floatingProgress,
             ),
 
-            // 2. Expanded Header Content (Fades out during collapse)
-            if (collapseRatio < 0.98)
+            // 2. Expanded Header Content (Fades out smoothly during collapse)
+            if (timeline.expandedOpacity > 0.005)
               Positioned(
                 top: topPadding,
                 left: 0,
                 right: 0,
                 bottom: 0,
                 child: Opacity(
-                  opacity: (1.0 - (collapseRatio * 1.4)).clamp(0.0, 1.0),
+                  opacity: timeline.expandedOpacity,
                   child: Transform.translate(
-                    offset: Offset(0, -collapseRatio * 24.0),
-                    child: _buildExpandedBody(context, effectiveFgColor),
+                    offset: Offset(0, timeline.expandedSlideY),
+                    child: _buildExpandedBody(
+                      context,
+                      effectiveFgColor,
+                      timeline,
+                    ),
                   ),
                 ),
               ),
@@ -499,10 +648,9 @@ class _Material4SliverHeaderDelegate extends SliverPersistentHeaderDelegate {
               height: collapsedHeight,
               child: _buildCompactBar(
                 context: context,
-                collapseRatio: collapseRatio,
+                timeline: timeline,
                 isFullyCollapsed: isFullyCollapsed,
                 isFloating: isFloating,
-                floatingProgress: floatingProgress,
                 foregroundColor: effectiveFgColor,
               ),
             ),
@@ -515,6 +663,7 @@ class _Material4SliverHeaderDelegate extends SliverPersistentHeaderDelegate {
   Widget _buildBackgroundSurface({
     required BuildContext context,
     required double collapseRatio,
+    required Material4AppBarTimeline timeline,
     required bool isFullyCollapsed,
     required bool isFloating,
     required double floatingProgress,
@@ -534,13 +683,11 @@ class _Material4SliverHeaderDelegate extends SliverPersistentHeaderDelegate {
         ? (style.collapsedGradient ?? style.gradient)
         : style.gradient;
 
-    // Shadows
-    final effectiveElevation = lerpDouble(
-          style.elevation,
-          style.collapsedElevation,
-          collapseRatio,
-        ) ??
-        0.0;
+    // Shadows & Elevation interpolation
+    final effectiveElevation = timeline.elevation(
+      style.elevation,
+      style.collapsedElevation,
+    );
 
     final shadows = isFullyCollapsed
         ? (style.collapsedShadows ??
@@ -573,7 +720,7 @@ class _Material4SliverHeaderDelegate extends SliverPersistentHeaderDelegate {
       );
     }
 
-    // Frosted Glass Blur Filter
+    // Frosted Glass Blur Filter (applied when configured)
     if (style.backdropBlur > 0.0) {
       surface = BackdropFilter(
         filter: ImageFilter.blur(
@@ -589,7 +736,11 @@ class _Material4SliverHeaderDelegate extends SliverPersistentHeaderDelegate {
     return surface;
   }
 
-  Widget _buildExpandedBody(BuildContext context, Color foregroundColor) {
+  Widget _buildExpandedBody(
+    BuildContext context,
+    Color foregroundColor,
+    Material4AppBarTimeline timeline,
+  ) {
     if (expandedContent != null) {
       return Padding(
         padding: style.padding,
@@ -625,6 +776,8 @@ class _Material4SliverHeaderDelegate extends SliverPersistentHeaderDelegate {
                           color: foregroundColor,
                           letterSpacing: -0.3,
                         ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(height: 2),
                     ],
@@ -632,23 +785,33 @@ class _Material4SliverHeaderDelegate extends SliverPersistentHeaderDelegate {
                       DefaultTextStyle(
                         style: TextStyle(
                           fontSize: profile?.name != null ? 13 : 22,
-                          fontWeight: profile?.name != null ? FontWeight.w600 : FontWeight.w800,
+                          fontWeight: profile?.name != null
+                              ? FontWeight.w600
+                              : FontWeight.w800,
                           color: profile?.name != null
                               ? foregroundColor.withValues(alpha: 0.8)
                               : foregroundColor,
                           letterSpacing: -0.4,
                         ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         child: title!,
                       ),
-                    if (subtitle != null) ...[
+                    if (subtitle != null &&
+                        timeline.subtitleOpacity > 0.01) ...[
                       const SizedBox(height: 2),
-                      DefaultTextStyle(
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                          color: foregroundColor.withValues(alpha: 0.72),
+                      Opacity(
+                        opacity: timeline.subtitleOpacity,
+                        child: DefaultTextStyle(
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color: foregroundColor.withValues(alpha: 0.72),
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          child: subtitle!,
                         ),
-                        child: subtitle!,
                       ),
                     ],
                   ],
@@ -679,20 +842,14 @@ class _Material4SliverHeaderDelegate extends SliverPersistentHeaderDelegate {
 
   Widget _buildCompactBar({
     required BuildContext context,
-    required double collapseRatio,
+    required Material4AppBarTimeline timeline,
     required bool isFullyCollapsed,
     required bool isFloating,
-    required double floatingProgress,
     required Color foregroundColor,
   }) {
-    // When floating on reverse scroll, use floatingProgress; otherwise use collapseRatio
-    final double compactOpacity = isFloating
-        ? floatingProgress
-        : (behavior.hideOnScrollDown
-            ? 0.0
-            : (collapseRatio > 0.6 ? (collapseRatio - 0.6) / 0.4 : 0.0));
+    final double compactOpacity = timeline.compactBarOpacity;
 
-    if (compactOpacity <= 0.01) {
+    if (compactOpacity <= 0.005) {
       return const SizedBox.shrink();
     }
 
@@ -717,7 +874,7 @@ class _Material4SliverHeaderDelegate extends SliverPersistentHeaderDelegate {
         .toList();
 
     return Opacity(
-      opacity: compactOpacity.clamp(0.0, 1.0),
+      opacity: compactOpacity,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12.0),
         child: Row(
@@ -725,8 +882,7 @@ class _Material4SliverHeaderDelegate extends SliverPersistentHeaderDelegate {
             // Left slot: Drawer Button (Smooth slide in on floating reveal)
             if (leadingWidget != null)
               Transform.translate(
-                offset: Offset(
-                    isFloating ? (1.0 - floatingProgress) * -16.0 : 0.0, 0),
+                offset: Offset(timeline.drawerSlideX, 0),
                 child: leadingWidget,
               )
             else
@@ -769,9 +925,11 @@ class _Material4SliverHeaderDelegate extends SliverPersistentHeaderDelegate {
             if (hasCompactProfile) ...[
               const SizedBox(width: 6),
               Transform.translate(
-                offset: Offset(
-                    isFloating ? (1.0 - floatingProgress) * 16.0 : 0.0, 0),
-                child: profile!.buildAvatar(context, isCompact: true),
+                offset: Offset(timeline.compactProfileSlideX, 0),
+                child: Transform.scale(
+                  scale: timeline.compactProfileScale,
+                  child: profile!.buildAvatar(context, isCompact: true),
+                ),
               ),
             ],
           ],

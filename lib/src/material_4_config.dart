@@ -277,6 +277,16 @@ enum BackgroundEffectType {
 /// Type alias for [Material4Config].
 typedef Material4ShapeConfig = Material4Config;
 
+/// Deprecated alias for [Material4Config].
+@Deprecated(
+    'Use Material4Config instead. This alias will be removed in a future release.')
+typedef DynamicShapeConfig = Material4Config;
+
+/// Deprecated alias for [Material4Type].
+@Deprecated(
+    'Use Material4Type instead. This alias will be removed in a future release.')
+typedef DynamicShapeType = Material4Type;
+
 class Material4Config {
   final Material4Type type;
   final BorderStyleType borderStyle;

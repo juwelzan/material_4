@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../creative_gallery/creative_showcase_screen.dart';
+import '../../showcase/material_4_showcase_screen.dart';
 import '../widgets/fluid_wave_bottom_bar.dart';
 import '../widgets/timeline_track_painter.dart';
 import '../widgets/wave_background_painter.dart';
@@ -96,6 +97,8 @@ class _SchoolDashboardScreenState extends State<SchoolDashboardScreen> {
                   _buildExamPassReceiptCard(),
                   const SizedBox(height: 16),
                   _buildFrostedLibraryCard(),
+                  const SizedBox(height: 16),
+                  _buildCompleteShowcaseLauncherButton(),
                   const SizedBox(height: 16),
                   _buildInteractiveShapePlaygroundButton(),
                   const SizedBox(height: 16),
@@ -976,6 +979,91 @@ class _SchoolDashboardScreenState extends State<SchoolDashboardScreen> {
           ),
           const Icon(Icons.badge_outlined, size: 22, color: Color(0xFF1D55A6)),
         ],
+      ),
+    );
+  }
+
+  /// Complete Material 4 Showcase Launcher (10 Sections)
+  Widget _buildCompleteShowcaseLauncherButton() {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFF5E43EE), Color(0xFF7E60FF)],
+        ),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x335E43EE),
+            blurRadius: 14,
+            offset: Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(20),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const Material4ShowcaseScreen(),
+              ),
+            );
+          },
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: const Icon(
+                    Icons.auto_awesome_rounded,
+                    color: Colors.white,
+                    size: 22,
+                  ),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Material 4 Complete Showcase',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        '10 Interactive Sections: Shapes, Borders, Paper, Cards & Morphing',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white.withValues(alpha: 0.85),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Icon(
+                  Icons.arrow_forward_ios_rounded,
+                  size: 14,
+                  color: Colors.white,
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

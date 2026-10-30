@@ -11,9 +11,23 @@ import 'shape_path_cache.dart';
 /// Type alias for [Material4PathBuilder].
 typedef Material4ShapePathBuilder = Material4PathBuilder;
 
+/// Deprecated alias for [Material4PathBuilder].
+@Deprecated(
+    'Use Material4PathBuilder instead. This alias will be removed in a future release.')
+typedef DynamicShapePathBuilder = Material4PathBuilder;
+
 class Material4PathBuilder {
   /// Global LRU path cache limiting memory usage and avoiding recomputation.
   static final ShapePathCache defaultCache = ShapePathCache();
+
+  /// Deprecated alias for [buildPath].
+  @Deprecated('Use buildPath instead.')
+  static Path build(
+    Size size,
+    Material4Config config, {
+    bool useCache = true,
+  }) =>
+      buildPath(size, config, useCache: useCache);
 
   static Path buildPath(
     Size size,

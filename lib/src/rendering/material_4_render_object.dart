@@ -23,6 +23,11 @@ import 'material_4_semantics.dart';
 /// - Direct Canvas rendering (backgrounds, borders, patterns, shadows, shimmer)
 /// - Point-in-path hit testing with transformation coordinate mapping
 /// - Fine-grained clipping and accessibility semantics
+/// Deprecated alias for [RenderMaterial4].
+@Deprecated(
+    'Use RenderMaterial4 instead. This alias will be removed in a future release.')
+typedef RenderDynamicShape = RenderMaterial4;
+
 class RenderMaterial4 extends RenderBox
     with RenderObjectWithChildMixin<RenderBox> {
   Material4Config _config;

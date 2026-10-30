@@ -32,6 +32,7 @@ class ShapeCacheKey {
   final ShapeConstraints constraints;
   final CustomBezierConfig? bezierConfig;
   final int notchesHash;
+  final int _cachedHashCode;
 
   ShapeCacheKey({required Size size, required Material4Config config})
       : type = config.type,
@@ -59,7 +60,38 @@ class ShapeCacheKey {
         constraints = config.constraints,
         bezierConfig = config.bezierConfig,
         notchesHash =
-            config.notches != null ? Object.hashAll(config.notches!) : 0;
+            config.notches != null ? Object.hashAll(config.notches!) : 0,
+        _cachedHashCode = Object.hash(
+          Object.hash(
+            config.type,
+            size.width,
+            size.height,
+            config.cornerRadius,
+            config.resolvedCorners,
+            config.edges,
+            config.anchor,
+            config.tabWidth,
+            config.tabHeight,
+            config.filletRadius,
+            config.scallopRadius,
+            config.petalCount,
+            config.protrusionDepth,
+          ),
+          Object.hash(
+            config.toothWidth,
+            config.toothHeight,
+            config.speechBubbleTailWidth,
+            config.speechBubbleTailHeight,
+            config.waveCount,
+            config.waveAmplitude,
+            config.skewAngle,
+            config.ribbonFoldDepth,
+            config.resolvedTransform,
+            config.constraints,
+            config.bezierConfig,
+            config.notches != null ? Object.hashAll(config.notches!) : 0,
+          ),
+        );
 
   /// Backward compatibility getters for legacy properties.
   CornerRadii get cornerRadii => corners.toCornerRadii();
@@ -100,33 +132,7 @@ class ShapeCacheKey {
           notchesHash == other.notchesHash;
 
   @override
-  int get hashCode => Object.hashAll([
-        type,
-        width,
-        height,
-        cornerRadius,
-        corners,
-        edges,
-        anchor,
-        tabWidth,
-        tabHeight,
-        filletRadius,
-        scallopRadius,
-        petalCount,
-        protrusionDepth,
-        toothWidth,
-        toothHeight,
-        speechBubbleTailWidth,
-        speechBubbleTailHeight,
-        waveCount,
-        waveAmplitude,
-        skewAngle,
-        ribbonFoldDepth,
-        transform,
-        constraints,
-        bezierConfig,
-        notchesHash,
-      ]);
+  int get hashCode => _cachedHashCode;
 }
 
 /// High-performance Least-Recently-Used (LRU) cache for reusable vector Paths.
@@ -174,12 +180,11 @@ class ShapePathCache {
 
     final key = ShapeCacheKey(size: size, config: config);
 
-    if (_cache.containsKey(key)) {
+    final cached = _cache.remove(key);
+    if (cached != null) {
       _hits++;
-      // Move to most-recently used position in LinkedHashMap
-      final path = _cache.remove(key)!;
-      _cache[key] = path;
-      return path;
+      _cache[key] = cached;
+      return cached;
     }
 
     _misses++;

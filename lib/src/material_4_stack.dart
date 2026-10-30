@@ -225,6 +225,11 @@ class ShapeChild extends ParentDataWidget<Material4MultiChildParentData> {
 /// Type alias for [Material4Stack].
 typedef Material4ShapeStack = Material4Stack;
 
+/// Deprecated alias for [Material4Stack].
+@Deprecated(
+    'Use Material4Stack instead. This alias will be removed in a future release.')
+typedef DynamicShapeStack = Material4Stack;
+
 class Material4Stack extends StatelessWidget {
   /// The list of children to lay out inside the shape.
   final List<Widget> children;

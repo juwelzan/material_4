@@ -4,6 +4,8 @@
 
 > [!NOTE]
 > This is our custom Flutter design system and not Google's official Material Design 4.
+>
+> **Upgrading from `dynamic_shape`?** Check the [Migration Guide](doc/MIGRATION_GUIDE.md) for step-by-step instructions. Backward-compatible `@Deprecated` aliases are available for a seamless upgrade.
 
 [![pub package](https://img.shields.io/badge/pub-v1.0.0-blue.svg)](https://pub.dev)
 [![license](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)

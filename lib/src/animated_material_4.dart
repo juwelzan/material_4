@@ -10,6 +10,16 @@ import 'material_4_container.dart';
 /// Type alias for [AnimatedMaterial4Container].
 typedef AnimatedMaterial4 = AnimatedMaterial4Container;
 
+/// Deprecated alias for [AnimatedMaterial4Container].
+@Deprecated(
+    'Use AnimatedMaterial4Container instead. This alias will be removed in a future release.')
+typedef AnimatedDynamicShapeContainer = AnimatedMaterial4Container;
+
+/// Deprecated alias for [AnimatedMaterial4Container].
+@Deprecated(
+    'Use AnimatedMaterial4Container instead. This alias will be removed in a future release.')
+typedef AnimatedDynamicShape = AnimatedMaterial4Container;
+
 class AnimatedMaterial4Container extends ImplicitlyAnimatedWidget {
   final Widget? child;
   final Material4Config config;

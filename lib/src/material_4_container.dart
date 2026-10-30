@@ -89,6 +89,21 @@ class Material4CustomPainter extends CustomPainter {
 /// Type alias for [Material4Container].
 typedef Material4ShapeContainer = Material4Container;
 
+/// Deprecated alias for [Material4Container].
+@Deprecated(
+    'Use Material4Container instead. This alias will be removed in a future release.')
+typedef DynamicShapeContainer = Material4Container;
+
+/// Deprecated alias for [Material4Clipper].
+@Deprecated(
+    'Use Material4Clipper instead. This alias will be removed in a future release.')
+typedef DynamicShapeClipper = Material4Clipper;
+
+/// Deprecated alias for [Material4CustomPainter].
+@Deprecated(
+    'Use Material4CustomPainter instead. This alias will be removed in a future release.')
+typedef DynamicShapeCustomPainter = Material4CustomPainter;
+
 class Material4Container extends StatelessWidget {
   final Widget? child;
 

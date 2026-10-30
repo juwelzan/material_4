@@ -25,6 +25,11 @@ import 'material_4_semantics.dart';
 /// - Collision detection and automatic resolution across sibling children
 /// - Direct Canvas rendering (backgrounds, borders, patterns, shadows, shimmer)
 /// - Fine-grained clipping and accessible semantics
+/// Deprecated alias for [RenderMultiChildMaterial4].
+@Deprecated(
+    'Use RenderMultiChildMaterial4 instead. This alias will be removed in a future release.')
+typedef RenderDynamicShapeMultiChild = RenderMultiChildMaterial4;
+
 class RenderMultiChildMaterial4 extends RenderBox
     with
         ContainerRenderObjectMixin<RenderBox, Material4MultiChildParentData>,

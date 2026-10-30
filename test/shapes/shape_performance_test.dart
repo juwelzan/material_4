@@ -115,5 +115,40 @@ void main() {
         greaterThanOrEqualTo(1),
       );
     });
+
+    test(
+      'Benchmark: uncached vs cached path retrieval throughput across 1,000 cycles',
+      () {
+        const size = Size(240, 120);
+        const config = Material4Config(
+          type: Material4Type.postageStamp,
+          toothWidth: 4,
+          toothHeight: 4,
+        );
+
+        // Warm up
+        for (int i = 0; i < 50; i++) {
+          Material4PathBuilder.buildPath(size, config, useCache: false);
+        }
+
+        final uncachedWatch = Stopwatch()..start();
+        for (int i = 0; i < 1000; i++) {
+          Material4PathBuilder.buildPath(size, config, useCache: false);
+        }
+        uncachedWatch.stop();
+
+        final cachedWatch = Stopwatch()..start();
+        for (int i = 0; i < 1000; i++) {
+          Material4PathBuilder.buildPath(size, config, useCache: true);
+        }
+        cachedWatch.stop();
+
+        // Cached lookup should be measurably faster than uncached path construction
+        expect(
+          cachedWatch.elapsedMicroseconds,
+          lessThan(uncachedWatch.elapsedMicroseconds),
+        );
+      },
+    );
   });
 }

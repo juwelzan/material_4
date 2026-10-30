@@ -99,6 +99,9 @@ class DynamicShapeContainer extends StatelessWidget {
   /// Hit testing strategy (exact shape contour vs rectangular bounding box).
   final ShapeHitTestBehavior hitTestBehavior;
 
+  /// Optional child alignment inside the container's safe content area.
+  final AlignmentGeometry? alignment;
+
   /// Optional accessory/badge to dock into the notch or tab
   final Widget? dockedBadge;
   final Alignment badgeAlignment;
@@ -111,6 +114,7 @@ class DynamicShapeContainer extends StatelessWidget {
     this.width,
     this.height,
     this.padding,
+    this.alignment,
     this.margin,
     this.color,
     this.gradient,
@@ -137,6 +141,7 @@ class DynamicShapeContainer extends StatelessWidget {
     this.width,
     this.height,
     this.padding,
+    this.alignment,
     this.margin,
     this.color,
     this.gradient,
@@ -1618,6 +1623,7 @@ class DynamicShapeContainer extends StatelessWidget {
       hitTestBehavior: hitTestBehavior,
       onTap: onTap,
       padding: padding,
+      alignment: alignment,
       width: width,
       height: height,
       child: content,

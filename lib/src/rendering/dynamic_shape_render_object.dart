@@ -36,9 +36,12 @@ class RenderDynamicShape extends RenderBox
   ShapeHitTestBehavior _hitTestBehavior;
   VoidCallback? _onTap;
   EdgeInsetsGeometry? _padding;
+  AlignmentGeometry? _alignment;
   TextDirection _textDirection;
   double? _explicitWidth;
   double? _explicitHeight;
+  String? _semanticLabel;
+  String? _semanticHint;
 
   /// Cached vector path for current [size].
   Path? _currentPath;
@@ -55,9 +58,12 @@ class RenderDynamicShape extends RenderBox
     ShapeHitTestBehavior hitTestBehavior = ShapeHitTestBehavior.shapeContour,
     VoidCallback? onTap,
     EdgeInsetsGeometry? padding,
+    AlignmentGeometry? alignment,
     TextDirection textDirection = TextDirection.ltr,
     double? width,
     double? height,
+    String? semanticLabel,
+    String? semanticHint,
     RenderBox? child,
   })  : _config = config,
         _color = color,
@@ -70,9 +76,12 @@ class RenderDynamicShape extends RenderBox
         _hitTestBehavior = hitTestBehavior,
         _onTap = onTap,
         _padding = padding,
+        _alignment = alignment,
         _textDirection = textDirection,
         _explicitWidth = width,
-        _explicitHeight = height {
+        _explicitHeight = height,
+        _semanticLabel = semanticLabel,
+        _semanticHint = semanticHint {
     this.child = child;
   }
 
@@ -181,6 +190,13 @@ class RenderDynamicShape extends RenderBox
     markNeedsLayout();
   }
 
+  AlignmentGeometry? get alignment => _alignment;
+  set alignment(AlignmentGeometry? value) {
+    if (_alignment == value) return;
+    _alignment = value;
+    markNeedsLayout();
+  }
+
   TextDirection get textDirection => _textDirection;
   set textDirection(TextDirection value) {
     if (_textDirection == value) return;
@@ -202,6 +218,20 @@ class RenderDynamicShape extends RenderBox
     markNeedsLayout();
   }
 
+  String? get semanticLabel => _semanticLabel;
+  set semanticLabel(String? value) {
+    if (_semanticLabel == value) return;
+    _semanticLabel = value;
+    markNeedsSemanticsUpdate();
+  }
+
+  String? get semanticHint => _semanticHint;
+  set semanticHint(String? value) {
+    if (_semanticHint == value) return;
+    _semanticHint = value;
+    markNeedsSemanticsUpdate();
+  }
+
   TapGestureRecognizer? _tapRecognizer;
 
   @override
@@ -217,6 +247,14 @@ class RenderDynamicShape extends RenderBox
     _tapRecognizer?.dispose();
     _tapRecognizer = null;
     super.detach();
+  }
+
+  @override
+  void dispose() {
+    _tapRecognizer?.dispose();
+    _tapRecognizer = null;
+    _currentPath = null;
+    super.dispose();
   }
 
   @override
@@ -263,12 +301,16 @@ class RenderDynamicShape extends RenderBox
     final w = _explicitWidth;
     final h = _explicitHeight;
 
-    // Determine target size bounds from incoming constraints
-    double tentativeWidth =
-        w ?? (constraints.hasBoundedWidth ? constraints.maxWidth : 300.0);
-    double tentativeHeight =
-        h ?? (constraints.hasBoundedHeight ? constraints.maxHeight : 150.0);
-    var tentativeSize = Size(tentativeWidth, tentativeHeight);
+    // Determine target size bounds from incoming constraints without arbitrary fallbacks
+    final double tentativeWidth = w ??
+        (constraints.hasBoundedWidth
+            ? constraints.maxWidth
+            : constraints.minWidth);
+    final double tentativeHeight = h ??
+        (constraints.hasBoundedHeight
+            ? constraints.maxHeight
+            : constraints.minHeight);
+    final tentativeSize = Size(tentativeWidth, tentativeHeight);
 
     final insets = _computeEffectiveInsets(tentativeSize);
 
@@ -306,8 +348,47 @@ class RenderDynamicShape extends RenderBox
 
       child!.layout(childConstraints, parentUsesSize: true);
 
-      final desiredW = w ?? (child!.size.width + insets.horizontal);
-      final desiredH = h ?? (child!.size.height + insets.vertical);
+      // If constraints were unbounded along an axis, recompute effective insets
+      // using the child's actual measured dimensions to ensure features (e.g. tabs,
+      // scallops, corners) are not scaled to zero by sanitize()
+      final safeReferenceSize = Size(
+        w ??
+            (constraints.hasBoundedWidth
+                ? constraints.maxWidth
+                : math.max(100.0, child!.size.width)),
+        h ??
+            (constraints.hasBoundedHeight
+                ? constraints.maxHeight
+                : math.max(100.0, child!.size.height)),
+      );
+      final resolvedInsets = _computeEffectiveInsets(safeReferenceSize);
+
+      double desiredW;
+      if (w != null) {
+        desiredW = w;
+      } else if (constraints.hasTightWidth) {
+        desiredW = constraints.maxWidth;
+      } else {
+        desiredW = child!.size.width + resolvedInsets.horizontal;
+      }
+
+      double desiredH;
+      if (h != null) {
+        desiredH = h;
+      } else if (constraints.hasTightHeight) {
+        desiredH = constraints.maxHeight;
+      } else {
+        desiredH = child!.size.height + resolvedInsets.vertical;
+      }
+
+      final targetRatio = _config.resolvedTransform.targetAspectRatio;
+      if (targetRatio != null && targetRatio > 0) {
+        if (w != null && h == null) {
+          desiredH = desiredW / targetRatio;
+        } else if (h != null && w == null) {
+          desiredW = desiredH * targetRatio;
+        }
+      }
 
       final clampedSize = constraints.constrain(Size(desiredW, desiredH));
       size = _config.constraints.clampSize(clampedSize);
@@ -315,12 +396,34 @@ class RenderDynamicShape extends RenderBox
       // Re-evaluate insets with finalized size
       final finalInsets = _computeEffectiveInsets(size);
       final childParentData = child!.parentData! as DynamicShapeParentData;
-      childParentData.offset = Offset(finalInsets.left, finalInsets.top);
+      final availableW = math.max(0.0, size.width - finalInsets.horizontal);
+      final availableH = math.max(0.0, size.height - finalInsets.vertical);
+
+      final resolvedAlignment =
+          childParentData.alignment?.resolve(_textDirection) ??
+              _alignment?.resolve(_textDirection);
+
+      if (resolvedAlignment != null) {
+        final deltaX = math.max(0.0, availableW - child!.size.width);
+        final deltaY = math.max(0.0, availableH - child!.size.height);
+        final alignX = (resolvedAlignment.x + 1.0) / 2.0 * deltaX;
+        final alignY = (resolvedAlignment.y + 1.0) / 2.0 * deltaY;
+        childParentData.offset =
+            Offset(finalInsets.left + alignX, finalInsets.top + alignY);
+      } else {
+        childParentData.offset = Offset(finalInsets.left, finalInsets.top);
+      }
     } else {
-      final desiredW =
-          w ?? (constraints.hasBoundedWidth ? constraints.minWidth : 0.0);
-      final desiredH =
-          h ?? (constraints.hasBoundedHeight ? constraints.minHeight : 0.0);
+      double desiredW = w ?? constraints.minWidth;
+      double desiredH = h ?? constraints.minHeight;
+      final targetRatio = _config.resolvedTransform.targetAspectRatio;
+      if (targetRatio != null && targetRatio > 0) {
+        if (w != null && h == null) {
+          desiredH = desiredW / targetRatio;
+        } else if (h != null && w == null) {
+          desiredW = desiredH * targetRatio;
+        }
+      }
       final clampedSize = constraints.constrain(Size(desiredW, desiredH));
       size = _config.constraints.clampSize(clampedSize);
     }
@@ -331,11 +434,15 @@ class RenderDynamicShape extends RenderBox
     final w = _explicitWidth;
     final h = _explicitHeight;
 
-    double tentativeWidth =
-        w ?? (constraints.hasBoundedWidth ? constraints.maxWidth : 300.0);
-    double tentativeHeight =
-        h ?? (constraints.hasBoundedHeight ? constraints.maxHeight : 150.0);
-    var tentativeSize = Size(tentativeWidth, tentativeHeight);
+    final double tentativeWidth = w ??
+        (constraints.hasBoundedWidth
+            ? constraints.maxWidth
+            : constraints.minWidth);
+    final double tentativeHeight = h ??
+        (constraints.hasBoundedHeight
+            ? constraints.maxHeight
+            : constraints.minHeight);
+    final tentativeSize = Size(tentativeWidth, tentativeHeight);
 
     final insets = _computeEffectiveInsets(tentativeSize);
 
@@ -373,15 +480,58 @@ class RenderDynamicShape extends RenderBox
 
       final childSize = child!.getDryLayout(childConstraints);
 
-      final desiredW = w ?? (childSize.width + insets.horizontal);
-      final desiredH = h ?? (childSize.height + insets.vertical);
+      final safeReferenceSize = Size(
+        w ??
+            (constraints.hasBoundedWidth
+                ? constraints.maxWidth
+                : math.max(100.0, childSize.width)),
+        h ??
+            (constraints.hasBoundedHeight
+                ? constraints.maxHeight
+                : math.max(100.0, childSize.height)),
+      );
+      final resolvedInsets = _computeEffectiveInsets(safeReferenceSize);
+
+      double desiredW;
+      if (w != null) {
+        desiredW = w;
+      } else if (constraints.hasTightWidth) {
+        desiredW = constraints.maxWidth;
+      } else {
+        desiredW = childSize.width + resolvedInsets.horizontal;
+      }
+
+      double desiredH;
+      if (h != null) {
+        desiredH = h;
+      } else if (constraints.hasTightHeight) {
+        desiredH = constraints.maxHeight;
+      } else {
+        desiredH = childSize.height + resolvedInsets.vertical;
+      }
+
+      final targetRatio = _config.resolvedTransform.targetAspectRatio;
+      if (targetRatio != null && targetRatio > 0) {
+        if (w != null && h == null) {
+          desiredH = desiredW / targetRatio;
+        } else if (h != null && w == null) {
+          desiredW = desiredH * targetRatio;
+        }
+      }
+
       final clampedSize = constraints.constrain(Size(desiredW, desiredH));
       return _config.constraints.clampSize(clampedSize);
     } else {
-      final desiredW =
-          w ?? (constraints.hasBoundedWidth ? constraints.minWidth : 0.0);
-      final desiredH =
-          h ?? (constraints.hasBoundedHeight ? constraints.minHeight : 0.0);
+      double desiredW = w ?? constraints.minWidth;
+      double desiredH = h ?? constraints.minHeight;
+      final targetRatio = _config.resolvedTransform.targetAspectRatio;
+      if (targetRatio != null && targetRatio > 0) {
+        if (w != null && h == null) {
+          desiredH = desiredW / targetRatio;
+        } else if (h != null && w == null) {
+          desiredW = desiredH * targetRatio;
+        }
+      }
       final clampedSize = constraints.constrain(Size(desiredW, desiredH));
       return _config.constraints.clampSize(clampedSize);
     }
@@ -395,6 +545,7 @@ class RenderDynamicShape extends RenderBox
       config: _config,
       padding: _padding,
       explicitWidth: _explicitWidth,
+      borderWidth: _borderWidth,
       textDirection: _textDirection,
     );
   }
@@ -407,6 +558,7 @@ class RenderDynamicShape extends RenderBox
       config: _config,
       padding: _padding,
       explicitWidth: _explicitWidth,
+      borderWidth: _borderWidth,
       textDirection: _textDirection,
     );
   }
@@ -419,6 +571,7 @@ class RenderDynamicShape extends RenderBox
       config: _config,
       padding: _padding,
       explicitHeight: _explicitHeight,
+      borderWidth: _borderWidth,
       textDirection: _textDirection,
     );
   }
@@ -431,6 +584,7 @@ class RenderDynamicShape extends RenderBox
       config: _config,
       padding: _padding,
       explicitHeight: _explicitHeight,
+      borderWidth: _borderWidth,
       textDirection: _textDirection,
     );
   }
@@ -507,20 +661,33 @@ class RenderDynamicShape extends RenderBox
 
   @override
   bool hitTest(BoxHitTestResult result, {required Offset position}) {
-    if (!DynamicShapeHitTester.containsPoint(
+    final bool isInsideShapeOrBox = DynamicShapeHitTester.containsPoint(
       path: currentPath,
       size: size,
       position: position,
       transform: _config.resolvedTransform,
       behavior: _hitTestBehavior,
-    )) {
-      return false;
+    );
+
+    // If visibleOverflow, children may render outside the shape contour,
+    // so test children if inside container bounds.
+    // Otherwise, children must be inside the shape contour to be hit-tested.
+    final bool canHitChild =
+        _contentProtection.mode == ContentProtectionMode.visibleOverflow
+            ? (Offset.zero & size).contains(position)
+            : isInsideShapeOrBox;
+
+    bool hitChild = false;
+    if (canHitChild) {
+      hitChild = hitTestChildren(result, position: position);
     }
 
-    // Hit test children
-    final hitChild = hitTestChildren(result, position: position);
+    if (hitChild) {
+      result.add(BoxHitTestEntry(this, position));
+      return true;
+    }
 
-    if (hitChild || _onTap != null) {
+    if (isInsideShapeOrBox && _onTap != null) {
       result.add(BoxHitTestEntry(this, position));
       return true;
     }
@@ -559,6 +726,8 @@ class RenderDynamicShape extends RenderBox
     DynamicShapeSemantics.applySemantics(
       config: config,
       onTap: _onTap,
+      semanticLabel: _semanticLabel,
+      semanticHint: _semanticHint,
     );
   }
 

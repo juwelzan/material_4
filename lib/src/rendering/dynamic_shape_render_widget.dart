@@ -18,9 +18,12 @@ class DynamicShapeRenderWidget extends SingleChildRenderObjectWidget {
   final ShapeHitTestBehavior hitTestBehavior;
   final VoidCallback? onTap;
   final EdgeInsetsGeometry? padding;
+  final AlignmentGeometry? alignment;
   final TextDirection? textDirection;
   final double? width;
   final double? height;
+  final String? semanticLabel;
+  final String? semanticHint;
 
   const DynamicShapeRenderWidget({
     super.key,
@@ -35,9 +38,12 @@ class DynamicShapeRenderWidget extends SingleChildRenderObjectWidget {
     this.hitTestBehavior = ShapeHitTestBehavior.shapeContour,
     this.onTap,
     this.padding,
+    this.alignment,
     this.textDirection,
     this.width,
     this.height,
+    this.semanticLabel,
+    this.semanticHint,
     super.child,
   });
 
@@ -55,10 +61,13 @@ class DynamicShapeRenderWidget extends SingleChildRenderObjectWidget {
       hitTestBehavior: hitTestBehavior,
       onTap: onTap,
       padding: padding,
+      alignment: alignment,
       textDirection:
           textDirection ?? Directionality.maybeOf(context) ?? TextDirection.ltr,
       width: width,
       height: height,
+      semanticLabel: semanticLabel,
+      semanticHint: semanticHint,
     );
   }
 
@@ -77,9 +86,12 @@ class DynamicShapeRenderWidget extends SingleChildRenderObjectWidget {
       ..hitTestBehavior = hitTestBehavior
       ..onTap = onTap
       ..padding = padding
+      ..alignment = alignment
       ..textDirection =
           textDirection ?? Directionality.maybeOf(context) ?? TextDirection.ltr
       ..explicitWidth = width
-      ..explicitHeight = height;
+      ..explicitHeight = height
+      ..semanticLabel = semanticLabel
+      ..semanticHint = semanticHint;
   }
 }

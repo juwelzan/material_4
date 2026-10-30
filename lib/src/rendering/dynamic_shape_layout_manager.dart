@@ -82,16 +82,25 @@ class DynamicShapeLayoutManager {
     required DynamicShapeConfig config,
     EdgeInsetsGeometry? padding,
     double? explicitWidth,
+    double borderWidth = 1.0,
     TextDirection textDirection = TextDirection.ltr,
   }) {
     if (explicitWidth != null) return explicitWidth;
     if (child == null) return config.constraints.minWidth;
 
     final resolvedPadding = padding?.resolve(textDirection) ?? EdgeInsets.zero;
-    final childMin = child.getMinIntrinsicWidth(height);
+    final safeInsets = ShapeSafeRegion.computeSafeInsets(
+      size: Size(100.0, height > 0 ? height : 100.0),
+      config: config,
+      basePadding: resolvedPadding,
+      borderWidth: borderWidth,
+      textDirection: textDirection,
+    );
+    final childHeight = math.max(0.0, height - safeInsets.vertical);
+    final childMin = child.getMinIntrinsicWidth(childHeight);
     return math.max(
       config.constraints.minWidth,
-      childMin + resolvedPadding.horizontal,
+      childMin + safeInsets.horizontal,
     );
   }
 
@@ -102,16 +111,25 @@ class DynamicShapeLayoutManager {
     required DynamicShapeConfig config,
     EdgeInsetsGeometry? padding,
     double? explicitWidth,
+    double borderWidth = 1.0,
     TextDirection textDirection = TextDirection.ltr,
   }) {
     if (explicitWidth != null) return explicitWidth;
     if (child == null) return config.constraints.minWidth;
 
     final resolvedPadding = padding?.resolve(textDirection) ?? EdgeInsets.zero;
-    final childMax = child.getMaxIntrinsicWidth(height);
+    final safeInsets = ShapeSafeRegion.computeSafeInsets(
+      size: Size(100.0, height > 0 ? height : 100.0),
+      config: config,
+      basePadding: resolvedPadding,
+      borderWidth: borderWidth,
+      textDirection: textDirection,
+    );
+    final childHeight = math.max(0.0, height - safeInsets.vertical);
+    final childMax = child.getMaxIntrinsicWidth(childHeight);
     return math.max(
       config.constraints.minWidth,
-      childMax + resolvedPadding.horizontal,
+      childMax + safeInsets.horizontal,
     );
   }
 
@@ -122,16 +140,25 @@ class DynamicShapeLayoutManager {
     required DynamicShapeConfig config,
     EdgeInsetsGeometry? padding,
     double? explicitHeight,
+    double borderWidth = 1.0,
     TextDirection textDirection = TextDirection.ltr,
   }) {
     if (explicitHeight != null) return explicitHeight;
     if (child == null) return config.constraints.minHeight;
 
     final resolvedPadding = padding?.resolve(textDirection) ?? EdgeInsets.zero;
-    final childMin = child.getMinIntrinsicHeight(width);
+    final safeInsets = ShapeSafeRegion.computeSafeInsets(
+      size: Size(width > 0 ? width : 100.0, 100.0),
+      config: config,
+      basePadding: resolvedPadding,
+      borderWidth: borderWidth,
+      textDirection: textDirection,
+    );
+    final childWidth = math.max(0.0, width - safeInsets.horizontal);
+    final childMin = child.getMinIntrinsicHeight(childWidth);
     return math.max(
       config.constraints.minHeight,
-      childMin + resolvedPadding.vertical,
+      childMin + safeInsets.vertical,
     );
   }
 
@@ -142,16 +169,25 @@ class DynamicShapeLayoutManager {
     required DynamicShapeConfig config,
     EdgeInsetsGeometry? padding,
     double? explicitHeight,
+    double borderWidth = 1.0,
     TextDirection textDirection = TextDirection.ltr,
   }) {
     if (explicitHeight != null) return explicitHeight;
     if (child == null) return config.constraints.minHeight;
 
     final resolvedPadding = padding?.resolve(textDirection) ?? EdgeInsets.zero;
-    final childMax = child.getMaxIntrinsicHeight(width);
+    final safeInsets = ShapeSafeRegion.computeSafeInsets(
+      size: Size(width > 0 ? width : 100.0, 100.0),
+      config: config,
+      basePadding: resolvedPadding,
+      borderWidth: borderWidth,
+      textDirection: textDirection,
+    );
+    final childWidth = math.max(0.0, width - safeInsets.horizontal);
+    final childMax = child.getMaxIntrinsicHeight(childWidth);
     return math.max(
       config.constraints.minHeight,
-      childMax + resolvedPadding.vertical,
+      childMax + safeInsets.vertical,
     );
   }
 }

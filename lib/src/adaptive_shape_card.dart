@@ -264,6 +264,34 @@ class _AdaptiveShapeCardState extends State<AdaptiveShapeCard>
 
       case Material4Type.customBezier:
         return const EdgeInsets.symmetric(horizontal: 16, vertical: 12);
+
+      case Material4Type.superellipse:
+      case Material4Type.continuousSquircle:
+        return const EdgeInsets.symmetric(horizontal: 18, vertical: 14);
+
+      case Material4Type.asymmetricBlob:
+      case Material4Type.liquid:
+        return const EdgeInsets.symmetric(horizontal: 20, vertical: 16);
+
+      case Material4Type.softDiamond:
+        return const EdgeInsets.symmetric(horizontal: 22, vertical: 18);
+
+      case Material4Type.roundedHexagon:
+      case Material4Type.roundedPentagon:
+        return const EdgeInsets.symmetric(horizontal: 20, vertical: 14);
+
+      case Material4Type.ticket:
+        return const EdgeInsets.symmetric(horizontal: 24, vertical: 14);
+
+      case Material4Type.flower:
+      case Material4Type.starburst:
+        return const EdgeInsets.all(16);
+
+      case Material4Type.leaf:
+        return const EdgeInsets.symmetric(horizontal: 22, vertical: 16);
+
+      case Material4Type.droplet:
+        return const EdgeInsets.only(left: 18, right: 18, top: 22, bottom: 16);
     }
   }
 

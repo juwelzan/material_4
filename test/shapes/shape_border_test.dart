@@ -6,8 +6,8 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('Phase 2: Border Engine Comprehensive Tests', () {
-    test('All 20 BorderStyleType enum values are defined and distinct', () {
-      expect(BorderStyleType.values.length, 20);
+    test('All 32 BorderStyleType enum values are defined and distinct', () {
+      expect(BorderStyleType.values.length, 32);
       expect(
         BorderStyleType.values.toSet().length,
         BorderStyleType.values.length,

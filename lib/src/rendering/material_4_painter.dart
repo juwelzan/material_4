@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../container/container_background.dart';
+import '../container/container_pattern.dart';
+import '../container/container_texture.dart';
 import '../creative/borders/creative_border_painter.dart';
 import '../creative/paper/paper_texture_renderer.dart';
 import '../creative/paper/repeating_patterns.dart';
@@ -119,6 +122,90 @@ class Material4Painter {
     }
   }
 
+  /// Stage 3B: Tactile Procedural Textures.
+  static void paintTexture({
+    required Canvas canvas,
+    required Size size,
+    required Path path,
+    required Material4Texture texture,
+  }) {
+    if (size.width <= 0 || size.height <= 0) return;
+    Material4TextureRenderer.renderTexture(
+      canvas: canvas,
+      size: size,
+      clipPath: path,
+      texture: texture,
+      animationProgress: texture.progress,
+    );
+  }
+
+  /// Complete painting pipeline coordinator for unified [Material4Background].
+  static void paintUnifiedBackground({
+    required Canvas canvas,
+    required Size size,
+    required Path path,
+    required Material4Background background,
+    required Material4Config config,
+  }) {
+    if (size.width <= 0 || size.height <= 0) return;
+
+    // 1. Base Fill & Effects
+    paintBackground(
+      canvas: canvas,
+      size: size,
+      path: path,
+      config: config.copyWith(
+        backgroundEffect: background.effect,
+        meshColors: background.meshColors,
+        paperBackground: background.paperBackground,
+        isGlassmorphic: background.isGlassmorphic,
+        glassBlur: background.glassBlur,
+        glassTint: background.glassTint,
+      ),
+      color: background.color,
+      gradient: background.gradient,
+    );
+
+    // 2. Texture
+    if (background.texture != null) {
+      paintTexture(
+        canvas: canvas,
+        size: size,
+        path: path,
+        texture: background.texture!,
+      );
+    }
+
+    // 3. Pattern
+    if (background.pattern != null) {
+      Material4PatternRenderer.renderPattern(
+        canvas: canvas,
+        size: size,
+        clipPath: path,
+        pattern: background.pattern!,
+        animationProgress: background.pattern!.progress,
+      );
+    } else if (background.creativePattern != null) {
+      paintPatterns(
+        canvas: canvas,
+        size: size,
+        path: path,
+        config: config.copyWith(creativePattern: background.creativePattern),
+        color: background.color,
+      );
+    }
+
+    // 4. Inner Shadows
+    if (background.innerShadows != null && background.innerShadows!.isNotEmpty) {
+      paintInnerShadows(
+        canvas: canvas,
+        size: size,
+        path: path,
+        config: config.copyWith(innerShadows: background.innerShadows),
+      );
+    }
+  }
+
   /// Stage 4: Background Patterns.
   ///
   /// Renders procedural pattern textures (stripes, dots, grid, waves) clipped to the shape contour.
@@ -128,8 +215,18 @@ class Material4Painter {
     required Path path,
     required Material4Config config,
     Color? color,
+    Material4Pattern? customPattern,
   }) {
     if (size.width <= 0 || size.height <= 0) return;
+
+    if (customPattern != null) {
+      Material4PatternRenderer.renderPattern(
+        canvas: canvas,
+        size: size,
+        clipPath: path,
+        pattern: customPattern,
+      );
+    }
 
     // Creative Stationery & Repeating Patterns (Phase 7.1)
     if (config.creativePattern != null) {

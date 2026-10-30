@@ -7,6 +7,7 @@ import 'animation/shape_animation_config.dart';
 import 'animation/shape_animation_controller.dart';
 import 'material_4_config.dart';
 import 'material_4_path_builder.dart';
+import 'container/container.dart';
 import 'material_4_stack.dart';
 import 'layout/shape_collision_detector.dart';
 import 'layout/shape_content_protection.dart';
@@ -170,12 +171,32 @@ class Material4Container extends StatelessWidget {
   /// Optional shape animation controller for programmatic motion orchestration.
   final ShapeAnimationController? controller;
 
+  /// Next-Gen Universal Custom Shape Builder with fluent geometry API.
+  final Material4CustomShape? customShape;
+
+  /// Unified multi-layer background (solid color, gradient, pattern, texture, effects).
+  final Material4Background? background;
+
+  /// Next-Gen universal shape-following animated border.
+  final Material4Border? border;
+
+  /// Synchronized multi-layer animation configuration.
+  final Material4ContainerAnimation? containerAnimation;
+
+  /// Programmatic morph controller for dynamic shape transitions and sequences.
+  final Material4MorphController? morphController;
+
   const Material4Container({
     super.key,
     this.config = const Material4Config(),
     this.shape,
     this.animation,
     this.controller,
+    this.customShape,
+    this.background,
+    this.border,
+    this.containerAnimation,
+    this.morphController,
     this.child,
     this.children,
     this.width,
@@ -215,6 +236,11 @@ class Material4Container extends StatelessWidget {
     this.shape,
     this.animation,
     this.controller,
+    this.customShape,
+    this.background,
+    this.border,
+    this.containerAnimation,
+    this.morphController,
     this.child,
     this.children,
     required ShapeContentMode mode,
@@ -249,6 +275,140 @@ class Material4Container extends StatelessWidget {
 
   /// Quick accessor to the active content layout mode.
   ShapeContentMode get contentMode => contentProtection.mode;
+
+  /// Factory constructor that configures the container directly from a [Material4ContainerPreset].
+  factory Material4Container.fromPreset({
+    Key? key,
+    required Material4ContainerPreset preset,
+    Widget? child,
+    List<Widget>? children,
+    double? width,
+    double? height,
+    EdgeInsetsGeometry? padding,
+    EdgeInsetsGeometry? margin,
+    VoidCallback? onTap,
+    VoidCallback? onLongPress,
+    VoidCallback? onDoubleTap,
+    Clip clipBehavior = Clip.antiAlias,
+    String? semanticLabel,
+  }) {
+    return Material4Container(
+      key: key,
+      config: preset.config,
+      customShape: preset.customShape,
+      background: preset.background,
+      border: preset.border,
+      containerAnimation: preset.animation,
+      color: preset.background.color,
+      gradient: preset.background.gradient,
+      shadows: preset.background.shadows,
+      borderColor: preset.border.color ?? const Color(0x1F1A1A1A),
+      borderWidth: preset.border.width,
+      width: width,
+      height: height,
+      padding: padding,
+      margin: margin,
+      onTap: onTap,
+      onLongPress: onLongPress,
+      onDoubleTap: onDoubleTap,
+      clipBehavior: clipBehavior,
+      semanticLabel: semanticLabel,
+      child: child,
+      children: children,
+    );
+  }
+
+  /// Factory for high-tech carbon fiber textured container.
+  factory Material4Container.carbonTech({
+    Key? key,
+    Widget? child,
+    List<Widget>? children,
+    double? width,
+    double? height,
+    EdgeInsetsGeometry? padding,
+    EdgeInsetsGeometry? margin,
+    VoidCallback? onTap,
+  }) =>
+      Material4Container.fromPreset(
+        key: key,
+        preset: Material4ContainerPreset.carbonTech,
+        width: width,
+        height: height,
+        padding: padding,
+        margin: margin,
+        onTap: onTap,
+        child: child,
+        children: children,
+      );
+
+  /// Factory for physical paper craft stationery container.
+  factory Material4Container.paperCraft({
+    Key? key,
+    Widget? child,
+    List<Widget>? children,
+    double? width,
+    double? height,
+    EdgeInsetsGeometry? padding,
+    EdgeInsetsGeometry? margin,
+    VoidCallback? onTap,
+  }) =>
+      Material4Container.fromPreset(
+        key: key,
+        preset: Material4ContainerPreset.paperCraft,
+        width: width,
+        height: height,
+        padding: padding,
+        margin: margin,
+        onTap: onTap,
+        child: child,
+        children: children,
+      );
+
+  /// Factory for warm organic sculpted card with breathing border.
+  factory Material4Container.organicCard({
+    Key? key,
+    Widget? child,
+    List<Widget>? children,
+    double? width,
+    double? height,
+    EdgeInsetsGeometry? padding,
+    EdgeInsetsGeometry? margin,
+    VoidCallback? onTap,
+  }) =>
+      Material4Container.fromPreset(
+        key: key,
+        preset: Material4ContainerPreset.organicCard,
+        width: width,
+        height: height,
+        padding: padding,
+        margin: margin,
+        onTap: onTap,
+        child: child,
+        children: children,
+      );
+
+  /// Factory for fluid organic metaball liquid container with animated liquid ripple.
+  factory Material4Container.liquidContainer({
+    Key? key,
+    Widget? child,
+    List<Widget>? children,
+    double? width,
+    double? height,
+    EdgeInsetsGeometry? padding,
+    EdgeInsetsGeometry? margin,
+    VoidCallback? onTap,
+  }) =>
+      Material4Container.fromPreset(
+        key: key,
+        preset: Material4ContainerPreset.liquid,
+        width: width,
+        height: height,
+        padding: padding,
+        margin: margin,
+        onTap: onTap,
+        child: child,
+        children: children,
+      );
 
   /// Factory for Frosted Glassmorphism Container with dynamic path clipping
   factory Material4Container.glass({
@@ -1683,8 +1843,65 @@ class Material4Container extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final effectiveConfig =
+    var effectiveConfig =
         shape != null ? config.copyWith(type: shape) : config;
+
+    if (customShape != null) {
+      effectiveConfig = effectiveConfig.copyWith(customShape: customShape);
+    }
+
+    if (morphController != null) {
+      return AnimatedBuilder(
+        animation: morphController!,
+        builder: (context, _) {
+          final activeShape = morphController!.currentCustomShape;
+          final morphedConfig = effectiveConfig.copyWith(
+            customShape: activeShape,
+            borderProgress: morphController!.morphProgress,
+          );
+          return _buildRenderTree(
+            context,
+            morphedConfig,
+            activeBackground: background,
+            activeBorder: border,
+          );
+        },
+      );
+    }
+
+    if (containerAnimation != null && containerAnimation!.animated) {
+      return _Material4CoordinatedAnimationContainer(
+        animation: containerAnimation!,
+        config: effectiveConfig,
+        customShape: customShape,
+        background: background,
+        border: border,
+        width: width,
+        height: height,
+        padding: padding,
+        margin: margin,
+        color: color,
+        gradient: gradient,
+        borderColor: borderColor,
+        borderWidth: borderWidth,
+        shadows: shadows,
+        onTap: onTap,
+        onLongPress: onLongPress,
+        onDoubleTap: onDoubleTap,
+        clipBehavior: clipBehavior,
+        contentProtection: contentProtection,
+        hitTestBehavior: hitTestBehavior,
+        interaction: interaction,
+        clipConfig: clipConfig,
+        alignment: alignment,
+        dockedBadge: dockedBadge,
+        badgeAlignment: badgeAlignment,
+        badgePadding: badgePadding,
+        semanticLabel: semanticLabel,
+        semanticHint: semanticHint,
+        child: child,
+      );
+    }
 
     if (animation != null) {
       return AnimatedMaterial4Container(
@@ -1711,18 +1928,30 @@ class Material4Container extends StatelessWidget {
       return AnimatedBuilder(
         animation: controller!,
         builder: (context, _) {
-          return _buildRenderTree(context, controller!.currentConfig);
+          return _buildRenderTree(
+            context,
+            controller!.currentConfig,
+            activeBackground: background,
+            activeBorder: border,
+          );
         },
       );
     }
 
-    return _buildRenderTree(context, effectiveConfig);
+    return _buildRenderTree(
+      context,
+      effectiveConfig,
+      activeBackground: background,
+      activeBorder: border,
+    );
   }
 
   Widget _buildRenderTree(
     BuildContext context,
-    Material4Config activeConfig,
-  ) {
+    Material4Config activeConfig, {
+    Material4Background? activeBackground,
+    Material4Border? activeBorder,
+  }) {
     final hasMultiChild = children != null && children!.isNotEmpty;
     Widget rendered;
 
@@ -1802,6 +2031,8 @@ class Material4Container extends StatelessWidget {
         height: height,
         semanticLabel: semanticLabel,
         semanticHint: semanticHint,
+        background: activeBackground,
+        border: activeBorder,
         child: content,
       );
     }
@@ -1825,5 +2056,281 @@ class Material4Container extends StatelessWidget {
     }
 
     return rendered;
+  }
+}
+
+class _Material4CoordinatedAnimationContainer extends StatefulWidget {
+  final Material4ContainerAnimation animation;
+  final Material4Config config;
+  final Material4CustomShape? customShape;
+  final Material4Background? background;
+  final Material4Border? border;
+  final double? width;
+  final double? height;
+  final EdgeInsetsGeometry? padding;
+  final EdgeInsetsGeometry? margin;
+  final Color? color;
+  final Gradient? gradient;
+  final Color borderColor;
+  final double borderWidth;
+  final List<BoxShadow>? shadows;
+  final VoidCallback? onTap;
+  final VoidCallback? onLongPress;
+  final VoidCallback? onDoubleTap;
+  final Clip clipBehavior;
+  final ShapeContentProtection contentProtection;
+  final ShapeHitTestBehavior hitTestBehavior;
+  final Material4Interaction? interaction;
+  final ShapeClipConfig? clipConfig;
+  final AlignmentGeometry? alignment;
+  final Widget? dockedBadge;
+  final Alignment badgeAlignment;
+  final EdgeInsets badgePadding;
+  final String? semanticLabel;
+  final String? semanticHint;
+  final Widget? child;
+
+  const _Material4CoordinatedAnimationContainer({
+    required this.animation,
+    required this.config,
+    this.customShape,
+    this.background,
+    this.border,
+    this.width,
+    this.height,
+    this.padding,
+    this.margin,
+    this.color,
+    this.gradient,
+    this.borderColor = const Color(0x1F1A1A1A),
+    this.borderWidth = 1.0,
+    this.shadows,
+    this.onTap,
+    this.onLongPress,
+    this.onDoubleTap,
+    this.clipBehavior = Clip.antiAlias,
+    this.contentProtection = const ShapeContentProtection(),
+    this.hitTestBehavior = ShapeHitTestBehavior.shapeContour,
+    this.interaction,
+    this.clipConfig,
+    this.alignment,
+    this.dockedBadge,
+    this.badgeAlignment = Alignment.topRight,
+    this.badgePadding = EdgeInsets.zero,
+    this.semanticLabel,
+    this.semanticHint,
+    this.child,
+  });
+
+  @override
+  State<_Material4CoordinatedAnimationContainer> createState() =>
+      _Material4CoordinatedAnimationContainerState();
+}
+
+class _Material4CoordinatedAnimationContainerState
+    extends State<_Material4CoordinatedAnimationContainer>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _animController;
+
+  @override
+  void initState() {
+    super.initState();
+    _animController = AnimationController(
+      vsync: this,
+      duration: widget.animation.duration,
+    );
+    if (widget.animation.loop) {
+      if (widget.animation.reverse) {
+        _animController.repeat(reverse: true);
+      } else {
+        _animController.repeat();
+      }
+    } else {
+      _animController.forward();
+    }
+  }
+
+  @override
+  void didUpdateWidget(
+      covariant _Material4CoordinatedAnimationContainer oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.animation.duration != widget.animation.duration) {
+      _animController.duration = widget.animation.duration;
+    }
+    if (oldWidget.animation.loop != widget.animation.loop ||
+        oldWidget.animation.reverse != widget.animation.reverse) {
+      _animController.reset();
+      if (widget.animation.loop) {
+        if (widget.animation.reverse) {
+          _animController.repeat(reverse: true);
+        } else {
+          _animController.repeat();
+        }
+      } else {
+        _animController.forward();
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _animController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final mediaQuery = MediaQuery.maybeOf(context);
+    final disableAnimations = mediaQuery?.disableAnimations ?? false;
+
+    if (disableAnimations) {
+      return Material4RenderWidget(
+        config: widget.config.copyWith(customShape: widget.customShape),
+        color: widget.color,
+        gradient: widget.gradient,
+        borderColor: widget.borderColor,
+        borderWidth: widget.borderWidth,
+        shadows: widget.shadows,
+        clipBehavior: widget.clipBehavior,
+        contentProtection: widget.contentProtection,
+        hitTestBehavior: widget.hitTestBehavior,
+        interaction: widget.interaction,
+        clipConfig: widget.clipConfig,
+        onTap: widget.onTap,
+        onLongPress: widget.onLongPress,
+        onDoubleTap: widget.onDoubleTap,
+        padding: widget.padding,
+        alignment: widget.alignment,
+        width: widget.width,
+        height: widget.height,
+        semanticLabel: widget.semanticLabel,
+        semanticHint: widget.semanticHint,
+        background: widget.background,
+        border: widget.border,
+        child: widget.child,
+      );
+    }
+
+    return AnimatedBuilder(
+      animation: _animController,
+      builder: (context, staticChild) {
+        final progress =
+            widget.animation.curve.transform(_animController.value);
+        final anim = widget.animation;
+
+        // Driven shape morphing
+        Material4CustomShape? activeShape = widget.customShape;
+        if (anim.sequence != null && anim.sequence!.isNotEmpty) {
+          final total = anim.sequence!.length;
+          final stepProgress = (progress * total) % total;
+          final idx = stepProgress.floor();
+          final localT = stepProgress - idx;
+          final fromShape = anim.sequence![idx];
+          final toShape = anim.sequence![(idx + 1) % total];
+          activeShape = Material4CustomShape.morph(
+            from: fromShape,
+            to: toShape,
+            progress: localT,
+            physics: anim.physics,
+          );
+        } else if (anim.shapeMorph &&
+            (anim.targetShape != null || anim.targetCustomShape != null)) {
+          final fromShape = widget.customShape ?? widget.config.type;
+          final toShape = anim.targetCustomShape ?? anim.targetShape!;
+          activeShape = Material4CustomShape.morph(
+            from: fromShape,
+            to: toShape,
+            progress: progress,
+            physics: anim.physics,
+          );
+        }
+
+        // Driven border
+        Material4Border? activeBorder = widget.border;
+        if (anim.animateBorder && activeBorder != null) {
+          activeBorder = activeBorder.copyWith(
+            progress: (progress * anim.borderSpeed) % 1.0,
+          );
+        }
+
+        // Driven pattern
+        Material4Pattern? activePattern = widget.background?.pattern;
+        if (anim.animatePattern && activePattern != null) {
+          activePattern = activePattern.copyWith(
+            progress: (progress * anim.patternSpeed) % 1.0,
+          );
+        }
+
+        // Driven texture
+        Material4Texture? activeTexture = widget.background?.texture;
+        if (anim.animateTexture && activeTexture != null) {
+          activeTexture = activeTexture.copyWith(
+            progress: (progress * anim.textureSpeed) % 1.0,
+          );
+        }
+
+        Material4Background? activeBackground = widget.background;
+        if (activePattern != null || activeTexture != null) {
+          activeBackground =
+              (activeBackground ?? const Material4Background()).copyWith(
+            pattern: activePattern,
+            texture: activeTexture,
+          );
+        }
+
+        final activeConfig = widget.config.copyWith(
+          customShape: activeShape,
+          borderProgress: progress,
+          backgroundProgress: progress,
+        );
+
+        Widget rendered = Material4RenderWidget(
+          config: activeConfig,
+          color: widget.color,
+          gradient: widget.gradient,
+          borderColor: widget.borderColor,
+          borderWidth: widget.borderWidth,
+          shadows: widget.shadows,
+          clipBehavior: widget.clipBehavior,
+          contentProtection: widget.contentProtection,
+          hitTestBehavior: widget.hitTestBehavior,
+          interaction: widget.interaction,
+          clipConfig: widget.clipConfig,
+          onTap: widget.onTap,
+          onLongPress: widget.onLongPress,
+          onDoubleTap: widget.onDoubleTap,
+          padding: widget.padding,
+          alignment: widget.alignment,
+          width: widget.width,
+          height: widget.height,
+          semanticLabel: widget.semanticLabel,
+          semanticHint: widget.semanticHint,
+          background: activeBackground,
+          border: activeBorder,
+          child: staticChild,
+        );
+
+        if (activeConfig.isGlassmorphic) {
+          rendered = ClipPath(
+            clipper: Material4Clipper(config: activeConfig),
+            clipBehavior: widget.clipBehavior,
+            child: BackdropFilter(
+              filter: ImageFilter.blur(
+                sigmaX: activeConfig.glassBlur,
+                sigmaY: activeConfig.glassBlur,
+              ),
+              child: rendered,
+            ),
+          );
+        }
+
+        if (widget.margin != null) {
+          rendered = Padding(padding: widget.margin!, child: rendered);
+        }
+
+        return rendered;
+      },
+      child: widget.child,
+    );
   }
 }

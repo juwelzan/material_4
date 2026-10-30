@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart' show listEquals;
 import 'package:flutter/material.dart' show BoxShadow, Gradient;
 
 import 'config/config.dart';
+import 'container/custom_shape.dart';
 import 'creative/borders/creative_border_config.dart';
 import 'creative/paper/paper_background_config.dart';
 import 'rendering/material_4_interaction.dart';
@@ -101,6 +102,43 @@ enum Material4Type {
 
   /// Fully custom Bézier geometry supplied via callback.
   customBezier,
+
+  // --- Universal Next-Gen Shapes ---
+  /// Mathematical Lamé curve super-ellipse with configurable exponent.
+  superellipse,
+
+  /// Curvature-continuous C2 squircle arc.
+  continuousSquircle,
+
+  /// Asymmetric procedural multi-control point organic blob.
+  asymmetricBlob,
+
+  /// Symmetrical diamond with outward curved convex facets.
+  softDiamond,
+
+  /// Regular 6-sided polygon with smooth corner fillets.
+  roundedHexagon,
+
+  /// Regular 5-sided polygon with smooth corner fillets.
+  roundedPentagon,
+
+  /// Event voucher ticket with opposing circular notch bites.
+  ticket,
+
+  /// Multi-petal circular botanical blossom silhouette.
+  flower,
+
+  /// Multi-pointed starburst badge emblem.
+  starburst,
+
+  /// Natural pointed botanical leaf silhouette.
+  leaf,
+
+  /// Teardrop water droplet with pointed apex and rounded base.
+  droplet,
+
+  /// Fluid organic metaball liquid droplet shape.
+  liquid,
 }
 
 /// Metallic reflection lustres for metallic borders and backgrounds.
@@ -230,6 +268,43 @@ enum BorderStyleType {
 
   /// Artisanal organic hand-drawn sketchy stroke with continuous harmonic jitter.
   handDrawn,
+
+  // --- Universal Next-Gen Animated Border Styles ---
+  /// Continuous flowing gradient energy sweep along the contour.
+  flowingBorder,
+
+  /// Marquee marching ants with animated phase offset.
+  movingDash,
+
+  /// Rhythmic harmonic breathing of stroke width and glow.
+  pulsatingBorder,
+
+  /// Hydrodynamic undulating wave crest boundary contouring the shape.
+  liquidBorder,
+
+  /// Sinusoidal ripple following the shape perimeter.
+  waveBorder,
+
+  /// Triangular sawtooth ripple along the boundary.
+  zigzagBorder,
+
+  /// Animated discrete energy sparks traversing the perimeter.
+  particleBorder,
+
+  /// Single or paired comets orbiting the perimeter.
+  orbitingLightBorder,
+
+  /// Concentric dual-stroke layers with opposing phase motion.
+  dualLayerBorder,
+
+  /// Specular reflective streak traversing the perimeter.
+  shimmerBorder,
+
+  /// 360-degree rotating chromatic sweep.
+  conicGradientBorder,
+
+  /// Electric plasma jitter stroke.
+  energyBorder,
 }
 
 /// Visual background effect styles for Material 4 shape interiors.
@@ -402,6 +477,9 @@ class Material4Config {
   /// Custom Bézier path builder callback for customBezier shape type (legacy).
   final Path Function(Size size)? customBezierBuilder;
 
+  /// Next-Gen Universal Custom Shape Builder with fluent geometry API.
+  final Material4CustomShape? customShape;
+
   // --- Next-Gen Border Parameters (Phase 2 Expansion) ---
   /// Animation progress for animated border effects (0.0 to 1.0).
   final double borderProgress;
@@ -519,6 +597,7 @@ class Material4Config {
     this.constraints = const ShapeConstraints(),
     this.bezierConfig,
     this.customBezierBuilder,
+    this.customShape,
     this.borderProgress = 1.0,
     this.dashPhase = 0.0,
     this.multiLayerBorders,
@@ -1185,6 +1264,7 @@ class Material4Config {
     ShapeConstraints? constraints,
     CustomBezierConfig? bezierConfig,
     Path Function(Size size)? customBezierBuilder,
+    Material4CustomShape? customShape,
     double? borderProgress,
     double? dashPhase,
     List<BorderLayer>? multiLayerBorders,
@@ -1261,6 +1341,7 @@ class Material4Config {
       constraints: constraints ?? this.constraints,
       bezierConfig: bezierConfig ?? this.bezierConfig,
       customBezierBuilder: customBezierBuilder ?? this.customBezierBuilder,
+      customShape: customShape ?? this.customShape,
       borderProgress: borderProgress ?? this.borderProgress,
       dashPhase: dashPhase ?? this.dashPhase,
       multiLayerBorders: multiLayerBorders ?? this.multiLayerBorders,
@@ -1474,6 +1555,7 @@ class Material4Config {
           constraints == other.constraints &&
           bezierConfig == other.bezierConfig &&
           customBezierBuilder == other.customBezierBuilder &&
+          customShape == other.customShape &&
           borderProgress == other.borderProgress &&
           dashPhase == other.dashPhase &&
           listEquals(multiLayerBorders, other.multiLayerBorders) &&
@@ -1547,6 +1629,7 @@ class Material4Config {
         constraints,
         bezierConfig,
         customBezierBuilder,
+        customShape,
         borderProgress,
         dashPhase,
         multiLayerBorders == null ? null : Object.hashAll(multiLayerBorders!),
@@ -1603,6 +1686,7 @@ class Material4Config {
           CreativeBorderConfig.lerp(a.creativeBorder, b.creativeBorder, t),
       paperBackground: t < 0.5 ? a.paperBackground : b.paperBackground,
       creativePattern: t < 0.5 ? a.creativePattern : b.creativePattern,
+      customShape: t < 0.5 ? a.customShape : b.customShape,
       stretchOffset:
           Offset.lerp(a.stretchOffset, b.stretchOffset, t) ?? a.stretchOffset,
     );

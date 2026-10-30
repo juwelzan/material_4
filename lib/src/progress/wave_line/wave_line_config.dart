@@ -278,3 +278,4 @@ class Material4WaveLineConfig {
         trackColor,
       ]);
 }
+

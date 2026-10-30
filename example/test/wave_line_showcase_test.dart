@@ -126,3 +126,4 @@ void main() {
     expect(find.text('GENERATED CODE'), findsOneWidget);
   });
 }
+

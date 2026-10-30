@@ -3,6 +3,7 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 
+import 'container/container_border.dart';
 import 'material_4_config.dart';
 
 /// Next-Generation high-performance border renderer supporting 20 unique border styles.
@@ -11,6 +12,37 @@ import 'material_4_config.dart';
 /// without allocating unnecessary objects during paint cycles.
 class ShapeBorderPainter {
   const ShapeBorderPainter._();
+
+  /// Paint a custom [Material4Border] along the given vector [path].
+  static void paintMaterial4Border({
+    required Canvas canvas,
+    required Size size,
+    required Path path,
+    required Material4Border border,
+  }) {
+    if (border.width <= 0 || border.opacity <= 0) return;
+    final effectiveColor = (border.color ?? const Color(0x1F1A1A1A))
+        .withValues(alpha: (border.color?.a ?? 0.12) * border.opacity);
+    final dummyConfig = Material4Config(
+      borderStyle: border.style,
+      borderProgress: border.progress,
+      dashPhase: border.progress * (border.dashLength + border.dashGap) * 4.0,
+      dashLength: border.dashLength,
+      dashGap: border.dashGap,
+      strokeAlign: border.strokeAlign,
+      borderGradient: border.gradient,
+      neonPulseIntensity: border.glowIntensity,
+      glowBlurRadius: border.blurRadius,
+    );
+    paintBorder(
+      canvas: canvas,
+      size: size,
+      path: path,
+      config: dummyConfig,
+      borderColor: effectiveColor,
+      borderWidth: border.width,
+    );
+  }
 
   /// Paint the border along the given [path] according to [config].
   static void paintBorder({
@@ -195,6 +227,55 @@ class ShapeBorderPainter {
 
       case BorderStyleType.handDrawn:
         _drawHandDrawn(canvas, path, config, borderColor, borderWidth);
+        break;
+
+      // --- Universal Next-Gen Animated Border Styles ---
+      case BorderStyleType.flowingBorder:
+        _drawFlowingBorder(canvas, size, path, config, borderColor, borderWidth);
+        break;
+
+      case BorderStyleType.movingDash:
+        _drawMovingDash(canvas, path, config, borderColor, borderWidth);
+        break;
+
+      case BorderStyleType.pulsatingBorder:
+        _drawPulsatingBorder(canvas, path, config, borderColor, borderWidth);
+        break;
+
+      case BorderStyleType.liquidBorder:
+        _drawLiquidBorder(canvas, path, config, borderColor, borderWidth);
+        break;
+
+      case BorderStyleType.waveBorder:
+        _drawWaveBorder(canvas, path, config, borderColor, borderWidth);
+        break;
+
+      case BorderStyleType.zigzagBorder:
+        _drawZigzagBorder(canvas, path, config, borderColor, borderWidth);
+        break;
+
+      case BorderStyleType.particleBorder:
+        _drawParticleBorder(canvas, path, config, borderColor, borderWidth);
+        break;
+
+      case BorderStyleType.orbitingLightBorder:
+        _drawOrbitingLightBorder(canvas, path, config, borderColor, borderWidth);
+        break;
+
+      case BorderStyleType.dualLayerBorder:
+        _drawDualLayerBorder(canvas, size, path, config, borderColor, borderWidth);
+        break;
+
+      case BorderStyleType.shimmerBorder:
+        _drawShimmerBorder(canvas, size, path, config, borderColor, borderWidth);
+        break;
+
+      case BorderStyleType.conicGradientBorder:
+        _drawConicGradientBorder(canvas, size, path, config, borderColor, borderWidth);
+        break;
+
+      case BorderStyleType.energyBorder:
+        _drawEnergyBorder(canvas, path, config, borderColor, borderWidth);
         break;
     }
   }
@@ -1005,6 +1086,444 @@ class ShapeBorderPainter {
 
       roughPath.close();
       canvas.drawPath(roughPath, roughPaint);
+    }
+  }
+
+  // =========================================================================
+  // --- Universal Next-Gen Animated Border Renderers ---
+  // =========================================================================
+
+  static void _drawFlowingBorder(
+    Canvas canvas,
+    Size size,
+    Path path,
+    Material4Config config,
+    Color borderColor,
+    double borderWidth,
+  ) {
+    final paint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = borderWidth
+      ..strokeCap = StrokeCap.round
+      ..isAntiAlias = true;
+
+    final progress = config.borderProgress;
+    final angle = progress * 2 * math.pi;
+
+    final colors = (config.borderGradient?.colors ?? [
+      borderColor,
+      borderColor.withValues(alpha: 0.15),
+      borderColor,
+      borderColor.withValues(alpha: 0.9),
+      borderColor,
+    ]);
+
+    paint.shader = SweepGradient(
+      startAngle: angle,
+      endAngle: angle + 2 * math.pi,
+      colors: colors,
+    ).createShader(Offset.zero & size);
+    canvas.drawPath(path, paint);
+  }
+
+  static void _drawMovingDash(
+    Canvas canvas,
+    Path path,
+    Material4Config config,
+    Color borderColor,
+    double borderWidth,
+  ) {
+    final phase = config.dashPhase != 0.0
+        ? config.dashPhase
+        : config.borderProgress * (config.dashLength + config.dashGap) * 6.0;
+    _drawDashed(
+      canvas,
+      path,
+      borderColor,
+      borderWidth,
+      config.dashLength > 0 ? config.dashLength : 8.0,
+      config.dashGap > 0 ? config.dashGap : 5.0,
+      phase,
+      config.borderGradient?.createShader(path.getBounds()),
+      1.0,
+    );
+  }
+
+  static void _drawPulsatingBorder(
+    Canvas canvas,
+    Path path,
+    Material4Config config,
+    Color borderColor,
+    double borderWidth,
+  ) {
+    final pulse = 0.75 + 0.35 * math.sin(config.borderProgress * 2 * math.pi);
+    final currentWidth = borderWidth * pulse;
+
+    final glowPaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = currentWidth * 2.2
+      ..color = borderColor.withValues(alpha: 0.35 * pulse)
+      ..maskFilter = MaskFilter.blur(
+        BlurStyle.normal,
+        config.glowBlurRadius > 0 ? config.glowBlurRadius : 6.0 * pulse,
+      )
+      ..isAntiAlias = true;
+    canvas.drawPath(path, glowPaint);
+
+    final corePaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = currentWidth
+      ..color = borderColor
+      ..isAntiAlias = true;
+    canvas.drawPath(path, corePaint);
+  }
+
+  static void _drawLiquidBorder(
+    Canvas canvas,
+    Path path,
+    Material4Config config,
+    Color borderColor,
+    double borderWidth,
+  ) {
+    final paint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = borderWidth
+      ..color = borderColor
+      ..strokeCap = StrokeCap.round
+      ..isAntiAlias = true;
+
+    final progress = config.borderProgress;
+    for (final metric in path.computeMetrics()) {
+      if (metric.length <= 0) continue;
+      final liquidPath = Path();
+      const step = 6.0;
+      double dist = 0.0;
+      bool first = true;
+
+      while (dist < metric.length) {
+        final tangent = metric.getTangentForOffset(dist);
+        if (tangent != null) {
+          final normal = Offset(-tangent.vector.dy, tangent.vector.dx);
+          final wave = math.sin((dist / metric.length * 4 * math.pi) +
+                  progress * 2 * math.pi) *
+              3.5;
+          final pt = tangent.position + normal * wave;
+          if (first) {
+            liquidPath.moveTo(pt.dx, pt.dy);
+            first = false;
+          } else {
+            liquidPath.lineTo(pt.dx, pt.dy);
+          }
+        }
+        dist += step;
+      }
+      liquidPath.close();
+      canvas.drawPath(liquidPath, paint);
+    }
+  }
+
+  static void _drawWaveBorder(
+    Canvas canvas,
+    Path path,
+    Material4Config config,
+    Color borderColor,
+    double borderWidth,
+  ) {
+    final paint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = borderWidth
+      ..color = borderColor
+      ..strokeCap = StrokeCap.round
+      ..isAntiAlias = true;
+
+    final phase = config.borderProgress * 2 * math.pi;
+    for (final metric in path.computeMetrics()) {
+      if (metric.length <= 0) continue;
+      final wavePath = Path();
+      const step = 5.0;
+      double dist = 0.0;
+      bool first = true;
+
+      while (dist < metric.length) {
+        final tangent = metric.getTangentForOffset(dist);
+        if (tangent != null) {
+          final normal = Offset(-tangent.vector.dy, tangent.vector.dx);
+          final displacement = math.sin(dist * 0.15 + phase) * 2.5;
+          final pt = tangent.position + normal * displacement;
+          if (first) {
+            wavePath.moveTo(pt.dx, pt.dy);
+            first = false;
+          } else {
+            wavePath.lineTo(pt.dx, pt.dy);
+          }
+        }
+        dist += step;
+      }
+      wavePath.close();
+      canvas.drawPath(wavePath, paint);
+    }
+  }
+
+  static void _drawZigzagBorder(
+    Canvas canvas,
+    Path path,
+    Material4Config config,
+    Color borderColor,
+    double borderWidth,
+  ) {
+    final paint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = borderWidth
+      ..color = borderColor
+      ..strokeCap = StrokeCap.round
+      ..isAntiAlias = true;
+
+    for (final metric in path.computeMetrics()) {
+      if (metric.length <= 0) continue;
+      final zigzagPath = Path();
+      const step = 8.0;
+      double dist = 0.0;
+      bool first = true;
+      bool flip = false;
+
+      while (dist < metric.length) {
+        final tangent = metric.getTangentForOffset(dist);
+        if (tangent != null) {
+          final normal = Offset(-tangent.vector.dy, tangent.vector.dx);
+          final pt = tangent.position + normal * (flip ? 2.5 : -2.5);
+          flip = !flip;
+          if (first) {
+            zigzagPath.moveTo(pt.dx, pt.dy);
+            first = false;
+          } else {
+            zigzagPath.lineTo(pt.dx, pt.dy);
+          }
+        }
+        dist += step;
+      }
+      zigzagPath.close();
+      canvas.drawPath(zigzagPath, paint);
+    }
+  }
+
+  static void _drawParticleBorder(
+    Canvas canvas,
+    Path path,
+    Material4Config config,
+    Color borderColor,
+    double borderWidth,
+  ) {
+    final basePaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = borderWidth * 0.6
+      ..color = borderColor.withValues(alpha: 0.2)
+      ..isAntiAlias = true;
+    canvas.drawPath(path, basePaint);
+
+    final sparkPaint = Paint()
+      ..style = PaintingStyle.fill
+      ..color = borderColor
+      ..isAntiAlias = true;
+
+    final progress = config.borderProgress;
+    for (final metric in path.computeMetrics()) {
+      if (metric.length <= 0) continue;
+      const count = 16;
+      for (int i = 0; i < count; i++) {
+        final t = ((i / count) + progress) % 1.0;
+        final tangent = metric.getTangentForOffset(t * metric.length);
+        if (tangent != null) {
+          final r =
+              borderWidth * (1.2 + 0.6 * math.sin(i * 1.5 + progress * 6));
+          canvas.drawCircle(tangent.position, r, sparkPaint);
+        }
+      }
+    }
+  }
+
+  static void _drawOrbitingLightBorder(
+    Canvas canvas,
+    Path path,
+    Material4Config config,
+    Color borderColor,
+    double borderWidth,
+  ) {
+    final basePaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = borderWidth * 0.7
+      ..color = borderColor.withValues(alpha: 0.18)
+      ..isAntiAlias = true;
+    canvas.drawPath(path, basePaint);
+
+    final progress = config.borderProgress;
+    for (final metric in path.computeMetrics()) {
+      if (metric.length <= 0) continue;
+      final cometLength = metric.length * 0.22;
+      final headDist = (progress * metric.length) % metric.length;
+
+      const segments = 12;
+      for (int i = 0; i < segments; i++) {
+        final tailDist = headDist - (i * (cometLength / segments));
+        final clampedDist =
+            tailDist < 0 ? tailDist + metric.length : tailDist;
+        final alpha = (1.0 - (i / segments)).clamp(0.0, 1.0);
+        final segmentPath = metric.extractPath(
+          clampedDist,
+          math.min(clampedDist + (cometLength / segments), metric.length),
+        );
+        final cometPaint = Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = borderWidth * (1.0 + (1.0 - i / segments) * 0.8)
+          ..color = borderColor.withValues(alpha: alpha)
+          ..strokeCap = StrokeCap.round
+          ..isAntiAlias = true;
+        canvas.drawPath(segmentPath, cometPaint);
+      }
+    }
+  }
+
+  static void _drawDualLayerBorder(
+    Canvas canvas,
+    Size size,
+    Path path,
+    Material4Config config,
+    Color borderColor,
+    double borderWidth,
+  ) {
+    final outerPaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = borderWidth
+      ..color = borderColor
+      ..isAntiAlias = true;
+    canvas.drawPath(path, outerPaint);
+
+    canvas.save();
+    canvas.clipPath(path);
+    final innerPaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = borderWidth * 0.6
+      ..color = borderColor.withValues(alpha: 0.45)
+      ..isAntiAlias = true;
+    canvas.drawPath(path, innerPaint);
+    canvas.restore();
+  }
+
+  static void _drawShimmerBorder(
+    Canvas canvas,
+    Size size,
+    Path path,
+    Material4Config config,
+    Color borderColor,
+    double borderWidth,
+  ) {
+    final basePaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = borderWidth
+      ..color = borderColor.withValues(alpha: 0.35)
+      ..isAntiAlias = true;
+    canvas.drawPath(path, basePaint);
+
+    final progress = config.borderProgress;
+    final w = size.width;
+    final beamX = (progress * 2.0 - 0.5) * w;
+
+    final shimmerPaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = borderWidth * 1.4
+      ..shader = LinearGradient(
+        begin: Alignment.centerLeft,
+        end: Alignment.centerRight,
+        colors: [
+          borderColor.withValues(alpha: 0.0),
+          Colors.white,
+          borderColor.withValues(alpha: 0.0),
+        ],
+      ).createShader(Rect.fromLTWH(beamX - w * 0.25, 0, w * 0.5, size.height))
+      ..isAntiAlias = true;
+    canvas.drawPath(path, shimmerPaint);
+  }
+
+  static void _drawConicGradientBorder(
+    Canvas canvas,
+    Size size,
+    Path path,
+    Material4Config config,
+    Color borderColor,
+    double borderWidth,
+  ) {
+    final paint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = borderWidth
+      ..isAntiAlias = true;
+
+    final progress = config.borderProgress;
+    final angle = progress * 2 * math.pi;
+
+    paint.shader = SweepGradient(
+      startAngle: angle,
+      endAngle: angle + 2 * math.pi,
+      colors: config.borderGradient?.colors ??
+          const [
+            Color(0xFFFF0055),
+            Color(0xFFFFAA00),
+            Color(0xFF00FFCC),
+            Color(0xFF0066FF),
+            Color(0xFFFF0055),
+          ],
+    ).createShader(Offset.zero & size);
+
+    canvas.drawPath(path, paint);
+  }
+
+  static void _drawEnergyBorder(
+    Canvas canvas,
+    Path path,
+    Material4Config config,
+    Color borderColor,
+    double borderWidth,
+  ) {
+    final glowPaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = borderWidth * 2.5
+      ..color = borderColor.withValues(alpha: 0.4)
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4.0)
+      ..isAntiAlias = true;
+    canvas.drawPath(path, glowPaint);
+
+    final corePaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = borderWidth
+      ..color = Color.lerp(borderColor, Colors.white, 0.7)!
+      ..strokeCap = StrokeCap.round
+      ..isAntiAlias = true;
+
+    final progress = config.borderProgress;
+    for (final metric in path.computeMetrics()) {
+      if (metric.length <= 0) continue;
+      final plasmaPath = Path();
+      const step = 5.0;
+      double dist = 0.0;
+      bool first = true;
+
+      while (dist < metric.length) {
+        final tangent = metric.getTangentForOffset(dist);
+        if (tangent != null) {
+          final normal = Offset(-tangent.vector.dy, tangent.vector.dx);
+          final jitter = math.sin(dist * 0.8 + progress * 24.0) *
+              math.cos(dist * 0.4 + progress * 16.0) *
+              2.0;
+          final pt = tangent.position + normal * jitter;
+          if (first) {
+            plasmaPath.moveTo(pt.dx, pt.dy);
+            first = false;
+          } else {
+            plasmaPath.lineTo(pt.dx, pt.dy);
+          }
+        }
+        dist += step;
+      }
+      plasmaPath.close();
+      canvas.drawPath(plasmaPath, corePaint);
     }
   }
 }

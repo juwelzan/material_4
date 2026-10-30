@@ -238,4 +238,25 @@ class ShapeMorphEngine {
     path.close();
     return path;
   }
+
+  /// Pairwise normalized contour morph between any two vector [Path] instances.
+  static Path morphPaths(
+    Path pathA,
+    Path pathB,
+    double progress, {
+    int sampleCount = defaultSampleCount,
+  }) {
+    if (progress <= 0.0) return pathA;
+    if (progress >= 1.0) return pathB;
+    final pointsA = samplePathContour(pathA, sampleCount);
+    final pointsB = samplePathContour(pathB, sampleCount);
+    final count = math.min(pointsA.length, pointsB.length);
+    final interpolated = <Offset>[];
+    for (int i = 0; i < count; i++) {
+      interpolated.add(
+        Offset.lerp(pointsA[i], pointsB[i], progress) ?? pointsA[i],
+      );
+    }
+    return buildSmoothSplinePath(interpolated);
+  }
 }

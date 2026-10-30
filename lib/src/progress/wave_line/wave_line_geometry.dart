@@ -493,3 +493,4 @@ class WaveLineGeometry {
     return particles;
   }
 }
+

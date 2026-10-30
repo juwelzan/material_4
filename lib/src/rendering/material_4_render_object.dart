@@ -3,10 +3,13 @@ import 'dart:math' as math;
 import 'package:flutter/gestures.dart';
 import 'package:flutter/rendering.dart';
 
+import '../container/container_background.dart';
+import '../container/container_border.dart';
 import '../layout/shape_content_protection.dart';
 import '../layout/shape_safe_region.dart';
 import '../material_4_config.dart';
 import '../material_4_path_builder.dart';
+import '../shape_border_painter.dart';
 import 'material_4_clip_manager.dart';
 import 'material_4_hit_test.dart';
 import 'material_4_interaction.dart';
@@ -51,6 +54,8 @@ class RenderMaterial4 extends RenderBox
   double? _explicitHeight;
   String? _semanticLabel;
   String? _semanticHint;
+  Material4Background? _background;
+  Material4Border? _border;
 
   /// Cached vector path for current [size].
   Path? _currentPath;
@@ -77,6 +82,8 @@ class RenderMaterial4 extends RenderBox
     double? height,
     String? semanticLabel,
     String? semanticHint,
+    Material4Background? background,
+    Material4Border? border,
     RenderBox? child,
   })  : _config = config,
         _color = color,
@@ -98,13 +105,29 @@ class RenderMaterial4 extends RenderBox
         _explicitWidth = width,
         _explicitHeight = height,
         _semanticLabel = semanticLabel,
-        _semanticHint = semanticHint {
+        _semanticHint = semanticHint,
+        _background = background,
+        _border = border {
     this.child = child;
   }
 
   // =========================================================================
   // Property Getters & Setters with Invalidation Separation
   // =========================================================================
+
+  Material4Background? get background => _background;
+  set background(Material4Background? value) {
+    if (_background == value) return;
+    _background = value;
+    markNeedsPaint();
+  }
+
+  Material4Border? get border => _border;
+  set border(Material4Border? value) {
+    if (_border == value) return;
+    _border = value;
+    markNeedsPaint();
+  }
 
   Material4Config get config => _config;
   set config(Material4Config value) {
@@ -840,42 +863,61 @@ class RenderMaterial4 extends RenderBox
       shadows: _shadows,
     );
 
-    // Stage 3: Shape background & procedural background effects
-    Material4Painter.paintBackground(
-      canvas: canvas,
-      size: size,
-      path: path,
-      config: _config,
-      color: _color,
-      gradient: _gradient,
-    );
+    if (_background != null) {
+      Material4Painter.paintUnifiedBackground(
+        canvas: canvas,
+        size: size,
+        path: path,
+        background: _background!,
+        config: _config,
+      );
+    } else {
+      // Stage 3: Shape background & procedural background effects
+      Material4Painter.paintBackground(
+        canvas: canvas,
+        size: size,
+        path: path,
+        config: _config,
+        color: _color,
+        gradient: _gradient,
+      );
 
-    // Stage 4: Background patterns (stripes, dots, grid, waves)
-    Material4Painter.paintPatterns(
-      canvas: canvas,
-      size: size,
-      path: path,
-      config: _config,
-      color: _color,
-    );
+      // Stage 4: Background patterns (stripes, dots, grid, waves)
+      Material4Painter.paintPatterns(
+        canvas: canvas,
+        size: size,
+        path: path,
+        config: _config,
+        color: _color,
+      );
 
-    // Stage 5: Background effects & inner shadows (tactile inset shadows)
-    Material4Painter.paintInnerShadows(
-      canvas: canvas,
-      size: size,
-      path: path,
-      config: _config,
-    );
+      // Stage 5: Background effects & inner shadows (tactile inset shadows)
+      Material4Painter.paintInnerShadows(
+        canvas: canvas,
+        size: size,
+        path: path,
+        config: _config,
+      );
+    }
 
-    // Stage 6: Distinctive borders (all 20 border styles with stroke alignment & reveal)
-    Material4Painter.paintBorders(
-      canvas: canvas,
-      size: size,
-      path: path,
-      config: _config,
-      borderColor: _borderColor,
-      borderWidth: _borderWidth,
-    );
+    if (_border != null) {
+      ShapeBorderPainter.paintMaterial4Border(
+        canvas: canvas,
+        size: size,
+        path: path,
+        border: _border!,
+      );
+    } else {
+      // Stage 6: Distinctive borders (all 20 border styles with stroke alignment & reveal)
+      Material4Painter.paintBorders(
+        canvas: canvas,
+        size: size,
+        path: path,
+        config: _config,
+        borderColor: _borderColor,
+        borderWidth: _borderWidth,
+      );
+    }
 
     // Stage 7: Foreground decorations (holographic shimmer light sweep)
     Material4Painter.paintForegroundDecorations(

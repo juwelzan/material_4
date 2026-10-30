@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import 'container/custom_shape.dart';
 import 'material_4_config.dart';
 import 'shape_path_cache.dart';
 
@@ -65,7 +66,9 @@ class Material4PathBuilder {
     Path path;
 
     // 2. Build Base Geometry
-    if (config.edges != null && !config.edges!.isAllStraight) {
+    if (config.customShape != null) {
+      path = config.customShape!.buildPath(effectiveSize);
+    } else if (config.edges != null && !config.edges!.isAllStraight) {
       path = _buildCustomEdgesPath(effectiveSize, config);
     } else {
       switch (config.type) {
@@ -158,6 +161,44 @@ class Material4PathBuilder {
           break;
         case Material4Type.customBezier:
           path = _buildCustomBezierPath(effectiveSize, config);
+          break;
+
+        // --- Universal Next-Gen Shapes ---
+        case Material4Type.superellipse:
+          path = _buildSuperellipsePath(effectiveSize, config);
+          break;
+        case Material4Type.continuousSquircle:
+          path = _buildContinuousSquirclePath(effectiveSize, config);
+          break;
+        case Material4Type.asymmetricBlob:
+          path = _buildAsymmetricBlobPath(effectiveSize, config);
+          break;
+        case Material4Type.softDiamond:
+          path = _buildSoftDiamondPath(effectiveSize, config);
+          break;
+        case Material4Type.roundedHexagon:
+          path = _buildRoundedHexagonPath(effectiveSize, config);
+          break;
+        case Material4Type.roundedPentagon:
+          path = _buildRoundedPentagonPath(effectiveSize, config);
+          break;
+        case Material4Type.ticket:
+          path = _buildTicketPath(effectiveSize, config);
+          break;
+        case Material4Type.flower:
+          path = _buildFlowerPath(effectiveSize, config);
+          break;
+        case Material4Type.starburst:
+          path = _buildStarburstPath(effectiveSize, config);
+          break;
+        case Material4Type.leaf:
+          path = _buildLeafPath(effectiveSize, config);
+          break;
+        case Material4Type.droplet:
+          path = _buildDropletPath(effectiveSize, config);
+          break;
+        case Material4Type.liquid:
+          path = _buildLiquidPath(effectiveSize, config);
           break;
       }
     }
@@ -1329,5 +1370,214 @@ class Material4PathBuilder {
       }
     }
     return result;
+  }
+
+  // =========================================================================
+  // UNIVERSAL NEXT-GEN SHAPE BUILDERS
+  // =========================================================================
+
+  /// 1. Mathematical Lamé curve super-ellipse with configurable exponent.
+  static Path _buildSuperellipsePath(Size size, Material4Config config) {
+    final a = size.width / 2.0;
+    final b = size.height / 2.0;
+    if (a <= 0 || b <= 0) return Path();
+
+    final path = Path();
+    const steps = 72;
+    const exp = 3.6;
+    const p = 2.0 / exp;
+
+    for (int i = 0; i <= steps; i++) {
+      final t = (i / steps) * 2 * math.pi;
+      final cosT = math.cos(t);
+      final sinT = math.sin(t);
+      final sgnCos = cosT.sign;
+      final sgnSin = sinT.sign;
+      final x = a + a * sgnCos * math.pow(cosT.abs(), p);
+      final y = b + b * sgnSin * math.pow(sinT.abs(), p);
+
+      if (i == 0) {
+        path.moveTo(x, y);
+      } else {
+        path.lineTo(x, y);
+      }
+    }
+    path.close();
+    return path;
+  }
+
+  /// 2. Curvature-continuous C2 squircle arc.
+  static Path _buildContinuousSquirclePath(Size size, Material4Config config) {
+    final path = Path();
+    final w = size.width;
+    final h = size.height;
+    final r = math.min(config.cornerRadius * 1.25, math.min(w, h) * 0.48);
+
+    path.moveTo(r, 0);
+    path.lineTo(w - r, 0);
+    path.cubicTo(w - r * 0.4, 0, w, r * 0.4, w, r);
+    path.lineTo(w, h - r);
+    path.cubicTo(w, h - r * 0.4, w - r * 0.4, h, w - r, h);
+    path.lineTo(r, h);
+    path.cubicTo(r * 0.4, h, 0, h - r * 0.4, 0, h - r);
+    path.lineTo(0, r);
+    path.cubicTo(0, r * 0.4, r * 0.4, 0, r, 0);
+    path.close();
+    return path;
+  }
+
+  /// 3. Asymmetric procedural multi-control point organic blob.
+  static Path _buildAsymmetricBlobPath(Size size, Material4Config config) {
+    final path = Path();
+    final w = size.width;
+    final h = size.height;
+
+    path.moveTo(w * 0.08, h * 0.38);
+    path.cubicTo(w * 0.04, h * 0.12, w * 0.28, 0, w * 0.58, 0);
+    path.cubicTo(w * 0.88, 0, w, h * 0.22, w * 0.96, h * 0.54);
+    path.cubicTo(w * 0.92, h * 0.82, w * 0.72, h, w * 0.42, h);
+    path.cubicTo(w * 0.18, h, 0, h * 0.78, w * 0.08, h * 0.38);
+    path.close();
+    return path;
+  }
+
+  /// 4. Symmetrical diamond with outward curved convex facets.
+  static Path _buildSoftDiamondPath(Size size, Material4Config config) {
+    final path = Path();
+    final w = size.width;
+    final h = size.height;
+
+    path.moveTo(w * 0.5, 0);
+    path.quadraticBezierTo(w * 0.82, h * 0.18, w, h * 0.5);
+    path.quadraticBezierTo(w * 0.82, h * 0.82, w * 0.5, h);
+    path.quadraticBezierTo(w * 0.18, h * 0.82, 0, h * 0.5);
+    path.quadraticBezierTo(w * 0.18, h * 0.18, w * 0.5, 0);
+    path.close();
+    return path;
+  }
+
+  /// 5. Regular 6-sided polygon with smooth corner fillets.
+  static Path _buildRoundedHexagonPath(Size size, Material4Config config) {
+    return Material4CustomShape.polygon(
+      sides: 6,
+      cornerRadius: config.cornerRadius > 0 ? config.cornerRadius : 16.0,
+    ).buildPath(size);
+  }
+
+  /// 6. Regular 5-sided polygon with smooth corner fillets.
+  static Path _buildRoundedPentagonPath(Size size, Material4Config config) {
+    return Material4CustomShape.polygon(
+      sides: 5,
+      cornerRadius: config.cornerRadius > 0 ? config.cornerRadius : 16.0,
+    ).buildPath(size);
+  }
+
+  /// 7. Event voucher ticket with opposing circular notch bites.
+  static Path _buildTicketPath(Size size, Material4Config config) {
+    final path = Path();
+    final w = size.width;
+    final h = size.height;
+    final r = math.min(config.cornerRadius, 18.0);
+    final notchR = math.min(config.scallopRadius > 0 ? config.scallopRadius : 16.0, h * 0.25);
+
+    path.moveTo(r, 0);
+    path.lineTo(w - r, 0);
+    path.arcToPoint(Offset(w, r), radius: Radius.circular(r));
+    path.lineTo(w, h * 0.5 - notchR);
+    path.arcToPoint(
+      Offset(w, h * 0.5 + notchR),
+      radius: Radius.circular(notchR),
+      clockwise: false,
+    );
+    path.lineTo(w, h - r);
+    path.arcToPoint(Offset(w - r, h), radius: Radius.circular(r));
+    path.lineTo(r, h);
+    path.arcToPoint(Offset(0, h - r), radius: Radius.circular(r));
+    path.lineTo(0, h * 0.5 + notchR);
+    path.arcToPoint(
+      Offset(0, h * 0.5 - notchR),
+      radius: Radius.circular(notchR),
+      clockwise: false,
+    );
+    path.lineTo(0, r);
+    path.arcToPoint(Offset(r, 0), radius: Radius.circular(r));
+    path.close();
+    return path;
+  }
+
+  /// 8. Multi-petal circular botanical blossom silhouette.
+  static Path _buildFlowerPath(Size size, Material4Config config) {
+    final path = Path();
+    final petals = math.max(config.petalCount > 0 ? config.petalCount : 8, 4);
+    final cx = size.width / 2.0;
+    final cy = size.height / 2.0;
+    final maxR = math.min(cx, cy);
+    final innerR = maxR * 0.65;
+
+    for (int i = 0; i < petals; i++) {
+      final aStart = (i * 2 * math.pi) / petals;
+      final aMid = ((i + 0.5) * 2 * math.pi) / petals;
+      final aEnd = ((i + 1) * 2 * math.pi) / petals;
+
+      final pStart = Offset(cx + innerR * math.cos(aStart), cy + innerR * math.sin(aStart));
+      final pTip = Offset(cx + maxR * math.cos(aMid), cy + maxR * math.sin(aMid));
+      final pEnd = Offset(cx + innerR * math.cos(aEnd), cy + innerR * math.sin(aEnd));
+
+      if (i == 0) path.moveTo(pStart.dx, pStart.dy);
+      path.quadraticBezierTo(pTip.dx, pTip.dy, pEnd.dx, pEnd.dy);
+    }
+    path.close();
+    return path;
+  }
+
+  /// 9. Multi-pointed starburst badge emblem.
+  static Path _buildStarburstPath(Size size, Material4Config config) {
+    return Material4CustomShape.star(
+      points: math.max(config.petalCount > 0 ? config.petalCount : 12, 6),
+      innerRadiusRatio: 0.72,
+      cornerRadius: config.cornerRadius > 0 ? math.min(config.cornerRadius, 6.0) : 4.0,
+    ).buildPath(size);
+  }
+
+  /// 10. Natural pointed botanical leaf silhouette.
+  static Path _buildLeafPath(Size size, Material4Config config) {
+    final path = Path();
+    final w = size.width;
+    final h = size.height;
+
+    path.moveTo(0, h);
+    path.cubicTo(0, h * 0.28, w * 0.28, 0, w, 0);
+    path.cubicTo(w, h * 0.72, w * 0.72, h, 0, h);
+    path.close();
+    return path;
+  }
+
+  /// 11. Teardrop water droplet with pointed apex and rounded base.
+  static Path _buildDropletPath(Size size, Material4Config config) {
+    final path = Path();
+    final w = size.width;
+    final h = size.height;
+
+    path.moveTo(w * 0.5, 0);
+    path.cubicTo(w * 0.88, h * 0.45, w, h * 0.65, w * 0.85, h * 0.88);
+    path.cubicTo(w * 0.7, h, w * 0.3, h, w * 0.15, h * 0.88);
+    path.cubicTo(0, h * 0.65, w * 0.12, h * 0.45, w * 0.5, 0);
+    path.close();
+    return path;
+  }
+
+  /// 12. Fluid organic metaball liquid droplet shape.
+  static Path _buildLiquidPath(Size size, Material4Config config) {
+    final path = Path();
+    final w = size.width;
+    final h = size.height;
+
+    path.moveTo(w * 0.2, h * 0.15);
+    path.cubicTo(w * 0.45, 0, w * 0.8, h * 0.05, w * 0.9, h * 0.35);
+    path.cubicTo(w, h * 0.65, w * 0.85, h * 0.92, w * 0.55, h * 0.98);
+    path.cubicTo(w * 0.25, h * 1.04, 0, h * 0.85, 0, h * 0.55);
+    path.cubicTo(0, h * 0.25, w * 0.05, h * 0.22, w * 0.2, h * 0.15);
+    path.close();
+    return path;
   }
 }

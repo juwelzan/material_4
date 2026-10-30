@@ -12,3 +12,4 @@ enum WaveDirection {
   /// Multi-layer waves alternate in opposing directions across adjacent strands.
   alternating,
 }
+

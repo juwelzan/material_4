@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../container/container_background.dart';
+import '../container/container_border.dart';
 import '../layout/shape_content_protection.dart';
 import '../material_4_config.dart';
 import 'material_4_hit_test.dart';
@@ -29,6 +31,8 @@ class Material4RenderWidget extends SingleChildRenderObjectWidget {
   final double? height;
   final String? semanticLabel;
   final String? semanticHint;
+  final Material4Background? background;
+  final Material4Border? border;
 
   const Material4RenderWidget({
     super.key,
@@ -53,6 +57,8 @@ class Material4RenderWidget extends SingleChildRenderObjectWidget {
     this.height,
     this.semanticLabel,
     this.semanticHint,
+    this.background,
+    this.border,
     super.child,
   });
 
@@ -81,6 +87,8 @@ class Material4RenderWidget extends SingleChildRenderObjectWidget {
       height: height,
       semanticLabel: semanticLabel,
       semanticHint: semanticHint,
+      background: background,
+      border: border,
     );
   }
 
@@ -108,6 +116,8 @@ class Material4RenderWidget extends SingleChildRenderObjectWidget {
       ..explicitWidth = width
       ..explicitHeight = height
       ..semanticLabel = semanticLabel
-      ..semanticHint = semanticHint;
+      ..semanticHint = semanticHint
+      ..background = background
+      ..border = border;
   }
 }

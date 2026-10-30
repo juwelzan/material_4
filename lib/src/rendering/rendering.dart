@@ -1,5 +1,6 @@
 export 'dynamic_shape_clip_manager.dart';
 export 'dynamic_shape_hit_test.dart';
+export 'dynamic_shape_interaction.dart';
 export 'dynamic_shape_layout_manager.dart';
 export 'dynamic_shape_multi_child_parent_data.dart';
 export 'dynamic_shape_multi_child_render_object.dart';

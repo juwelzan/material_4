@@ -12,6 +12,7 @@ import '../layout/shape_content_protection.dart';
 import '../layout/shape_safe_region.dart';
 import 'dynamic_shape_clip_manager.dart';
 import 'dynamic_shape_hit_test.dart';
+import 'dynamic_shape_interaction.dart';
 import 'dynamic_shape_multi_child_parent_data.dart';
 import 'dynamic_shape_painter.dart';
 import 'dynamic_shape_semantics.dart';
@@ -38,7 +39,11 @@ class RenderMultiChildDynamicShape extends RenderBox
   Clip _clipBehavior;
   ShapeContentProtection _contentProtection;
   ShapeHitTestBehavior _hitTestBehavior;
+  DynamicShapeInteraction? _interaction;
+  ShapeClipConfig? _clipConfig;
   VoidCallback? _onTap;
+  VoidCallback? _onLongPress;
+  VoidCallback? _onDoubleTap;
   EdgeInsetsGeometry? _padding;
   AlignmentGeometry _alignment;
   ShapeLayoutStrategy _layoutStrategy;
@@ -66,7 +71,11 @@ class RenderMultiChildDynamicShape extends RenderBox
     Clip clipBehavior = Clip.antiAlias,
     ShapeContentProtection contentProtection = const ShapeContentProtection(),
     ShapeHitTestBehavior hitTestBehavior = ShapeHitTestBehavior.shapeContour,
+    DynamicShapeInteraction? interaction,
+    ShapeClipConfig? clipConfig,
     VoidCallback? onTap,
+    VoidCallback? onLongPress,
+    VoidCallback? onDoubleTap,
     EdgeInsetsGeometry? padding,
     AlignmentGeometry alignment = Alignment.center,
     ShapeLayoutStrategy layoutStrategy = ShapeLayoutStrategy.stack,
@@ -87,7 +96,11 @@ class RenderMultiChildDynamicShape extends RenderBox
         _clipBehavior = clipBehavior,
         _contentProtection = contentProtection,
         _hitTestBehavior = hitTestBehavior,
+        _interaction = interaction,
+        _clipConfig = clipConfig,
         _onTap = onTap,
+        _onLongPress = onLongPress,
+        _onDoubleTap = onDoubleTap,
         _padding = padding,
         _alignment = alignment,
         _layoutStrategy = layoutStrategy,
@@ -184,19 +197,46 @@ class RenderMultiChildDynamicShape extends RenderBox
     _hitTestBehavior = value;
   }
 
+  DynamicShapeInteraction? get interaction => _interaction;
+  set interaction(DynamicShapeInteraction? value) {
+    if (_interaction == value) return;
+    _interaction = value;
+  }
+
+  ShapeClipConfig? get clipConfig => _clipConfig;
+  set clipConfig(ShapeClipConfig? value) {
+    if (_clipConfig == value) return;
+    _clipConfig = value;
+    markNeedsPaint();
+  }
+
   VoidCallback? get onTap => _onTap;
   set onTap(VoidCallback? value) {
     if (_onTap == value) return;
     final hadTap = _onTap != null;
     _onTap = value;
-    if (attached) {
-      _tapRecognizer?.dispose();
-      _tapRecognizer =
-          value != null ? (TapGestureRecognizer()..onTap = value) : null;
-    }
+    _syncRecognizers();
     if (hadTap != (_onTap != null)) {
       markNeedsSemanticsUpdate();
     }
+  }
+
+  VoidCallback? get onLongPress => _onLongPress;
+  set onLongPress(VoidCallback? value) {
+    if (_onLongPress == value) return;
+    final hadLongPress = _onLongPress != null;
+    _onLongPress = value;
+    _syncRecognizers();
+    if (hadLongPress != (_onLongPress != null)) {
+      markNeedsSemanticsUpdate();
+    }
+  }
+
+  VoidCallback? get onDoubleTap => _onDoubleTap;
+  set onDoubleTap(VoidCallback? value) {
+    if (_onDoubleTap == value) return;
+    _onDoubleTap = value;
+    _syncRecognizers();
   }
 
   EdgeInsetsGeometry? get padding => _padding;
@@ -277,19 +317,38 @@ class RenderMultiChildDynamicShape extends RenderBox
   List<ShapeLayoutDiagnostic> get diagnostics => layoutDiagnostics;
 
   TapGestureRecognizer? _tapRecognizer;
+  LongPressGestureRecognizer? _longPressRecognizer;
+  DoubleTapGestureRecognizer? _doubleTapRecognizer;
+
+  void _syncRecognizers() {
+    if (!attached) return;
+    _tapRecognizer?.dispose();
+    _tapRecognizer =
+        _onTap != null ? (TapGestureRecognizer()..onTap = _onTap) : null;
+    _longPressRecognizer?.dispose();
+    _longPressRecognizer = _onLongPress != null
+        ? (LongPressGestureRecognizer()..onLongPress = _onLongPress)
+        : null;
+    _doubleTapRecognizer?.dispose();
+    _doubleTapRecognizer = _onDoubleTap != null
+        ? (DoubleTapGestureRecognizer()..onDoubleTap = _onDoubleTap)
+        : null;
+  }
 
   @override
   void attach(PipelineOwner owner) {
     super.attach(owner);
-    if (_onTap != null) {
-      _tapRecognizer = TapGestureRecognizer()..onTap = _onTap;
-    }
+    _syncRecognizers();
   }
 
   @override
   void detach() {
     _tapRecognizer?.dispose();
     _tapRecognizer = null;
+    _longPressRecognizer?.dispose();
+    _longPressRecognizer = null;
+    _doubleTapRecognizer?.dispose();
+    _doubleTapRecognizer = null;
     super.detach();
   }
 
@@ -297,6 +356,10 @@ class RenderMultiChildDynamicShape extends RenderBox
   void dispose() {
     _tapRecognizer?.dispose();
     _tapRecognizer = null;
+    _longPressRecognizer?.dispose();
+    _longPressRecognizer = null;
+    _doubleTapRecognizer?.dispose();
+    _doubleTapRecognizer = null;
     _currentPath = null;
     _layoutDiagnostics.clear();
     super.dispose();
@@ -995,6 +1058,18 @@ class RenderMultiChildDynamicShape extends RenderBox
       }
     }
 
+    // 8. Shape path bounds (handles outward tabs, outward speech bubble tails, scale > 1.0)
+    final pathBounds = currentPath.getBounds();
+    bounds = bounds.expandToInclude(pathBounds);
+
+    // 9. If overflow clipping is explicitly enabled, clamp to container rectangular bounds
+    if (DynamicShapeClipManager.shouldClipOverflow(
+      config: _config,
+      clipConfig: _clipConfig,
+    )) {
+      bounds = bounds.intersect(Offset.zero & size);
+    }
+
     return bounds;
   }
 
@@ -1002,6 +1077,23 @@ class RenderMultiChildDynamicShape extends RenderBox
   void paint(PaintingContext context, Offset offset) {
     if (size.width <= 0 || size.height <= 0) return;
 
+    if (DynamicShapeClipManager.shouldClipOverflow(
+      config: _config,
+      clipConfig: _clipConfig,
+    )) {
+      DynamicShapeClipManager.paintWithRectClip(
+        context: context,
+        offset: offset,
+        clipRect: Offset.zero & size,
+        clipBehavior: _clipBehavior,
+        painter: (c, o) => _paintLayers(c, o),
+      );
+    } else {
+      _paintLayers(context, offset);
+    }
+  }
+
+  void _paintLayers(PaintingContext context, Offset offset) {
     // Stage 1: Vector Path Geometry
     final path = currentPath;
     final canvas = context.canvas;
@@ -1073,6 +1165,7 @@ class RenderMultiChildDynamicShape extends RenderBox
         protection: _contentProtection,
         config: _config,
         clipBehavior: _clipBehavior,
+        clipConfig: _clipConfig,
       );
 
       if (shouldClip) {
@@ -1126,21 +1219,46 @@ class RenderMultiChildDynamicShape extends RenderBox
 
   @override
   bool hitTest(BoxHitTestResult result, {required Offset position}) {
+    if (size.width <= 0 || size.height <= 0) return false;
+
+    final effectiveInteraction = _interaction ??
+        _config.interaction ??
+        DynamicShapeInteraction(hitTestBehavior: _hitTestBehavior);
+
+    final behavior = effectiveInteraction.hitTestBehavior;
+
+    // 1. Point-in-shape evaluation via DynamicShapeHitTester
     final bool isInsideShapeOrBox = DynamicShapeHitTester.containsPoint(
       path: currentPath,
       size: size,
       position: position,
+      config: _config,
       transform: _config.resolvedTransform,
-      behavior: _hitTestBehavior,
+      behavior: behavior,
+      interaction: effectiveInteraction,
+      pathIsTransformed: true,
     );
 
-    final bool canHitChild =
-        _contentProtection.mode == ContentProtectionMode.visibleOverflow
+    // 2. DeferToChild mode: only children receive interaction, shape itself never claims hits
+    if (behavior == ShapeHitTestBehavior.deferToChild) {
+      if (firstChild != null && effectiveInteraction.enableChildHitTesting) {
+        final hitChild = hitTestChildren(result, position: position);
+        if (hitChild) {
+          result.add(BoxHitTestEntry(this, position));
+          return true;
+        }
+      }
+      return false;
+    }
+
+    // 3. Child hit testing
+    final bool canHitChild = effectiveInteraction.enableChildHitTesting &&
+        (_contentProtection.mode == ContentProtectionMode.visibleOverflow
             ? (Offset.zero & size).contains(position)
-            : isInsideShapeOrBox;
+            : isInsideShapeOrBox);
 
     bool hitChild = false;
-    if (canHitChild) {
+    if (canHitChild && firstChild != null) {
       hitChild = hitTestChildren(result, position: position);
     }
 
@@ -1149,9 +1267,27 @@ class RenderMultiChildDynamicShape extends RenderBox
       return true;
     }
 
-    if (isInsideShapeOrBox && _onTap != null) {
-      result.add(BoxHitTestEntry(this, position));
-      return true;
+    // 4. Opaque mode: claims hit across rectangular bounds even without onTap
+    if (behavior == ShapeHitTestBehavior.opaque) {
+      if ((Offset.zero & size).contains(position) &&
+          effectiveInteraction.enableShapeHitTesting) {
+        result.add(BoxHitTestEntry(this, position));
+        return true;
+      }
+      return false;
+    }
+
+    // 5. Interactive shape body hit testing
+    if (isInsideShapeOrBox) {
+      if (_onTap != null || _onLongPress != null || _onDoubleTap != null) {
+        result.add(BoxHitTestEntry(this, position));
+        return true;
+      }
+      if (behavior == ShapeHitTestBehavior.translucent &&
+          effectiveInteraction.enableShapeHitTesting) {
+        result.add(BoxHitTestEntry(this, position));
+        return true;
+      }
     }
 
     return false;
@@ -1159,7 +1295,56 @@ class RenderMultiChildDynamicShape extends RenderBox
 
   @override
   bool hitTestChildren(BoxHitTestResult result, {required Offset position}) {
-    return defaultHitTestChildren(result, position: position);
+    if (firstChild == null) return false;
+
+    // Fast path: if no custom zIndex, use default reverse linked-list order
+    bool hasCustomZ = false;
+    RenderBox? child = firstChild;
+    while (child != null) {
+      final childParentData =
+          child.parentData! as DynamicShapeMultiChildParentData;
+      if (childParentData.zIndex != 0) {
+        hasCustomZ = true;
+        break;
+      }
+      child = childParentData.nextSibling;
+    }
+
+    if (!hasCustomZ) {
+      return defaultHitTestChildren(result, position: position);
+    }
+
+    // When custom zIndex is present, hit test in reverse paint order (highest zIndex first)
+    final sortedChildren = <RenderBox>[];
+    child = firstChild;
+    while (child != null) {
+      sortedChildren.add(child);
+      final childParentData =
+          child.parentData! as DynamicShapeMultiChildParentData;
+      child = childParentData.nextSibling;
+    }
+
+    sortedChildren.sort((a, b) {
+      final zA = (a.parentData! as DynamicShapeMultiChildParentData).zIndex;
+      final zB = (b.parentData! as DynamicShapeMultiChildParentData).zIndex;
+      return zA.compareTo(zB);
+    });
+
+    for (int i = sortedChildren.length - 1; i >= 0; i--) {
+      final c = sortedChildren[i];
+      final childParentData = c.parentData! as DynamicShapeMultiChildParentData;
+      final isHit = result.addWithPaintOffset(
+        offset: childParentData.offset,
+        position: position,
+        hitTest: (BoxHitTestResult result, Offset transformed) {
+          assert(transformed == position - childParentData.offset);
+          return c.hitTest(result, position: transformed);
+        },
+      );
+      if (isHit) return true;
+    }
+
+    return false;
   }
 
   @override
@@ -1181,6 +1366,7 @@ class RenderMultiChildDynamicShape extends RenderBox
     DynamicShapeSemantics.applySemantics(
       config: config,
       onTap: _onTap,
+      onLongPress: _onLongPress,
       semanticLabel: _semanticLabel,
       semanticHint: _semanticHint,
     );
@@ -1188,8 +1374,10 @@ class RenderMultiChildDynamicShape extends RenderBox
 
   @override
   void handleEvent(PointerEvent event, BoxHitTestEntry entry) {
-    if (event is PointerDownEvent && _onTap != null) {
+    if (event is PointerDownEvent) {
       _tapRecognizer?.addPointer(event);
+      _longPressRecognizer?.addPointer(event);
+      _doubleTapRecognizer?.addPointer(event);
     }
   }
 }

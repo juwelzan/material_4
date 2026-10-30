@@ -1,6 +1,6 @@
 import 'package:flutter/rendering.dart';
 
-/// Accessibility and semantics coordinator for [RenderDynamicShape].
+/// Accessibility and semantics coordinator for [RenderDynamicShape] and [RenderMultiChildDynamicShape].
 class DynamicShapeSemantics {
   const DynamicShapeSemantics._();
 
@@ -8,6 +8,7 @@ class DynamicShapeSemantics {
   static void applySemantics({
     required SemanticsConfiguration config,
     VoidCallback? onTap,
+    VoidCallback? onLongPress,
     String? semanticLabel,
     String? semanticHint,
     bool enabled = true,
@@ -20,11 +21,16 @@ class DynamicShapeSemantics {
       config.hint = semanticHint;
     }
 
-    if (onTap != null) {
+    if (onTap != null || onLongPress != null) {
       config.isButton = true;
       config.isEnabled = enabled;
       if (enabled) {
-        config.onTap = onTap;
+        if (onTap != null) {
+          config.onTap = onTap;
+        }
+        if (onLongPress != null) {
+          config.onLongPress = onLongPress;
+        }
       }
     }
   }

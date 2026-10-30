@@ -52,3 +52,4 @@ class DynamicShapeMultiChildParentData
   String toString() =>
       '${super.toString()}; alignment=$alignment; anchor=$anchor; priority=$priority; margin=$margin; policy=$collisionPolicy';
 }
+

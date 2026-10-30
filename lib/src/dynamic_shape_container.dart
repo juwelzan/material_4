@@ -8,6 +8,7 @@ import 'dynamic_shape_stack.dart';
 import 'layout/shape_collision_detector.dart';
 import 'layout/shape_content_protection.dart';
 import 'rendering/dynamic_shape_hit_test.dart';
+import 'rendering/dynamic_shape_interaction.dart';
 import 'rendering/dynamic_shape_multi_child_render_widget.dart';
 import 'rendering/dynamic_shape_painter.dart';
 import 'rendering/dynamic_shape_render_widget.dart';
@@ -99,6 +100,8 @@ class DynamicShapeContainer extends StatelessWidget {
   final double borderWidth;
   final List<BoxShadow>? shadows;
   final VoidCallback? onTap;
+  final VoidCallback? onLongPress;
+  final VoidCallback? onDoubleTap;
   final Clip clipBehavior;
 
   /// Shape-aware content protection mode ensuring child readability and bounds.
@@ -106,6 +109,12 @@ class DynamicShapeContainer extends StatelessWidget {
 
   /// Hit testing strategy (exact shape contour vs rectangular bounding box).
   final ShapeHitTestBehavior hitTestBehavior;
+
+  /// Shape-aware interaction, hit-testing, and pointer routing configuration.
+  final DynamicShapeInteraction? interaction;
+
+  /// Granular layer-specific clipping configuration.
+  final ShapeClipConfig? clipConfig;
 
   /// Optional child alignment inside the container's safe content area.
   final AlignmentGeometry? alignment;
@@ -123,6 +132,12 @@ class DynamicShapeContainer extends StatelessWidget {
   final Widget? dockedBadge;
   final Alignment badgeAlignment;
   final EdgeInsets badgePadding;
+
+  /// Accessibility semantic label.
+  final String? semanticLabel;
+
+  /// Accessibility semantic hint.
+  final String? semanticHint;
 
   const DynamicShapeContainer({
     super.key,
@@ -145,12 +160,18 @@ class DynamicShapeContainer extends StatelessWidget {
       BoxShadow(color: Color(0x0C000000), blurRadius: 10, offset: Offset(0, 4)),
     ],
     this.onTap,
+    this.onLongPress,
+    this.onDoubleTap,
     this.clipBehavior = Clip.antiAlias,
     this.contentProtection = const ShapeContentProtection(),
     this.hitTestBehavior = ShapeHitTestBehavior.shapeContour,
+    this.interaction,
+    this.clipConfig,
     this.dockedBadge,
     this.badgeAlignment = Alignment.topRight,
     this.badgePadding = EdgeInsets.zero,
+    this.semanticLabel,
+    this.semanticHint,
   });
 
   /// Factory constructor for direct [ShapeContentMode] selection.
@@ -176,11 +197,17 @@ class DynamicShapeContainer extends StatelessWidget {
       BoxShadow(color: Color(0x0C000000), blurRadius: 10, offset: Offset(0, 4)),
     ],
     this.onTap,
+    this.onLongPress,
+    this.onDoubleTap,
     this.clipBehavior = Clip.antiAlias,
     this.hitTestBehavior = ShapeHitTestBehavior.shapeContour,
+    this.interaction,
+    this.clipConfig,
     this.dockedBadge,
     this.badgeAlignment = Alignment.topRight,
     this.badgePadding = EdgeInsets.zero,
+    this.semanticLabel,
+    this.semanticHint,
   }) : contentProtection = ShapeContentProtection(mode: mode);
 
   /// Quick accessor to the active content layout mode.
@@ -1643,7 +1670,11 @@ class DynamicShapeContainer extends StatelessWidget {
         clipBehavior: clipBehavior,
         contentProtection: contentProtection,
         hitTestBehavior: hitTestBehavior,
+        interaction: interaction ?? config.interaction,
+        clipConfig: clipConfig ?? config.clipConfig,
         onTap: onTap,
+        onLongPress: onLongPress,
+        onDoubleTap: onDoubleTap,
         padding: padding,
         alignment: alignment ?? Alignment.center,
         width: width,
@@ -1651,6 +1682,8 @@ class DynamicShapeContainer extends StatelessWidget {
         layoutStrategy: layoutStrategy,
         spacing: childrenSpacing,
         collisionPolicy: collisionPolicy,
+        semanticLabel: semanticLabel,
+        semanticHint: semanticHint,
         children: multiChildren,
       );
     } else {
@@ -1681,11 +1714,17 @@ class DynamicShapeContainer extends StatelessWidget {
         clipBehavior: clipBehavior,
         contentProtection: contentProtection,
         hitTestBehavior: hitTestBehavior,
+        interaction: interaction ?? config.interaction,
+        clipConfig: clipConfig ?? config.clipConfig,
         onTap: onTap,
+        onLongPress: onLongPress,
+        onDoubleTap: onDoubleTap,
         padding: padding,
         alignment: alignment,
         width: width,
         height: height,
+        semanticLabel: semanticLabel,
+        semanticHint: semanticHint,
         child: content,
       );
     }

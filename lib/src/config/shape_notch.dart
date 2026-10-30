@@ -192,6 +192,26 @@ class ShapeNotch {
     return (edgeLength * positionFactor) - (width / 2.0) + offset;
   }
 
+  /// Calculates the rectangular bounding area of this notch on [size].
+  Rect computeNotchRect(Size size) {
+    final nW = width;
+    final nD = depth;
+    switch (edge) {
+      case ShapeEdge.top:
+        final start = resolveEdgeOffset(size.width);
+        return Rect.fromLTWH(start, 0, nW, nD);
+      case ShapeEdge.bottom:
+        final start = resolveEdgeOffset(size.width);
+        return Rect.fromLTWH(start, size.height - nD, nW, nD);
+      case ShapeEdge.left:
+        final start = resolveEdgeOffset(size.height);
+        return Rect.fromLTWH(0, start, nD, nW);
+      case ShapeEdge.right:
+        final start = resolveEdgeOffset(size.height);
+        return Rect.fromLTWH(size.width - nD, start, nD, nW);
+    }
+  }
+
   /// Evaluates and reports collisions and boundary violations across all [notches] on [size].
   ///
   /// Detects:
@@ -404,8 +424,10 @@ class ShapeNotch {
     String? id,
     bool? isNormalizedPlacement,
   }) {
+    final effectiveNormalized =
+        isNormalizedPlacement ?? this.isNormalizedPlacement;
     return ShapeNotch(
-      edge: edge ?? (isNormalizedPlacement == true ? this.edge : null),
+      edge: edge ?? (effectiveNormalized ? this.edge : null),
       positionFactor: positionFactor ?? this.positionFactor,
       width: width ?? this.width,
       depth: depth ?? height ?? this.depth,

@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart' show listEquals;
 import 'package:flutter/material.dart' show BoxShadow, Gradient;
 
 import 'config/config.dart';
+import 'rendering/dynamic_shape_interaction.dart';
 import 'shape_pattern.dart';
 
 export 'config/config.dart';
@@ -435,6 +436,12 @@ class DynamicShapeConfig {
   /// Number of floating ambient particles for particles background effect.
   final int particleCount;
 
+  /// Granular layer-specific clipping configuration.
+  final ShapeClipConfig? clipConfig;
+
+  /// Shape-aware interaction, hit-testing, and pointer routing configuration.
+  final DynamicShapeInteraction? interaction;
+
   const DynamicShapeConfig({
     this.type = DynamicShapeType.smoothRounded,
     this.borderStyle = BorderStyleType.solid,
@@ -503,6 +510,8 @@ class DynamicShapeConfig {
     this.noiseOpacity = 0.05,
     this.waveLevel = 0.5,
     this.particleCount = 12,
+    this.clipConfig,
+    this.interaction,
   })  : _cornerRadii = cornerRadii,
         _rotation = rotation,
         _scaleX = scaleX,
@@ -1164,6 +1173,8 @@ class DynamicShapeConfig {
     double? noiseOpacity,
     double? waveLevel,
     int? particleCount,
+    ShapeClipConfig? clipConfig,
+    DynamicShapeInteraction? interaction,
   }) {
     return DynamicShapeConfig(
       type: type ?? this.type,
@@ -1235,6 +1246,8 @@ class DynamicShapeConfig {
       noiseOpacity: noiseOpacity ?? this.noiseOpacity,
       waveLevel: waveLevel ?? this.waveLevel,
       particleCount: particleCount ?? this.particleCount,
+      clipConfig: clipConfig ?? this.clipConfig,
+      interaction: interaction ?? this.interaction,
     );
   }
 

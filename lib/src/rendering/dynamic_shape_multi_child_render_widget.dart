@@ -5,6 +5,7 @@ import '../dynamic_shape_stack.dart';
 import '../layout/shape_collision_detector.dart';
 import '../layout/shape_content_protection.dart';
 import 'dynamic_shape_hit_test.dart';
+import 'dynamic_shape_interaction.dart';
 import 'dynamic_shape_multi_child_render_object.dart';
 
 /// Multi-child RenderObjectWidget hosting the [RenderMultiChildDynamicShape] engine.
@@ -18,7 +19,11 @@ class DynamicShapeMultiChildRenderWidget extends MultiChildRenderObjectWidget {
   final Clip clipBehavior;
   final ShapeContentProtection contentProtection;
   final ShapeHitTestBehavior hitTestBehavior;
+  final DynamicShapeInteraction? interaction;
+  final ShapeClipConfig? clipConfig;
   final VoidCallback? onTap;
+  final VoidCallback? onLongPress;
+  final VoidCallback? onDoubleTap;
   final EdgeInsetsGeometry? padding;
   final AlignmentGeometry alignment;
   final ShapeLayoutStrategy layoutStrategy;
@@ -41,7 +46,11 @@ class DynamicShapeMultiChildRenderWidget extends MultiChildRenderObjectWidget {
     this.clipBehavior = Clip.antiAlias,
     this.contentProtection = const ShapeContentProtection(),
     this.hitTestBehavior = ShapeHitTestBehavior.shapeContour,
+    this.interaction,
+    this.clipConfig,
     this.onTap,
+    this.onLongPress,
+    this.onDoubleTap,
     this.padding,
     this.alignment = Alignment.center,
     this.layoutStrategy = ShapeLayoutStrategy.stack,
@@ -67,7 +76,11 @@ class DynamicShapeMultiChildRenderWidget extends MultiChildRenderObjectWidget {
       clipBehavior: clipBehavior,
       contentProtection: contentProtection,
       hitTestBehavior: hitTestBehavior,
+      interaction: interaction,
+      clipConfig: clipConfig,
       onTap: onTap,
+      onLongPress: onLongPress,
+      onDoubleTap: onDoubleTap,
       padding: padding,
       alignment: alignment,
       layoutStrategy: layoutStrategy,
@@ -95,7 +108,11 @@ class DynamicShapeMultiChildRenderWidget extends MultiChildRenderObjectWidget {
       ..clipBehavior = clipBehavior
       ..contentProtection = contentProtection
       ..hitTestBehavior = hitTestBehavior
+      ..interaction = interaction
+      ..clipConfig = clipConfig
       ..onTap = onTap
+      ..onLongPress = onLongPress
+      ..onDoubleTap = onDoubleTap
       ..padding = padding
       ..alignment = alignment
       ..layoutStrategy = layoutStrategy
@@ -109,3 +126,4 @@ class DynamicShapeMultiChildRenderWidget extends MultiChildRenderObjectWidget {
       ..semanticHint = semanticHint;
   }
 }
+

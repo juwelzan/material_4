@@ -4,6 +4,7 @@ import 'dynamic_shape_config.dart';
 import 'layout/shape_collision_detector.dart';
 import 'layout/shape_content_protection.dart';
 import 'rendering/dynamic_shape_hit_test.dart';
+import 'rendering/dynamic_shape_interaction.dart';
 import 'rendering/dynamic_shape_multi_child_parent_data.dart';
 import 'rendering/dynamic_shape_multi_child_render_widget.dart';
 
@@ -252,8 +253,20 @@ class DynamicShapeStack extends StatelessWidget {
   /// Point-in-path hit testing strategy.
   final ShapeHitTestBehavior hitTestBehavior;
 
+  /// Shape-aware interaction and pointer routing configuration.
+  final DynamicShapeInteraction? interaction;
+
+  /// Granular layer-specific clipping configuration.
+  final ShapeClipConfig? clipConfig;
+
   /// Optional tap callback.
   final VoidCallback? onTap;
+
+  /// Optional long-press callback.
+  final VoidCallback? onLongPress;
+
+  /// Optional double-tap callback.
+  final VoidCallback? onDoubleTap;
 
   /// Outer padding within the shape boundary.
   final EdgeInsetsGeometry? padding;
@@ -294,7 +307,11 @@ class DynamicShapeStack extends StatelessWidget {
     this.clipBehavior = Clip.antiAlias,
     this.contentProtection = const ShapeContentProtection(),
     this.hitTestBehavior = ShapeHitTestBehavior.shapeContour,
+    this.interaction,
+    this.clipConfig,
     this.onTap,
+    this.onLongPress,
+    this.onDoubleTap,
     this.padding,
     this.alignment = Alignment.center,
     this.layoutStrategy = ShapeLayoutStrategy.stack,
@@ -319,7 +336,11 @@ class DynamicShapeStack extends StatelessWidget {
     this.clipBehavior = Clip.antiAlias,
     this.contentProtection = const ShapeContentProtection(),
     this.hitTestBehavior = ShapeHitTestBehavior.shapeContour,
+    this.interaction,
+    this.clipConfig,
     this.onTap,
+    this.onLongPress,
+    this.onDoubleTap,
     this.padding,
     this.alignment = Alignment.center,
     this.spacing = 8.0,
@@ -343,7 +364,11 @@ class DynamicShapeStack extends StatelessWidget {
     this.clipBehavior = Clip.antiAlias,
     this.contentProtection = const ShapeContentProtection(),
     this.hitTestBehavior = ShapeHitTestBehavior.shapeContour,
+    this.interaction,
+    this.clipConfig,
     this.onTap,
+    this.onLongPress,
+    this.onDoubleTap,
     this.padding,
     this.alignment = Alignment.center,
     this.spacing = 8.0,
@@ -367,7 +392,11 @@ class DynamicShapeStack extends StatelessWidget {
     this.clipBehavior = Clip.antiAlias,
     this.contentProtection = const ShapeContentProtection(),
     this.hitTestBehavior = ShapeHitTestBehavior.shapeContour,
+    this.interaction,
+    this.clipConfig,
     this.onTap,
+    this.onLongPress,
+    this.onDoubleTap,
     this.padding,
     this.alignment = Alignment.center,
     this.spacing = 8.0,
@@ -391,7 +420,11 @@ class DynamicShapeStack extends StatelessWidget {
     this.clipBehavior = Clip.antiAlias,
     this.contentProtection = const ShapeContentProtection(),
     this.hitTestBehavior = ShapeHitTestBehavior.shapeContour,
+    this.interaction,
+    this.clipConfig,
     this.onTap,
+    this.onLongPress,
+    this.onDoubleTap,
     this.padding,
     this.alignment = Alignment.center,
     this.spacing = 8.0,
@@ -414,7 +447,11 @@ class DynamicShapeStack extends StatelessWidget {
       clipBehavior: clipBehavior,
       contentProtection: contentProtection,
       hitTestBehavior: hitTestBehavior,
+      interaction: interaction,
+      clipConfig: clipConfig,
       onTap: onTap,
+      onLongPress: onLongPress,
+      onDoubleTap: onDoubleTap,
       padding: padding,
       alignment: alignment,
       layoutStrategy: layoutStrategy,

@@ -144,18 +144,54 @@ class ShapeTransform {
     return path.transform(matrix.storage);
   }
 
+  /// Attempts to calculate the inverted 4x4 matrix for [size].
+  ///
+  /// Returns `null` if the matrix is singular (e.g. zero scale) or non-invertible.
+  vm.Matrix4? tryInvert(Size size) {
+    if (!hasTransform) return vm.Matrix4.identity();
+    if (size.width <= 0 || size.height <= 0 || !isFinite) return null;
+    final matrix = toMatrix4(size);
+    final det = matrix.determinant();
+    if (det.abs() < 1e-9 || det.isNaN || det.isInfinite) return null;
+    try {
+      return vm.Matrix4.inverted(matrix);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Transforms a point between container coordinate space and local shape space.
+  ///
+  /// When [inverse] is true, maps a container touch point into local shape space.
+  /// When [inverse] is false, maps a local shape coordinate into container space.
+  Offset? tryTransformPoint(Offset point, Size size, {bool inverse = true}) {
+    if (!hasTransform) return point;
+    if (point.dx.isNaN ||
+        point.dy.isNaN ||
+        point.dx.isInfinite ||
+        point.dy.isInfinite) {
+      return null;
+    }
+
+    final matrix = inverse ? tryInvert(size) : toMatrix4(size);
+    if (matrix == null) return null;
+
+    final vec = matrix.transform3(vm.Vector3(point.dx, point.dy, 0.0));
+    if (vec.x.isNaN ||
+        vec.y.isNaN ||
+        vec.x.isInfinite ||
+        vec.y.isInfinite) {
+      return null;
+    }
+    return Offset(vec.x, vec.y);
+  }
+
   /// Transforms a touch point [point] from container space into local shape space
   /// for exact hit-testing consistency with rendering.
   Offset transformPointForHitTest(Offset point, Size size) {
     if (!hasTransform) return point;
-    final matrix = toMatrix4(size);
-    try {
-      final inverse = vm.Matrix4.inverted(matrix);
-      final vec = inverse.transform3(vm.Vector3(point.dx, point.dy, 0.0));
-      return Offset(vec.x, vec.y);
-    } catch (_) {
-      return point;
-    }
+    final transformed = tryTransformPoint(point, size, inverse: true);
+    return transformed ?? point;
   }
 
   /// Creates a copy with the given fields replaced.

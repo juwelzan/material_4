@@ -831,8 +831,9 @@ class Material4AvatarShape {
   static Material4AvatarShape lerp(
     Material4AvatarShape? a,
     Material4AvatarShape? b,
-    double t,
-  ) {
+    double t, {
+    int samples = 72,
+  }) {
     if (a == null && b == null) return Material4AvatarShape.circle();
     if (a == null) return b!;
     if (b == null) return a;
@@ -840,41 +841,34 @@ class Material4AvatarShape {
     if (t >= 1.0) return b;
 
     return Material4AvatarShape._(
-      id: 'lerp_${a.id}_to_${b.id}_$t',
+      id: 'lerp_${a.id}_to_${b.id}_${(t * 100).round()}',
       pathBuilder: (size) {
-        final pathA = a.buildPath(size);
-        final pathB = b.buildPath(size);
-        // For shapes sharing compatible points or when morphing, interpolate via combined metrics
-        final metricsA = pathA.computeMetrics().toList();
-        final metricsB = pathB.computeMetrics().toList();
+        final ptsA = _AvatarContourCache.getOrComputeSamples(a, size, samples);
+        final ptsB = _AvatarContourCache.getOrComputeSamples(b, size, samples);
 
-        if (metricsA.isEmpty) return pathB;
-        if (metricsB.isEmpty) return pathA;
+        if (ptsA.isEmpty) return b.buildPath(size);
+        if (ptsB.isEmpty) return a.buildPath(size);
 
-        final path = Path();
-        const int samples = 72;
+        final count = math.min(ptsA.length, ptsB.length);
         final pts = <Offset>[];
-
-        final lenA = metricsA.first.length;
-        final lenB = metricsB.first.length;
-
-        for (int i = 0; i < samples; i++) {
-          final frac = i / samples;
-          final pA =
-              metricsA.first.getTangentForOffset(frac * lenA)?.position ??
-                  Offset.zero;
-          final pB =
-              metricsB.first.getTangentForOffset(frac * lenB)?.position ??
-                  Offset.zero;
-          pts.add(Offset.lerp(pA, pB, t)!);
+        for (int i = 0; i < count; i++) {
+          final pA = ptsA[i];
+          final pB = ptsB[i];
+          pts.add(Offset(
+            pA.dx + (pB.dx - pA.dx) * t,
+            pA.dy + (pB.dy - pA.dy) * t,
+          ));
         }
 
+        final path = Path();
         path.moveTo(
-            (pts.first.dx + pts.last.dx) / 2, (pts.first.dy + pts.last.dy) / 2);
-        for (int i = 0; i < samples; i++) {
+          (pts.first.dx + pts.last.dx) / 2.0,
+          (pts.first.dy + pts.last.dy) / 2.0,
+        );
+        for (int i = 0; i < count; i++) {
           final curr = pts[i];
-          final next = pts[(i + 1) % samples];
-          final mid = Offset((curr.dx + next.dx) / 2, (curr.dy + next.dy) / 2);
+          final next = pts[(i + 1) % count];
+          final mid = Offset((curr.dx + next.dx) / 2.0, (curr.dy + next.dy) / 2.0);
           path.quadraticBezierTo(curr.dx, curr.dy, mid.dx, mid.dy);
         }
         path.close();
@@ -895,3 +889,64 @@ class Material4AvatarShape {
   @override
   int get hashCode => Object.hash(id, config, organicShape);
 }
+
+/// Internal cache for contour samples and phase-aligned path points.
+class _AvatarContourCache {
+  static final Map<String, List<Offset>> _sampleCache = {};
+  static const int _maxCacheSize = 128;
+
+  /// Retrieves cached contour samples or computes and aligns them starting from top-center.
+  static List<Offset> getOrComputeSamples(
+    Material4AvatarShape shape,
+    Size size,
+    int samples,
+  ) {
+    if (size.width <= 0 || size.height <= 0) return const [];
+    final key = '${shape.id}_${size.width.toInt()}x${size.height.toInt()}_$samples';
+    final cached = _sampleCache[key];
+    if (cached != null) return cached;
+
+    final path = shape.buildPath(size);
+    final metrics = path.computeMetrics().toList();
+    if (metrics.isEmpty) return const [];
+
+    final metric = metrics.first;
+    final totalLen = metric.length;
+    if (totalLen <= 0) return const [];
+
+    final rawPts = <Offset>[];
+    for (int i = 0; i < samples; i++) {
+      final frac = i / samples;
+      final tangent = metric.getTangentForOffset(frac * totalLen);
+      rawPts.add(tangent?.position ?? Offset.zero);
+    }
+
+    // Phase alignment: find point closest to top-center (size.width / 2, 0)
+    final topCenter = Offset(size.width / 2.0, 0.0);
+    int bestIndex = 0;
+    double bestDistSq = double.infinity;
+    for (int i = 0; i < rawPts.length; i++) {
+      final p = rawPts[i];
+      final dx = p.dx - topCenter.dx;
+      final dy = p.dy - topCenter.dy;
+      final dSq = dx * dx + dy * dy;
+      if (dSq < bestDistSq) {
+        bestDistSq = dSq;
+        bestIndex = i;
+      }
+    }
+
+    // Rotate points so index 0 always begins at top-center
+    final alignedPts = <Offset>[];
+    for (int i = 0; i < samples; i++) {
+      alignedPts.add(rawPts[(bestIndex + i) % samples]);
+    }
+
+    if (_sampleCache.length >= _maxCacheSize) {
+      _sampleCache.remove(_sampleCache.keys.first);
+    }
+    _sampleCache[key] = alignedPts;
+    return alignedPts;
+  }
+}
+

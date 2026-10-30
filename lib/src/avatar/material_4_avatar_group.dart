@@ -161,6 +161,9 @@ class Material4AvatarGroup extends StatelessWidget {
         onTap: avatar.onTap,
         onLongPress: avatar.onLongPress,
         semanticLabel: avatar.semanticLabel,
+        animation: avatar.animation,
+        effects: avatar.effects,
+        controller: avatar.controller,
         child: avatar.child,
       );
 

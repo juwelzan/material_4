@@ -233,7 +233,12 @@ class Material4AvatarBorder {
   }
 
   /// Paints this border along [path] on [canvas] scaled to [size].
-  void paintBorder(Canvas canvas, Size size, Path path) {
+  void paintBorder(
+    Canvas canvas,
+    Size size,
+    Path path, {
+    double rotationAngle = 0.0,
+  }) {
     if (style == AvatarBorderStyle.none || width <= 0) return;
 
     final bounds = path.getBounds();
@@ -281,7 +286,25 @@ class Material4AvatarBorder {
           ..strokeCap = StrokeCap.round
           ..strokeJoin = StrokeJoin.round;
         if (gradient != null) {
-          paint.shader = gradient!.createShader(bounds);
+          if (rotationAngle != 0.0) {
+            final center = Offset(
+              bounds.left + bounds.width / 2.0,
+              bounds.top + bounds.height / 2.0,
+            );
+            paint.shader = gradient!.createShader(
+              bounds,
+              textDirection: TextDirection.ltr,
+            );
+            canvas.save();
+            canvas.translate(center.dx, center.dy);
+            canvas.rotate(rotationAngle);
+            canvas.translate(-center.dx, -center.dy);
+            canvas.drawPath(path, paint);
+            canvas.restore();
+            return;
+          } else {
+            paint.shader = gradient!.createShader(bounds);
+          }
         } else {
           paint.color = color;
         }

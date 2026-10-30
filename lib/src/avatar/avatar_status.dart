@@ -274,6 +274,7 @@ class Material4AvatarStatus {
 
     return _PulsingStatusIndicator(
       color: color,
+      size: effectiveSize,
       child: indicator,
     );
   }
@@ -311,10 +312,12 @@ class Material4AvatarStatus {
 
 class _PulsingStatusIndicator extends StatefulWidget {
   final Color color;
+  final double size;
   final Widget child;
 
   const _PulsingStatusIndicator({
     required this.color,
+    required this.size,
     required this.child,
   });
 
@@ -365,8 +368,8 @@ class _PulsingStatusIndicatorState extends State<_PulsingStatusIndicator>
               child: Transform.scale(
                 scale: _scaleAnimation.value,
                 child: Container(
-                  width: 14,
-                  height: 14,
+                  width: widget.size,
+                  height: widget.size,
                   decoration: BoxDecoration(
                     color: widget.color,
                     shape: BoxShape.circle,

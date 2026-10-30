@@ -19,6 +19,10 @@ import 'package:material_4/material_4.dart';
 /// 11. Initials Avatar (Deterministic Backgrounds)
 /// 12. Group Avatar (Overlapping Layout)
 /// 13. Custom Shape Avatar (Flower, Shield, Ticket, Star)
+/// 14. Automatic Infinite Shape Morphing
+/// 15. Programmatic Controller Studio
+/// 16. Living Avatar Studio (Breathing, Floating & Glow)
+/// 17. Morphing & Living Group Avatar
 ///
 /// Each item includes a live interactive preview and a viewable/copyable code snippet.
 class AvatarShowcaseScreen extends StatefulWidget {
@@ -60,6 +64,39 @@ class _AvatarShowcaseScreenState extends State<AvatarShowcaseScreen> {
   // Interactive state for #12 Group Avatar
   int _groupVisibleCount = 4;
   final double _groupSpacing = -14.0;
+
+  // Interactive state for #14 Infinite Morphing
+  Material4AvatarAnimationPreset _infinitePreset =
+      Material4AvatarAnimationPreset.organicFlow;
+
+  // Controller and options for #15 Programmatic Controller Studio
+  late final Material4AvatarController _programmaticController;
+  final List<(String, Material4AvatarShape)> _controllerShapeOptions = [
+    ('Circle', Material4AvatarShape.circle()),
+    ('Squircle', Material4AvatarShape.squircle(smoothness: 0.85)),
+    ('Organic Blob', Material4AvatarShape.organicBlob(seed: 42)),
+    ('Hexagon', Material4AvatarShape.hexagon(cornerRadius: 10)),
+    ('Shield', Material4AvatarShape.shield()),
+  ];
+
+  // Interactive state for #16 Living Avatar Studio
+  bool _livingBreathing = true;
+  bool _livingFloating = true;
+  bool _livingRotatingBorder = true;
+  bool _livingGrayscale = false;
+  bool _livingGlow = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _programmaticController = Material4AvatarController();
+  }
+
+  @override
+  void dispose() {
+    _programmaticController.dispose();
+    super.dispose();
+  }
 
   void _nextMorphStep() {
     setState(() {
@@ -782,6 +819,510 @@ Material4Avatar.icon(
   shape: Material4AvatarShape.shield(),
   backgroundColor: const Color(0xFF3949AB),
   badge: const Material4AvatarBadge.admin(size: 18),
+)''',
+          ),
+          const SizedBox(height: 16),
+        ],
+
+        // 14. Automatic Infinite Shape Morphing
+        if (_matchesFilter('Morphing & Groups')) ...[
+          _buildAvatarShowcaseCard(
+            index: '14',
+            title: 'Automatic Infinite Shape Morphing',
+            subtitle:
+                'Phase-aligned Bézier interpolation looping through arbitrary shapes.',
+            tag: 'INFINITE MORPH',
+            tagColor: const Color(0xFF6200EE),
+            avatar: Column(
+              children: [
+                Material4Avatar.animated(
+                  key: ValueKey(_infinitePreset),
+                  shapes: [
+                    Material4AvatarShape.circle(),
+                    Material4AvatarShape.squircle(smoothness: 0.85),
+                    Material4AvatarShape.organicBlob(seed: 42),
+                    Material4AvatarShape.hexagon(cornerRadius: 10),
+                    Material4AvatarShape.shield(),
+                    Material4AvatarShape.circle(),
+                  ],
+                  animation: Material4AvatarAnimation(
+                    autoStart: true,
+                    duration: const Duration(milliseconds: 1400),
+                    holdDuration: const Duration(milliseconds: 600),
+                    curve: Curves.easeInOutCubic,
+                    preset: _infinitePreset,
+                  ),
+                  size: 76,
+                  initials: 'IM',
+                  backgroundColor: const Color(0xFF6200EE),
+                  border: const Material4AvatarBorder.gradient(
+                    gradient: LinearGradient(
+                      colors: [Color(0xFF00E5FF), Color(0xFF7C4DFF)],
+                    ),
+                    width: 3.0,
+                  ),
+                  effects: const Material4AvatarEffects(
+                    ambientGlow: true,
+                    glowColor: Color(0x557C4DFF),
+                    glowRadius: 10.0,
+                  ),
+                  onTap: () => _notifyTap('Infinite Morph Avatar'),
+                ),
+                const SizedBox(height: 12),
+                Wrap(
+                  spacing: 6,
+                  runSpacing: 6,
+                  alignment: WrapAlignment.center,
+                  children: [
+                    Material4AvatarAnimationPreset.organicFlow,
+                    Material4AvatarAnimationPreset.smoothMorph,
+                    Material4AvatarAnimationPreset.softBounce,
+                    Material4AvatarAnimationPreset.pulseMorph,
+                  ].map((preset) {
+                    final isSelected = _infinitePreset == preset;
+                    return ChoiceChip(
+                      label: Text(
+                        preset.name,
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight:
+                              isSelected ? FontWeight.w700 : FontWeight.w500,
+                        ),
+                      ),
+                      selected: isSelected,
+                      selectedColor: const Color(0xFFEDE7F6),
+                      onSelected: (_) {
+                        setState(() => _infinitePreset = preset);
+                      },
+                    );
+                  }).toList(),
+                ),
+              ],
+            ),
+            codeSnippet: '''Material4Avatar.animated(
+  shapes: [
+    Material4AvatarShape.circle(),
+    Material4AvatarShape.squircle(smoothness: 0.85),
+    Material4AvatarShape.organicBlob(seed: 42),
+    Material4AvatarShape.hexagon(cornerRadius: 10),
+    Material4AvatarShape.shield(),
+    Material4AvatarShape.circle(),
+  ],
+  animation: const Material4AvatarAnimation(
+    autoStart: true,
+    duration: Duration(milliseconds: 1400),
+    holdDuration: Duration(milliseconds: 600),
+    curve: Curves.easeInOutCubic,
+    preset: Material4AvatarAnimationPreset.organicFlow,
+  ),
+  size: 76,
+  initials: 'IM',
+  backgroundColor: const Color(0xFF6200EE),
+  border: const Material4AvatarBorder.gradient(
+    gradient: LinearGradient(colors: [Color(0xFF00E5FF), Color(0xFF7C4DFF)]),
+    width: 3.0,
+  ),
+  effects: const Material4AvatarEffects(
+    ambientGlow: true,
+    glowColor: Color(0x557C4DFF),
+  ),
+)''',
+          ),
+          const SizedBox(height: 16),
+        ],
+
+        // 15. Programmatic Controller Studio
+        if (_matchesFilter('Morphing & Groups')) ...[
+          _buildAvatarShowcaseCard(
+            index: '15',
+            title: 'Programmatic Controller Studio',
+            subtitle:
+                'External control: play, pause, step forward/back, and animateTo.',
+            tag: 'CONTROLLER',
+            tagColor: const Color(0xFF00897B),
+            avatar: AnimatedBuilder(
+              animation: _programmaticController,
+              builder: (context, _) {
+                final safeIndex = _programmaticController.currentIndex
+                    .clamp(0, _controllerShapeOptions.length - 1);
+                final currentName = _controllerShapeOptions[safeIndex].$1;
+                return Column(
+                  children: [
+                    Material4Avatar.animated(
+                      controller: _programmaticController,
+                      shapes:
+                          _controllerShapeOptions.map((e) => e.$2).toList(),
+                      animation: const Material4AvatarAnimation(
+                        autoStart: false,
+                        duration: Duration(milliseconds: 650),
+                        holdDuration: Duration(milliseconds: 400),
+                        preset: Material4AvatarAnimationPreset.smoothMorph,
+                      ),
+                      size: 72,
+                      initials: 'PC',
+                      backgroundColor: const Color(0xFF00897B),
+                      border: const Material4AvatarBorder.solid(
+                        color: Color(0xFF80CBC4),
+                        width: 2.5,
+                      ),
+                      onTap: () => _programmaticController.nextShape(),
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      'Shape: $currentName  •  ${_programmaticController.isPlaying ? "Playing ▶" : "Paused ⏸"}',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        color: const Color(0xFF004D40),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      alignment: WrapAlignment.center,
+                      children: [
+                        OutlinedButton.icon(
+                          onPressed: () {
+                            if (_programmaticController.isPlaying) {
+                              _programmaticController.pause();
+                            } else {
+                              _programmaticController.play();
+                            }
+                          },
+                          icon: Icon(
+                            _programmaticController.isPlaying
+                                ? Icons.pause_rounded
+                                : Icons.play_arrow_rounded,
+                            size: 16,
+                          ),
+                          label: Text(_programmaticController.isPlaying
+                              ? 'Pause'
+                              : 'Play'),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: const Color(0xFF00897B),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 8),
+                          ),
+                        ),
+                        OutlinedButton.icon(
+                          onPressed: () =>
+                              _programmaticController.previousShape(),
+                          icon:
+                              const Icon(Icons.skip_previous_rounded, size: 16),
+                          label: const Text('Prev'),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: const Color(0xFF00897B),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 8),
+                          ),
+                        ),
+                        OutlinedButton.icon(
+                          onPressed: () => _programmaticController.nextShape(),
+                          icon: const Icon(Icons.skip_next_rounded, size: 16),
+                          label: const Text('Next'),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: const Color(0xFF00897B),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 8),
+                          ),
+                        ),
+                        OutlinedButton.icon(
+                          onPressed: () => _programmaticController.stop(),
+                          icon: const Icon(Icons.stop_rounded, size: 16),
+                          label: const Text('Stop'),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: const Color(0xFFE53935),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 8),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    Wrap(
+                      spacing: 6,
+                      runSpacing: 6,
+                      alignment: WrapAlignment.center,
+                      children: List.generate(_controllerShapeOptions.length,
+                          (idx) {
+                        final item = _controllerShapeOptions[idx];
+                        final isSelected =
+                            _programmaticController.currentIndex == idx;
+                        return ChoiceChip(
+                          label: Text(item.$1,
+                              style: const TextStyle(fontSize: 11)),
+                          selected: isSelected,
+                          selectedColor: const Color(0xFFB2DFDB),
+                          onSelected: (_) {
+                            _programmaticController.animateTo(item.$2);
+                          },
+                        );
+                      }),
+                    ),
+                  ],
+                );
+              },
+            ),
+            codeSnippet: '''final controller = Material4AvatarController();
+
+// Embed with programmatic controller:
+Material4Avatar.animated(
+  controller: controller,
+  shapes: [
+    Material4AvatarShape.circle(),
+    Material4AvatarShape.squircle(),
+    Material4AvatarShape.hexagon(),
+  ],
+  size: 72,
+  initials: 'PC',
+)
+
+// Programmatic controls:
+controller.play();
+controller.pause();
+controller.nextShape();
+controller.previousShape();
+controller.animateTo(Material4AvatarShape.flower(petals: 8));''',
+          ),
+          const SizedBox(height: 16),
+        ],
+
+        // 16. Living Avatar Studio (Breathing, Floating & Glow)
+        if (_matchesFilter('Morphing & Groups') ||
+            _matchesFilter('Organic Shapes')) ...[
+          _buildAvatarShowcaseCard(
+            index: '16',
+            title: 'Living Avatar Studio (Breathing, Floating & Glow)',
+            subtitle:
+                'Micro-interactions: subtle breathing, floating, rotating border & glow.',
+            tag: 'LIVING EFFECTS',
+            tagColor: const Color(0xFFE65100),
+            avatar: Column(
+              children: [
+                Material4Avatar(
+                  size: 76,
+                  initials: 'LA',
+                  shape: Material4AvatarShape.squircle(smoothness: 0.9),
+                  backgroundColor: const Color(0xFFE65100),
+                  textColor: Colors.white,
+                  border: const Material4AvatarBorder.gradient(
+                    gradient: SweepGradient(
+                      colors: [
+                        Color(0xFFFFD54F),
+                        Color(0xFFFF7043),
+                        Color(0xFFE91E63),
+                        Color(0xFFFFD54F),
+                      ],
+                    ),
+                    width: 3.5,
+                  ),
+                  effects: Material4AvatarEffects(
+                    breathing: _livingBreathing,
+                    floating: _livingFloating,
+                    animatedBorder: _livingRotatingBorder,
+                    borderRotationDuration: const Duration(seconds: 4),
+                    ambientGlow: _livingGlow,
+                    glowColor: const Color(0x66FF7043),
+                    glowRadius: 14.0,
+                    grayscale: _livingGrayscale,
+                  ),
+                  badge: const Material4AvatarBadge.status(
+                    status: Material4AvatarStatus.online(pulse: true),
+                    position: Material4AvatarBadgePosition.bottomRight,
+                  ),
+                  onTap: () => _notifyTap('Living Avatar'),
+                ),
+                const SizedBox(height: 12),
+                Wrap(
+                  spacing: 6,
+                  runSpacing: 6,
+                  alignment: WrapAlignment.center,
+                  children: [
+                    FilterChip(
+                      label: const Text('Breathing',
+                          style: TextStyle(fontSize: 11)),
+                      selected: _livingBreathing,
+                      selectedColor: const Color(0xFFFFE0B2),
+                      onSelected: (val) =>
+                          setState(() => _livingBreathing = val),
+                    ),
+                    FilterChip(
+                      label: const Text('Floating',
+                          style: TextStyle(fontSize: 11)),
+                      selected: _livingFloating,
+                      selectedColor: const Color(0xFFFFE0B2),
+                      onSelected: (val) =>
+                          setState(() => _livingFloating = val),
+                    ),
+                    FilterChip(
+                      label: const Text('Rotating Border',
+                          style: TextStyle(fontSize: 11)),
+                      selected: _livingRotatingBorder,
+                      selectedColor: const Color(0xFFFFE0B2),
+                      onSelected: (val) =>
+                          setState(() => _livingRotatingBorder = val),
+                    ),
+                    FilterChip(
+                      label:
+                          const Text('Glow', style: TextStyle(fontSize: 11)),
+                      selected: _livingGlow,
+                      selectedColor: const Color(0xFFFFE0B2),
+                      onSelected: (val) => setState(() => _livingGlow = val),
+                    ),
+                    FilterChip(
+                      label: const Text('Grayscale',
+                          style: TextStyle(fontSize: 11)),
+                      selected: _livingGrayscale,
+                      selectedColor: const Color(0xFFFFE0B2),
+                      onSelected: (val) =>
+                          setState(() => _livingGrayscale = val),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            codeSnippet: '''Material4Avatar(
+  size: 76,
+  initials: 'LA',
+  shape: Material4AvatarShape.squircle(smoothness: 0.9),
+  backgroundColor: const Color(0xFFE65100),
+  border: const Material4AvatarBorder.gradient(
+    gradient: SweepGradient(colors: [
+      Color(0xFFFFD54F),
+      Color(0xFFFF7043),
+      Color(0xFFE91E63),
+      Color(0xFFFFD54F),
+    ]),
+    width: 3.5,
+  ),
+  effects: const Material4AvatarEffects(
+    breathing: true,
+    floating: true,
+    animatedBorder: true,
+    ambientGlow: true,
+    glowRadius: 14.0,
+  ),
+  badge: const Material4AvatarBadge.status(
+    status: Material4AvatarStatus.online(pulse: true),
+  ),
+)''',
+          ),
+          const SizedBox(height: 16),
+        ],
+
+        // 17. Morphing & Living Group Avatar
+        if (_matchesFilter('Morphing & Groups')) ...[
+          _buildAvatarShowcaseCard(
+            index: '17',
+            title: 'Morphing & Living Group Avatar',
+            subtitle:
+                'Stacked group avatar where members have individual morphing & micro-animations.',
+            tag: 'GROUP MORPH',
+            tagColor: const Color(0xFF1565C0),
+            avatar: Material4AvatarGroup(
+              maxVisible: 4,
+              spacing: -14,
+              avatars: [
+                Material4Avatar.animated(
+                  initials: 'AG',
+                  size: 52,
+                  shapes: [
+                    Material4AvatarShape.circle(),
+                    Material4AvatarShape.squircle(smoothness: 0.8),
+                    Material4AvatarShape.circle(),
+                  ],
+                  animation: const Material4AvatarAnimation(
+                    duration: Duration(milliseconds: 1000),
+                    holdDuration: Duration(milliseconds: 500),
+                  ),
+                  backgroundColor: const Color(0xFF6200EE),
+                  border: const Material4AvatarBorder.solid(
+                    color: Colors.white,
+                    width: 2.0,
+                  ),
+                  onTap: () => _notifyTap('Morphing Member (AG)'),
+                ),
+                Material4Avatar.breathing(
+                  initials: 'BR',
+                  size: 52,
+                  shape: Material4AvatarShape.hexagon(cornerRadius: 8),
+                  backgroundColor: const Color(0xFF00B0FF),
+                  border: const Material4AvatarBorder.solid(
+                    color: Colors.white,
+                    width: 2.0,
+                  ),
+                  onTap: () => _notifyTap('Breathing Member (BR)'),
+                ),
+                Material4Avatar.floating(
+                  initials: 'FL',
+                  size: 52,
+                  shape: Material4AvatarShape.organicBlob(seed: 12),
+                  backgroundColor: const Color(0xFF00E676),
+                  border: const Material4AvatarBorder.solid(
+                    color: Colors.white,
+                    width: 2.0,
+                  ),
+                  onTap: () => _notifyTap('Floating Member (FL)'),
+                ),
+                Material4Avatar.animated(
+                  initials: 'SH',
+                  size: 52,
+                  shapes: [
+                    Material4AvatarShape.shield(),
+                    Material4AvatarShape.squircle(),
+                    Material4AvatarShape.shield(),
+                  ],
+                  animation: const Material4AvatarAnimation(
+                    duration: Duration(milliseconds: 1400),
+                    holdDuration: Duration(milliseconds: 400),
+                  ),
+                  backgroundColor: const Color(0xFFFF9100),
+                  border: const Material4AvatarBorder.solid(
+                    color: Colors.white,
+                    width: 2.0,
+                  ),
+                  onTap: () => _notifyTap('Shield Morpher (SH)'),
+                ),
+              ],
+              onOverflowTap: () => _notifyTap('Group Overflow (Show All)'),
+            ),
+            codeSnippet: '''Material4AvatarGroup(
+  maxVisible: 4,
+  spacing: -14,
+  avatars: [
+    Material4Avatar.animated(
+      initials: 'AG',
+      size: 52,
+      shapes: [
+        Material4AvatarShape.circle(),
+        Material4AvatarShape.squircle(),
+        Material4AvatarShape.circle(),
+      ],
+      animation: const Material4AvatarAnimation(
+        duration: Duration(milliseconds: 1000),
+      ),
+    ),
+    Material4Avatar.breathing(
+      initials: 'BR',
+      size: 52,
+      shape: Material4AvatarShape.hexagon(cornerRadius: 8),
+    ),
+    Material4Avatar.floating(
+      initials: 'FL',
+      size: 52,
+      shape: Material4AvatarShape.organicBlob(seed: 12),
+    ),
+    Material4Avatar.animated(
+      initials: 'SH',
+      size: 52,
+      shapes: [
+        Material4AvatarShape.shield(),
+        Material4AvatarShape.squircle(),
+        Material4AvatarShape.shield(),
+      ],
+    ),
+  ],
 )''',
           ),
           const SizedBox(height: 16),

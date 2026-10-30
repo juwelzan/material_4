@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'dynamic_shape_config.dart';
 import 'dynamic_shape_container.dart';
+import 'layout/shape_content_protection.dart';
 import 'shape_pattern.dart';
 
 /// A production-ready, highly versatile card widget designed to morph into
@@ -329,6 +330,7 @@ class _AdaptiveShapeCardState extends State<AdaptiveShapeCard>
           borderColor: widget.borderColor,
           borderWidth: widget.borderWidth,
           dockedBadge: widget.badge,
+          contentProtection: const ShapeContentProtection.visibleOverflow(),
           child: LayoutBuilder(
             builder: (context, constraints) {
               return Stack(

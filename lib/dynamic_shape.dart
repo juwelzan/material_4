@@ -14,6 +14,8 @@ export 'src/config/config.dart';
 export 'src/dynamic_shape_config.dart';
 export 'src/dynamic_shape_container.dart';
 export 'src/dynamic_shape_path_builder.dart';
+export 'src/layout/layout.dart';
+export 'src/rendering/rendering.dart';
 export 'src/school_shape_presets.dart';
 export 'src/shape_animation_controller.dart';
 export 'src/shape_background_renderer.dart';

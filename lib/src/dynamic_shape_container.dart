@@ -4,8 +4,10 @@ import 'package:flutter/material.dart';
 
 import 'dynamic_shape_config.dart';
 import 'dynamic_shape_path_builder.dart';
-import 'shape_background_renderer.dart';
-import 'shape_border_painter.dart';
+import 'layout/shape_content_protection.dart';
+import 'rendering/dynamic_shape_hit_test.dart';
+import 'rendering/dynamic_shape_painter.dart';
+import 'rendering/dynamic_shape_render_widget.dart';
 import 'shape_pattern.dart';
 
 /// CustomClipper that clips any child widget to the exact contour
@@ -26,11 +28,11 @@ class DynamicShapeClipper extends CustomClipper<Path> {
   }
 }
 
-/// CustomPainter that renders the background fill/gradient,
-/// patterns, inner/inset shadows, shimmer sweep,
-/// unique borders (dashed, dotted, double stroke, gradient, neo-3D, glow),
-/// and soft drop shadows.
-class DynamicShapePainter extends CustomPainter {
+/// Legacy adapter if a [CustomPainter] is directly needed.
+///
+/// Under normal usage, [DynamicShapeContainer] and [DynamicShapeRenderWidget]
+/// draw directly using [RenderDynamicShape] and [DynamicShapePainter.paintShape].
+class DynamicShapeCustomPainter extends CustomPainter {
   final DynamicShapeConfig config;
   final Color? color;
   final Gradient? gradient;
@@ -38,7 +40,7 @@ class DynamicShapePainter extends CustomPainter {
   final double borderWidth;
   final List<BoxShadow>? shadows;
 
-  const DynamicShapePainter({
+  const DynamicShapeCustomPainter({
     required this.config,
     this.color,
     this.gradient,
@@ -50,152 +52,21 @@ class DynamicShapePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final path = DynamicShapePathBuilder.buildPath(size, config);
-
-    // 1. Neo-Brutalism 3D Hard Offset Block
-    if (config.borderStyle == BorderStyleType.neo3d) {
-      final neoPaint = Paint()
-        ..style = PaintingStyle.fill
-        ..color = config.neoColor;
-      canvas.save();
-      canvas.translate(config.neoOffset.dx, config.neoOffset.dy);
-      canvas.drawPath(path, neoPaint);
-      canvas.restore();
-    }
-
-    // 2. Soft Drop Shadows (if provided and not neo3d)
-    if (config.borderStyle != BorderStyleType.neo3d &&
-        shadows != null &&
-        shadows!.isNotEmpty) {
-      for (final shadow in shadows!) {
-        final shadowPaint = Paint()
-          ..color = shadow.color
-          ..maskFilter = MaskFilter.blur(BlurStyle.normal, shadow.blurRadius);
-        canvas.save();
-        canvas.translate(shadow.offset.dx, shadow.offset.dy);
-        canvas.drawPath(path, shadowPaint);
-        canvas.restore();
-      }
-    }
-
-    // 3. Ambient Colored Glow Halo
-    if (config.borderStyle == BorderStyleType.glow) {
-      final glowColor = config.glowColor ?? borderColor;
-      final glowPaint = Paint()
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = borderWidth * 2.5
-        ..color = glowColor.withValues(alpha: 0.45)
-        ..maskFilter = MaskFilter.blur(BlurStyle.normal, config.glowBlurRadius);
-      canvas.drawPath(path, glowPaint);
-    }
-
-    // 4. Background Fill & Next-Gen Procedural Effects
-    ShapeBackgroundRenderer.renderBackground(
-      canvas: canvas,
-      size: size,
-      clipPath: path,
-      config: config,
-      baseColor: color,
-      baseGradient: gradient,
-    );
-
-    // 5. Procedural Pattern Textures (Stripes, Dots, Grid, Waves)
-    if (config.pattern != ShapePattern.none) {
-      final patternColor = config.patternColor ??
-          (color != null
-              ? (color!.computeLuminance() > 0.5
-                  ? Colors.black.withValues(alpha: 0.06)
-                  : Colors.white.withValues(alpha: 0.12))
-              : const Color(0x0F000000));
-
-      ShapePatternRenderer.drawPattern(
-        canvas: canvas,
-        clipPath: path,
-        size: size,
-        pattern: config.pattern,
-        color: patternColor,
-        spacing: config.patternSpacing,
-        strokeWidth: config.patternStrokeWidth,
-      );
-    }
-
-    // 6. Tactile Inset Inner Shadow (Claymorphic / Sculpted Depth)
-    if (config.innerShadows != null && config.innerShadows!.isNotEmpty) {
-      for (final innerShadow in config.innerShadows!) {
-        _drawInnerShadow(canvas, path, innerShadow, size);
-      }
-    }
-
-    // 7. Holographic Shimmer Light Sweep
-    if (config.isShimmering) {
-      _drawShimmer(canvas, path, size, config.shimmerProgress);
-    }
-
-    // 8. Unique Border Rendering based on BorderStyleType
-    _drawUniqueBorder(canvas, size, path);
-  }
-
-  void _drawInnerShadow(
-    Canvas canvas,
-    Path path,
-    BoxShadow innerShadow,
-    Size size,
-  ) {
-    final shadowRect = (Offset.zero & size).inflate(innerShadow.blurRadius * 2);
-    final shadowPath = Path()
-      ..fillType = PathFillType.evenOdd
-      ..addRect(shadowRect)
-      ..addPath(path, Offset.zero);
-
-    final shadowPaint = Paint()
-      ..color = innerShadow.color
-      ..maskFilter = MaskFilter.blur(BlurStyle.normal, innerShadow.blurRadius);
-
-    canvas.save();
-    canvas.clipPath(path);
-    canvas.translate(innerShadow.offset.dx, innerShadow.offset.dy);
-    canvas.drawPath(shadowPath, shadowPaint);
-    canvas.restore();
-  }
-
-  void _drawShimmer(Canvas canvas, Path path, Size size, double progress) {
-    canvas.save();
-    canvas.clipPath(path);
-
-    final sweepSpan = size.width * 2.0;
-    final sweepX = -size.width + sweepSpan * progress;
-    final shimmerGradient = LinearGradient(
-      begin: Alignment.topLeft,
-      end: Alignment.bottomRight,
-      colors: [
-        Colors.white.withValues(alpha: 0.0),
-        Colors.white.withValues(alpha: 0.35),
-        Colors.white.withValues(alpha: 0.0),
-      ],
-      stops: const [0.35, 0.5, 0.65],
-    );
-
-    final shimmerPaint = Paint()
-      ..shader = shimmerGradient.createShader(
-        Rect.fromLTWH(sweepX, 0, size.width, size.height),
-      );
-
-    canvas.drawRect(Offset.zero & size, shimmerPaint);
-    canvas.restore();
-  }
-
-  void _drawUniqueBorder(Canvas canvas, Size size, Path path) {
-    ShapeBorderPainter.paintBorder(
+    DynamicShapePainter.paintShape(
       canvas: canvas,
       size: size,
       path: path,
       config: config,
+      color: color,
+      gradient: gradient,
       borderColor: borderColor,
       borderWidth: borderWidth,
+      shadows: shadows,
     );
   }
 
   @override
-  bool shouldRepaint(covariant DynamicShapePainter oldDelegate) {
+  bool shouldRepaint(covariant DynamicShapeCustomPainter oldDelegate) {
     return oldDelegate.config != config ||
         oldDelegate.color != color ||
         oldDelegate.gradient != gradient ||
@@ -222,6 +93,12 @@ class DynamicShapeContainer extends StatelessWidget {
   final VoidCallback? onTap;
   final Clip clipBehavior;
 
+  /// Shape-aware content protection mode ensuring child readability and bounds.
+  final ShapeContentProtection contentProtection;
+
+  /// Hit testing strategy (exact shape contour vs rectangular bounding box).
+  final ShapeHitTestBehavior hitTestBehavior;
+
   /// Optional accessory/badge to dock into the notch or tab
   final Widget? dockedBadge;
   final Alignment badgeAlignment;
@@ -244,6 +121,8 @@ class DynamicShapeContainer extends StatelessWidget {
     ],
     this.onTap,
     this.clipBehavior = Clip.antiAlias,
+    this.contentProtection = const ShapeContentProtection.strict(),
+    this.hitTestBehavior = ShapeHitTestBehavior.shapeContour,
     this.dockedBadge,
     this.badgeAlignment = Alignment.topRight,
     this.badgePadding = EdgeInsets.zero,
@@ -1684,30 +1563,11 @@ class DynamicShapeContainer extends StatelessWidget {
   Widget build(BuildContext context) {
     Widget content = child ?? const SizedBox.shrink();
 
-    if (padding != null) {
-      content = Padding(padding: padding!, child: content);
-    }
-
-    // Clip child to exact dynamic shape path so ripples/images/glass don't bleed
-    Widget clippedContent = ClipPath(
-      clipper: DynamicShapeClipper(config: config),
-      clipBehavior: clipBehavior,
-      child: config.isGlassmorphic
-          ? BackdropFilter(
-              filter: ImageFilter.blur(
-                sigmaX: config.glassBlur,
-                sigmaY: config.glassBlur,
-              ),
-              child: content,
-            )
-          : content,
-    );
-
     // If a docked badge is specified
     if (dockedBadge != null) {
-      clippedContent = Stack(
+      content = Stack(
         children: [
-          clippedContent,
+          content,
           Positioned.fill(
             child: Align(
               alignment: badgeAlignment,
@@ -1718,31 +1578,41 @@ class DynamicShapeContainer extends StatelessWidget {
       );
     }
 
-    // Outer painted container
-    Widget paintedContainer = CustomPaint(
-      painter: DynamicShapePainter(
-        config: config,
-        color: color,
-        gradient: gradient,
-        borderColor: borderColor,
-        borderWidth: borderWidth,
-        shadows: shadows,
-      ),
-      child: SizedBox(width: width, height: height, child: clippedContent),
+    Widget rendered = DynamicShapeRenderWidget(
+      config: config,
+      color: color,
+      gradient: gradient,
+      borderColor: borderColor,
+      borderWidth: borderWidth,
+      shadows: shadows,
+      clipBehavior: clipBehavior,
+      contentProtection: contentProtection,
+      hitTestBehavior: hitTestBehavior,
+      onTap: onTap,
+      padding: padding,
+      width: width,
+      height: height,
+      child: content,
     );
 
-    if (onTap != null) {
-      paintedContainer = GestureDetector(
-        onTap: onTap,
-        behavior: HitTestBehavior.opaque,
-        child: paintedContainer,
+    if (config.isGlassmorphic) {
+      rendered = ClipPath(
+        clipper: DynamicShapeClipper(config: config),
+        clipBehavior: clipBehavior,
+        child: BackdropFilter(
+          filter: ImageFilter.blur(
+            sigmaX: config.glassBlur,
+            sigmaY: config.glassBlur,
+          ),
+          child: rendered,
+        ),
       );
     }
 
     if (margin != null) {
-      paintedContainer = Padding(padding: margin!, child: paintedContainer);
+      rendered = Padding(padding: margin!, child: rendered);
     }
 
-    return paintedContainer;
+    return rendered;
   }
 }

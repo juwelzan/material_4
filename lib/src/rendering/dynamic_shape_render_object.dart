@@ -1,0 +1,571 @@
+import 'dart:math' as math;
+
+import 'package:flutter/gestures.dart';
+import 'package:flutter/material.dart' show Colors;
+import 'package:flutter/rendering.dart';
+
+import '../dynamic_shape_config.dart';
+import '../dynamic_shape_path_builder.dart';
+import '../layout/shape_content_protection.dart';
+import '../layout/shape_safe_region.dart';
+import 'dynamic_shape_clip_manager.dart';
+import 'dynamic_shape_hit_test.dart';
+import 'dynamic_shape_layout_manager.dart';
+import 'dynamic_shape_painter.dart';
+import 'dynamic_shape_parent_data.dart';
+import 'dynamic_shape_semantics.dart';
+
+/// Central hardware-accelerated [RenderBox] engine for dynamic vector shapes.
+///
+/// Responsible for:
+/// - Exact vector path generation and caching
+/// - Shape-aware content protection and safe insets layout
+/// - Direct Canvas rendering (backgrounds, borders, patterns, shadows, shimmer)
+/// - Point-in-path hit testing with transformation coordinate mapping
+/// - Fine-grained clipping and accessibility semantics
+class RenderDynamicShape extends RenderBox
+    with RenderObjectWithChildMixin<RenderBox> {
+  DynamicShapeConfig _config;
+  Color? _color;
+  Gradient? _gradient;
+  Color _borderColor;
+  double _borderWidth;
+  List<BoxShadow>? _shadows;
+  Clip _clipBehavior;
+  ShapeContentProtection _contentProtection;
+  ShapeHitTestBehavior _hitTestBehavior;
+  VoidCallback? _onTap;
+  EdgeInsetsGeometry? _padding;
+  TextDirection _textDirection;
+  double? _explicitWidth;
+  double? _explicitHeight;
+
+  /// Cached vector path for current [size].
+  Path? _currentPath;
+
+  RenderDynamicShape({
+    required DynamicShapeConfig config,
+    Color? color,
+    Gradient? gradient,
+    Color borderColor = const Color(0x18000000),
+    double borderWidth = 1.0,
+    List<BoxShadow>? shadows,
+    Clip clipBehavior = Clip.antiAlias,
+    ShapeContentProtection contentProtection = const ShapeContentProtection(),
+    ShapeHitTestBehavior hitTestBehavior = ShapeHitTestBehavior.shapeContour,
+    VoidCallback? onTap,
+    EdgeInsetsGeometry? padding,
+    TextDirection textDirection = TextDirection.ltr,
+    double? width,
+    double? height,
+    RenderBox? child,
+  })  : _config = config,
+        _color = color,
+        _gradient = gradient,
+        _borderColor = borderColor,
+        _borderWidth = borderWidth,
+        _shadows = shadows,
+        _clipBehavior = clipBehavior,
+        _contentProtection = contentProtection,
+        _hitTestBehavior = hitTestBehavior,
+        _onTap = onTap,
+        _padding = padding,
+        _textDirection = textDirection,
+        _explicitWidth = width,
+        _explicitHeight = height {
+    this.child = child;
+  }
+
+  // =========================================================================
+  // Property Getters & Setters with Invalidation Separation
+  // =========================================================================
+
+  DynamicShapeConfig get config => _config;
+  set config(DynamicShapeConfig value) {
+    if (_config == value) return;
+    final needsLayoutRecompute = _config.cornerRadius != value.cornerRadius ||
+        _config.corners != value.corners ||
+        _config.edges != value.edges ||
+        _config.notches != value.notches ||
+        _config.transform != value.transform ||
+        _config.constraints != value.constraints ||
+        _config.type != value.type ||
+        _config.tabWidth != value.tabWidth ||
+        _config.tabHeight != value.tabHeight ||
+        _config.waveCount != value.waveCount ||
+        _config.waveAmplitude != value.waveAmplitude;
+
+    _config = value;
+    _currentPath = null;
+    if (needsLayoutRecompute) {
+      markNeedsLayout();
+    } else {
+      markNeedsPaint();
+    }
+  }
+
+  Color? get color => _color;
+  set color(Color? value) {
+    if (_color == value) return;
+    _color = value;
+    markNeedsPaint();
+  }
+
+  Gradient? get gradient => _gradient;
+  set gradient(Gradient? value) {
+    if (_gradient == value) return;
+    _gradient = value;
+    markNeedsPaint();
+  }
+
+  Color get borderColor => _borderColor;
+  set borderColor(Color value) {
+    if (_borderColor == value) return;
+    _borderColor = value;
+    markNeedsPaint();
+  }
+
+  double get borderWidth => _borderWidth;
+  set borderWidth(double value) {
+    if (_borderWidth == value) return;
+    _borderWidth = value;
+    markNeedsLayout();
+  }
+
+  List<BoxShadow>? get shadows => _shadows;
+  set shadows(List<BoxShadow>? value) {
+    if (_shadows == value) return;
+    _shadows = value;
+    markNeedsPaint();
+  }
+
+  Clip get clipBehavior => _clipBehavior;
+  set clipBehavior(Clip value) {
+    if (_clipBehavior == value) return;
+    _clipBehavior = value;
+    markNeedsPaint();
+  }
+
+  ShapeContentProtection get contentProtection => _contentProtection;
+  set contentProtection(ShapeContentProtection value) {
+    if (_contentProtection == value) return;
+    _contentProtection = value;
+    markNeedsLayout();
+  }
+
+  ShapeHitTestBehavior get hitTestBehavior => _hitTestBehavior;
+  set hitTestBehavior(ShapeHitTestBehavior value) {
+    if (_hitTestBehavior == value) return;
+    _hitTestBehavior = value;
+  }
+
+  VoidCallback? get onTap => _onTap;
+  set onTap(VoidCallback? value) {
+    if (_onTap == value) return;
+    final hadTap = _onTap != null;
+    _onTap = value;
+    if (attached) {
+      _tapRecognizer?.dispose();
+      _tapRecognizer =
+          value != null ? (TapGestureRecognizer()..onTap = value) : null;
+    }
+    if (hadTap != (_onTap != null)) {
+      markNeedsSemanticsUpdate();
+    }
+  }
+
+  EdgeInsetsGeometry? get padding => _padding;
+  set padding(EdgeInsetsGeometry? value) {
+    if (_padding == value) return;
+    _padding = value;
+    markNeedsLayout();
+  }
+
+  TextDirection get textDirection => _textDirection;
+  set textDirection(TextDirection value) {
+    if (_textDirection == value) return;
+    _textDirection = value;
+    markNeedsLayout();
+  }
+
+  double? get explicitWidth => _explicitWidth;
+  set explicitWidth(double? value) {
+    if (_explicitWidth == value) return;
+    _explicitWidth = value;
+    markNeedsLayout();
+  }
+
+  double? get explicitHeight => _explicitHeight;
+  set explicitHeight(double? value) {
+    if (_explicitHeight == value) return;
+    _explicitHeight = value;
+    markNeedsLayout();
+  }
+
+  TapGestureRecognizer? _tapRecognizer;
+
+  @override
+  void attach(PipelineOwner owner) {
+    super.attach(owner);
+    if (_onTap != null) {
+      _tapRecognizer = TapGestureRecognizer()..onTap = _onTap;
+    }
+  }
+
+  @override
+  void detach() {
+    _tapRecognizer?.dispose();
+    _tapRecognizer = null;
+    super.detach();
+  }
+
+  @override
+  void setupParentData(RenderBox child) {
+    if (child.parentData is! DynamicShapeParentData) {
+      child.parentData = DynamicShapeParentData();
+    }
+  }
+
+  // =========================================================================
+  // Geometry Path Retrieval
+  // =========================================================================
+
+  /// Resolves the current vector [Path] for this RenderBox size.
+  Path get currentPath {
+    if (_currentPath != null) return _currentPath!;
+    _currentPath = DynamicShapePathBuilder.buildPath(size, _config);
+    return _currentPath!;
+  }
+
+  EdgeInsets _computeEffectiveInsets(Size tentativeSize) {
+    final base = _padding?.resolve(_textDirection) ?? EdgeInsets.zero;
+    if (!_contentProtection.autoPadding ||
+        _contentProtection.mode == ContentProtectionMode.visibleOverflow) {
+      return base;
+    }
+
+    return ShapeSafeRegion.computeSafeInsets(
+      size: tentativeSize,
+      config: _config,
+      basePadding: base,
+      borderWidth: _borderWidth,
+      textDirection: _textDirection,
+    );
+  }
+
+  // =========================================================================
+  // Layout & Sizing
+  // =========================================================================
+
+  @override
+  void performLayout() {
+    _currentPath = null;
+    final w = _explicitWidth;
+    final h = _explicitHeight;
+
+    // Determine target size bounds from incoming constraints
+    double tentativeWidth =
+        w ?? (constraints.hasBoundedWidth ? constraints.maxWidth : 300.0);
+    double tentativeHeight =
+        h ?? (constraints.hasBoundedHeight ? constraints.maxHeight : 150.0);
+    var tentativeSize = Size(tentativeWidth, tentativeHeight);
+
+    final insets = _computeEffectiveInsets(tentativeSize);
+
+    if (child != null) {
+      final effectiveInsets =
+          _contentProtection.mode == ContentProtectionMode.visibleOverflow
+              ? (_padding?.resolve(_textDirection) ?? EdgeInsets.zero)
+              : insets;
+
+      final maxAvailableW = w != null
+          ? math.max(0.0, w - effectiveInsets.horizontal)
+          : (constraints.hasBoundedWidth
+              ? math.max(0.0, constraints.maxWidth - effectiveInsets.horizontal)
+              : double.infinity);
+
+      final maxAvailableH = h != null
+          ? math.max(0.0, h - effectiveInsets.vertical)
+          : (constraints.hasBoundedHeight
+              ? math.max(0.0, constraints.maxHeight - effectiveInsets.vertical)
+              : double.infinity);
+
+      final minAvailableW = constraints.minWidth > 0
+          ? math.max(0.0, constraints.minWidth - effectiveInsets.horizontal)
+          : 0.0;
+      final minAvailableH = constraints.minHeight > 0
+          ? math.max(0.0, constraints.minHeight - effectiveInsets.vertical)
+          : 0.0;
+
+      final childConstraints = BoxConstraints(
+        minWidth: math.min(minAvailableW, maxAvailableW),
+        maxWidth: maxAvailableW,
+        minHeight: math.min(minAvailableH, maxAvailableH),
+        maxHeight: maxAvailableH,
+      );
+
+      child!.layout(childConstraints, parentUsesSize: true);
+
+      final desiredW = w ?? (child!.size.width + insets.horizontal);
+      final desiredH = h ?? (child!.size.height + insets.vertical);
+
+      final clampedSize = constraints.constrain(Size(desiredW, desiredH));
+      size = _config.constraints.clampSize(clampedSize);
+
+      // Re-evaluate insets with finalized size
+      final finalInsets = _computeEffectiveInsets(size);
+      final childParentData = child!.parentData! as DynamicShapeParentData;
+      childParentData.offset = Offset(finalInsets.left, finalInsets.top);
+    } else {
+      final desiredW =
+          w ?? (constraints.hasBoundedWidth ? constraints.minWidth : 0.0);
+      final desiredH =
+          h ?? (constraints.hasBoundedHeight ? constraints.minHeight : 0.0);
+      final clampedSize = constraints.constrain(Size(desiredW, desiredH));
+      size = _config.constraints.clampSize(clampedSize);
+    }
+  }
+
+  @override
+  Size computeDryLayout(BoxConstraints constraints) {
+    final w = _explicitWidth;
+    final h = _explicitHeight;
+
+    double tentativeWidth =
+        w ?? (constraints.hasBoundedWidth ? constraints.maxWidth : 300.0);
+    double tentativeHeight =
+        h ?? (constraints.hasBoundedHeight ? constraints.maxHeight : 150.0);
+    var tentativeSize = Size(tentativeWidth, tentativeHeight);
+
+    final insets = _computeEffectiveInsets(tentativeSize);
+
+    if (child != null) {
+      final effectiveInsets =
+          _contentProtection.mode == ContentProtectionMode.visibleOverflow
+              ? (_padding?.resolve(_textDirection) ?? EdgeInsets.zero)
+              : insets;
+
+      final maxAvailableW = w != null
+          ? math.max(0.0, w - effectiveInsets.horizontal)
+          : (constraints.hasBoundedWidth
+              ? math.max(0.0, constraints.maxWidth - effectiveInsets.horizontal)
+              : double.infinity);
+
+      final maxAvailableH = h != null
+          ? math.max(0.0, h - effectiveInsets.vertical)
+          : (constraints.hasBoundedHeight
+              ? math.max(0.0, constraints.maxHeight - effectiveInsets.vertical)
+              : double.infinity);
+
+      final minAvailableW = constraints.minWidth > 0
+          ? math.max(0.0, constraints.minWidth - effectiveInsets.horizontal)
+          : 0.0;
+      final minAvailableH = constraints.minHeight > 0
+          ? math.max(0.0, constraints.minHeight - effectiveInsets.vertical)
+          : 0.0;
+
+      final childConstraints = BoxConstraints(
+        minWidth: math.min(minAvailableW, maxAvailableW),
+        maxWidth: maxAvailableW,
+        minHeight: math.min(minAvailableH, maxAvailableH),
+        maxHeight: maxAvailableH,
+      );
+
+      final childSize = child!.getDryLayout(childConstraints);
+
+      final desiredW = w ?? (childSize.width + insets.horizontal);
+      final desiredH = h ?? (childSize.height + insets.vertical);
+      final clampedSize = constraints.constrain(Size(desiredW, desiredH));
+      return _config.constraints.clampSize(clampedSize);
+    } else {
+      final desiredW =
+          w ?? (constraints.hasBoundedWidth ? constraints.minWidth : 0.0);
+      final desiredH =
+          h ?? (constraints.hasBoundedHeight ? constraints.minHeight : 0.0);
+      final clampedSize = constraints.constrain(Size(desiredW, desiredH));
+      return _config.constraints.clampSize(clampedSize);
+    }
+  }
+
+  @override
+  double computeMinIntrinsicWidth(double height) {
+    return DynamicShapeLayoutManager.computeMinIntrinsicWidth(
+      height: height,
+      child: child,
+      config: _config,
+      padding: _padding,
+      explicitWidth: _explicitWidth,
+      textDirection: _textDirection,
+    );
+  }
+
+  @override
+  double computeMaxIntrinsicWidth(double height) {
+    return DynamicShapeLayoutManager.computeMaxIntrinsicWidth(
+      height: height,
+      child: child,
+      config: _config,
+      padding: _padding,
+      explicitWidth: _explicitWidth,
+      textDirection: _textDirection,
+    );
+  }
+
+  @override
+  double computeMinIntrinsicHeight(double width) {
+    return DynamicShapeLayoutManager.computeMinIntrinsicHeight(
+      width: width,
+      child: child,
+      config: _config,
+      padding: _padding,
+      explicitHeight: _explicitHeight,
+      textDirection: _textDirection,
+    );
+  }
+
+  @override
+  double computeMaxIntrinsicHeight(double width) {
+    return DynamicShapeLayoutManager.computeMaxIntrinsicHeight(
+      width: width,
+      child: child,
+      config: _config,
+      padding: _padding,
+      explicitHeight: _explicitHeight,
+      textDirection: _textDirection,
+    );
+  }
+
+  // =========================================================================
+  // Painting & Direct Canvas Rendering
+  // =========================================================================
+
+  @override
+  void paint(PaintingContext context, Offset offset) {
+    if (size.width <= 0 || size.height <= 0) return;
+
+    final path = currentPath;
+    final canvas = context.canvas;
+
+    canvas.save();
+    canvas.translate(offset.dx, offset.dy);
+
+    // 1. Render Glassmorphic Backdrop Blur if requested
+    if (_config.isGlassmorphic) {
+      canvas.save();
+      canvas.clipPath(path);
+      // Paint subtle frosted tint before backdrop filter
+      final tintPaint = Paint()
+        ..color = _config.glassTint ?? Colors.white.withValues(alpha: 0.15);
+      canvas.drawPath(path, tintPaint);
+      canvas.restore();
+    }
+
+    // 2. Direct Canvas Rendering: Backgrounds, Shadows, Glow, Patterns, Borders
+    DynamicShapePainter.paintShape(
+      canvas: canvas,
+      size: size,
+      path: path,
+      config: _config,
+      color: _color,
+      gradient: _gradient,
+      borderColor: _borderColor,
+      borderWidth: _borderWidth,
+      shadows: _shadows,
+    );
+
+    canvas.restore();
+
+    // 3. Child Painting with Selective Clipping
+    if (child != null) {
+      final childParentData = child!.parentData! as DynamicShapeParentData;
+      final childOffset = offset + childParentData.offset;
+
+      if (DynamicShapeClipManager.shouldClipChild(
+        protection: _contentProtection,
+        config: _config,
+        clipBehavior: _clipBehavior,
+      )) {
+        DynamicShapeClipManager.paintWithClip(
+          context: context,
+          offset: offset,
+          bounds: Offset.zero & size,
+          clipPath: path,
+          clipBehavior: _clipBehavior,
+          painter: (childContext, _) {
+            childContext.paintChild(child!, childOffset);
+          },
+        );
+      } else {
+        context.paintChild(child!, childOffset);
+      }
+    }
+  }
+
+  // =========================================================================
+  // Hit Testing & Coordinate Transformations
+  // =========================================================================
+
+  @override
+  bool hitTest(BoxHitTestResult result, {required Offset position}) {
+    if (!DynamicShapeHitTester.containsPoint(
+      path: currentPath,
+      size: size,
+      position: position,
+      transform: _config.resolvedTransform,
+      behavior: _hitTestBehavior,
+    )) {
+      return false;
+    }
+
+    // Hit test children
+    final hitChild = hitTestChildren(result, position: position);
+
+    if (hitChild || _onTap != null) {
+      result.add(BoxHitTestEntry(this, position));
+      return true;
+    }
+
+    return false;
+  }
+
+  @override
+  bool hitTestChildren(BoxHitTestResult result, {required Offset position}) {
+    if (child == null) return false;
+    final childParentData = child!.parentData! as DynamicShapeParentData;
+    return result.addWithPaintOffset(
+      offset: childParentData.offset,
+      position: position,
+      hitTest: (BoxHitTestResult result, Offset transformed) {
+        assert(transformed == position - childParentData.offset);
+        return child!.hitTest(result, position: transformed);
+      },
+    );
+  }
+
+  @override
+  void applyPaintTransform(RenderBox child, Matrix4 transform) {
+    final childParentData = child.parentData! as DynamicShapeParentData;
+    transform.translateByDouble(
+      childParentData.offset.dx,
+      childParentData.offset.dy,
+      0.0,
+      1.0,
+    );
+  }
+
+  @override
+  void describeSemanticsConfiguration(SemanticsConfiguration config) {
+    super.describeSemanticsConfiguration(config);
+    DynamicShapeSemantics.applySemantics(
+      config: config,
+      onTap: _onTap,
+    );
+  }
+
+  @override
+  void handleEvent(PointerEvent event, BoxHitTestEntry entry) {
+    if (event is PointerDownEvent && _onTap != null) {
+      _tapRecognizer?.addPointer(event);
+    }
+  }
+}

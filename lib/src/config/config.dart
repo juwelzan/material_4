@@ -7,4 +7,3 @@ export 'shape_corners.dart';
 export 'shape_edge_config.dart';
 export 'shape_notch.dart';
 export 'shape_transform.dart';
-

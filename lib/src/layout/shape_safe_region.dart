@@ -114,7 +114,9 @@ class ShapeSafeRegion {
     // -------------------------------------------------------------------------
     if (config.notches != null && config.notches!.isNotEmpty) {
       for (final notch in config.notches!) {
-        if (!notch.isInward) continue; // Outward tabs do not intrude on interior
+        if (!notch.isInward) {
+          continue; // Outward tabs do not intrude on interior
+        }
 
         final depthAllowance = notch.depth + strokeOffset;
         final targetEdge = isRtl ? _mirrorEdge(notch.edge) : notch.edge;
@@ -224,7 +226,8 @@ class ShapeSafeRegion {
         break;
 
       case DynamicShapeType.organicBlob:
-        final blobInset = math.min(size.width, size.height) * 0.14 + strokeOffset;
+        final blobInset =
+            math.min(size.width, size.height) * 0.14 + strokeOffset;
         left = math.max(left, blobInset);
         right = math.max(right, blobInset);
         top = math.max(top, blobInset);
@@ -240,7 +243,8 @@ class ShapeSafeRegion {
         break;
 
       case DynamicShapeType.capsule:
-        final capRadius = math.min(size.width, size.height) * 0.28 + strokeOffset;
+        final capRadius =
+            math.min(size.width, size.height) * 0.28 + strokeOffset;
         left = math.max(left, capRadius);
         right = math.max(right, capRadius);
         break;
@@ -264,7 +268,8 @@ class ShapeSafeRegion {
 
       case DynamicShapeType.speechBubble:
         final anchor = _resolveAnchor(config.anchor, isRtl);
-        final tailAllowance = config.speechBubbleTailHeight + strokeOffset + 4.0;
+        final tailAllowance =
+            config.speechBubbleTailHeight + strokeOffset + 4.0;
         if (anchor == ShapeAnchor.bottomLeft ||
             anchor == ShapeAnchor.bottomRight ||
             anchor == ShapeAnchor.bottomCenter) {
@@ -294,7 +299,8 @@ class ShapeSafeRegion {
         break;
 
       case DynamicShapeType.octagon:
-        final octAllowance = math.min(size.width, size.height) * 0.12 + strokeOffset;
+        final octAllowance =
+            math.min(size.width, size.height) * 0.12 + strokeOffset;
         left = math.max(left, octAllowance);
         right = math.max(right, octAllowance);
         top = math.max(top, octAllowance);
@@ -317,7 +323,8 @@ class ShapeSafeRegion {
 
       case DynamicShapeType.parallelogram:
         final skewRad = config.skewAngle.abs() * math.pi / 180.0;
-        final skewAllowance = (math.tan(skewRad) * size.height * 0.35) + strokeOffset;
+        final skewAllowance =
+            (math.tan(skewRad) * size.height * 0.35) + strokeOffset;
         left = math.max(left, skewAllowance);
         right = math.max(right, skewAllowance);
         break;
@@ -333,7 +340,8 @@ class ShapeSafeRegion {
         break;
 
       case DynamicShapeType.customBezier:
-        final defaultBezierInset = math.min(size.width, size.height) * 0.12 + strokeOffset;
+        final defaultBezierInset =
+            math.min(size.width, size.height) * 0.12 + strokeOffset;
         left = math.max(left, defaultBezierInset);
         right = math.max(right, defaultBezierInset);
         top = math.max(top, defaultBezierInset);

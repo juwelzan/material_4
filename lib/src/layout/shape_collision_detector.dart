@@ -63,19 +63,23 @@ class ShapeCollisionDetector {
 
     const tolerance = 0.1;
     if (candidateRect.left < safeRect.left - tolerance) {
-      collisions.add('Left boundary breach: ${candidateRect.left} < ${safeRect.left}');
+      collisions.add(
+          'Left boundary breach: ${candidateRect.left} < ${safeRect.left}');
       collidingEdges.add(ShapeEdge.left);
     }
     if (candidateRect.top < safeRect.top - tolerance) {
-      collisions.add('Top boundary breach: ${candidateRect.top} < ${safeRect.top}');
+      collisions
+          .add('Top boundary breach: ${candidateRect.top} < ${safeRect.top}');
       collidingEdges.add(ShapeEdge.top);
     }
     if (candidateRect.right > safeRect.right + tolerance) {
-      collisions.add('Right boundary breach: ${candidateRect.right} > ${safeRect.right}');
+      collisions.add(
+          'Right boundary breach: ${candidateRect.right} > ${safeRect.right}');
       collidingEdges.add(ShapeEdge.right);
     }
     if (candidateRect.bottom > safeRect.bottom + tolerance) {
-      collisions.add('Bottom boundary breach: ${candidateRect.bottom} > ${safeRect.bottom}');
+      collisions.add(
+          'Bottom boundary breach: ${candidateRect.bottom} > ${safeRect.bottom}');
       collidingEdges.add(ShapeEdge.bottom);
     }
 
@@ -101,7 +105,8 @@ class ShapeCollisionDetector {
     if (config.type == DynamicShapeType.steppedCorner) {
       final cornerCutout = _computeSteppedCornerCutout(config, shapeSize);
       if (cornerCutout != null && candidateRect.overlaps(cornerCutout)) {
-        collisions.add('Content intrudes into stepped corner cutout zone ($cornerCutout).');
+        collisions.add(
+            'Content intrudes into stepped corner cutout zone ($cornerCutout).');
         final inter = candidateRect.intersect(cornerCutout);
         overlap = overlap == null ? inter : overlap.expandToInclude(inter);
       }
@@ -131,7 +136,8 @@ class ShapeCollisionDetector {
         final rectA = childRects[i];
         final rectB = childRects[j];
 
-        final inflatedA = minSpacing > 0 ? rectA.inflate(minSpacing / 2.0) : rectA;
+        final inflatedA =
+            minSpacing > 0 ? rectA.inflate(minSpacing / 2.0) : rectA;
         if (inflatedA.overlaps(rectB)) {
           collisions.add(
             'Child #$i ($rectA) collides with Child #$j ($rectB) [spacing: $minSpacing dp].',
@@ -162,7 +168,8 @@ class ShapeCollisionDetector {
     Rect? overlap;
 
     if (badgeRect.overlaps(contentRect)) {
-      collisions.add('Docked badge ($badgeRect) overlaps main content area ($contentRect).');
+      collisions.add(
+          'Docked badge ($badgeRect) overlaps main content area ($contentRect).');
       overlap = badgeRect.intersect(contentRect);
     }
 
@@ -175,7 +182,8 @@ class ShapeCollisionDetector {
         final notchRect = _computeNotchRect(notch, shapeSize);
         if (notchRect != null && badgeRect.overlaps(notchRect)) {
           // If badge was intended for this notch, it's safe; otherwise flag collision
-          collisions.add('Badge encroaches upon inward notch #$i on ${notch.edge}.');
+          collisions
+              .add('Badge encroaches upon inward notch #$i on ${notch.edge}.');
           final inter = badgeRect.intersect(notchRect);
           overlap = overlap == null ? inter : overlap.expandToInclude(inter);
         }
@@ -190,9 +198,10 @@ class ShapeCollisionDetector {
   }
 
   static Rect? _computeNotchRect(ShapeNotch notch, Size size) {
-    final edgeLength = (notch.edge == ShapeEdge.top || notch.edge == ShapeEdge.bottom)
-        ? size.width
-        : size.height;
+    final edgeLength =
+        (notch.edge == ShapeEdge.top || notch.edge == ShapeEdge.bottom)
+            ? size.width
+            : size.height;
     final center = edgeLength * notch.positionFactor + notch.offset;
     final halfWidth = notch.width / 2.0;
 
@@ -228,7 +237,8 @@ class ShapeCollisionDetector {
     }
   }
 
-  static Rect? _computeSteppedCornerCutout(DynamicShapeConfig config, Size size) {
+  static Rect? _computeSteppedCornerCutout(
+      DynamicShapeConfig config, Size size) {
     final w = config.tabWidth;
     final h = config.tabHeight;
     switch (config.anchor) {

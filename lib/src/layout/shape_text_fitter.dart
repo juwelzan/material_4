@@ -69,7 +69,8 @@ class ShapeTextFitter {
   }
 
   /// Measures multi-line text metrics including line count and unconstrained width.
-  static ({Size size, int lineCount, bool didExceedMaxLines}) measureMultilineText({
+  static ({Size size, int lineCount, bool didExceedMaxLines})
+      measureMultilineText({
     required String text,
     TextStyle? style,
     required double maxWidth,

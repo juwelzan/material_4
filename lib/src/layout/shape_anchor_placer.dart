@@ -28,10 +28,14 @@ class ShapeAnchorPlacer {
         return isRtl ? Offset.zero : Offset(size.width, 0.0);
 
       case ShapeAnchor.bottomLeft:
-        return isRtl ? Offset(size.width, size.height) : Offset(0.0, size.height);
+        return isRtl
+            ? Offset(size.width, size.height)
+            : Offset(0.0, size.height);
 
       case ShapeAnchor.bottomRight:
-        return isRtl ? Offset(0.0, size.height) : Offset(size.width, size.height);
+        return isRtl
+            ? Offset(0.0, size.height)
+            : Offset(size.width, size.height);
 
       case ShapeAnchor.topCenter:
         return Offset(size.width / 2.0, 0.0);
@@ -40,10 +44,14 @@ class ShapeAnchorPlacer {
         return Offset(size.width / 2.0, size.height);
 
       case ShapeAnchor.leftCenter:
-        return isRtl ? Offset(size.width, size.height / 2.0) : Offset(0.0, size.height / 2.0);
+        return isRtl
+            ? Offset(size.width, size.height / 2.0)
+            : Offset(0.0, size.height / 2.0);
 
       case ShapeAnchor.rightCenter:
-        return isRtl ? Offset(0.0, size.height / 2.0) : Offset(size.width, size.height / 2.0);
+        return isRtl
+            ? Offset(0.0, size.height / 2.0)
+            : Offset(size.width, size.height / 2.0);
 
       case ShapeAnchor.center:
         return Offset(size.width / 2.0, size.height / 2.0);
@@ -89,19 +97,23 @@ class ShapeAnchorPlacer {
       case ShapeAnchor.topLeft:
         return Offset(config.tabWidth / 2.0, config.tabHeight / 2.0);
       case ShapeAnchor.topRight:
-        return Offset(size.width - (config.tabWidth / 2.0), config.tabHeight / 2.0);
+        return Offset(
+            size.width - (config.tabWidth / 2.0), config.tabHeight / 2.0);
       case ShapeAnchor.topCenter:
         return Offset(size.width / 2.0, config.tabHeight / 2.0);
       case ShapeAnchor.bottomLeft:
-        return Offset(config.tabWidth / 2.0, size.height - (config.tabHeight / 2.0));
+        return Offset(
+            config.tabWidth / 2.0, size.height - (config.tabHeight / 2.0));
       case ShapeAnchor.bottomRight:
-        return Offset(size.width - (config.tabWidth / 2.0), size.height - (config.tabHeight / 2.0));
+        return Offset(size.width - (config.tabWidth / 2.0),
+            size.height - (config.tabHeight / 2.0));
       case ShapeAnchor.bottomCenter:
         return Offset(size.width / 2.0, size.height - (config.tabHeight / 2.0));
       case ShapeAnchor.leftCenter:
         return Offset(config.protrusionDepth / 2.0, size.height / 2.0);
       case ShapeAnchor.rightCenter:
-        return Offset(size.width - (config.protrusionDepth / 2.0), size.height / 2.0);
+        return Offset(
+            size.width - (config.protrusionDepth / 2.0), size.height / 2.0);
       case ShapeAnchor.center:
         return Offset(size.width / 2.0, size.height / 2.0);
     }

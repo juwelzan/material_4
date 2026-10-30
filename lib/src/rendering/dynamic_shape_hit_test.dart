@@ -45,4 +45,3 @@ class DynamicShapeHitTester {
     return path.contains(localPoint);
   }
 }
-

@@ -94,10 +94,7 @@ void main() {
             home: Scaffold(
               body: SingleChildScrollView(
                 child: Center(
-                  child: SizedBox(
-                    width: 500,
-                    child: schoolCards[i],
-                  ),
+                  child: schoolCards[i],
                 ),
               ),
             ),

@@ -127,7 +127,8 @@ class ShapeContentPlacer {
     // Remaining width is allocated to content
     final contentW = math.max(0.0, availableW);
     final contentH = safeBounds.height;
-    final contentRect = Rect.fromLTWH(currentX, safeBounds.top, contentW, contentH);
+    final contentRect =
+        Rect.fromLTWH(currentX, safeBounds.top, contentW, contentH);
 
     if (isRtl) {
       // Mirror leading and trailing for RTL layout

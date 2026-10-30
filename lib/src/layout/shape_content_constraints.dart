@@ -49,10 +49,12 @@ class ShapeContentConstraints {
 
     if (incomingConstraints != null) {
       if (incomingConstraints.minWidth > 0) {
-        minW = math.max(0.0, incomingConstraints.minWidth - safeInsets.horizontal);
+        minW =
+            math.max(0.0, incomingConstraints.minWidth - safeInsets.horizontal);
       }
       if (incomingConstraints.minHeight > 0) {
-        minH = math.max(0.0, incomingConstraints.minHeight - safeInsets.vertical);
+        minH =
+            math.max(0.0, incomingConstraints.minHeight - safeInsets.vertical);
       }
     }
 

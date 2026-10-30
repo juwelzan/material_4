@@ -121,12 +121,40 @@ class DynamicShapeContainer extends StatelessWidget {
     ],
     this.onTap,
     this.clipBehavior = Clip.antiAlias,
-    this.contentProtection = const ShapeContentProtection.strict(),
+    this.contentProtection = const ShapeContentProtection(),
     this.hitTestBehavior = ShapeHitTestBehavior.shapeContour,
     this.dockedBadge,
     this.badgeAlignment = Alignment.topRight,
     this.badgePadding = EdgeInsets.zero,
   });
+
+  /// Factory constructor for direct [ShapeContentMode] selection.
+  DynamicShapeContainer.withMode({
+    super.key,
+    this.config = const DynamicShapeConfig(),
+    this.child,
+    required ShapeContentMode mode,
+    this.width,
+    this.height,
+    this.padding,
+    this.margin,
+    this.color,
+    this.gradient,
+    this.borderColor = const Color(0x1F1A1A1A),
+    this.borderWidth = 1.0,
+    this.shadows = const [
+      BoxShadow(color: Color(0x0C000000), blurRadius: 10, offset: Offset(0, 4)),
+    ],
+    this.onTap,
+    this.clipBehavior = Clip.antiAlias,
+    this.hitTestBehavior = ShapeHitTestBehavior.shapeContour,
+    this.dockedBadge,
+    this.badgeAlignment = Alignment.topRight,
+    this.badgePadding = EdgeInsets.zero,
+  }) : contentProtection = ShapeContentProtection(mode: mode);
+
+  /// Quick accessor to the active content layout mode.
+  ShapeContentMode get contentMode => contentProtection.mode;
 
   /// Factory for Frosted Glassmorphism Container with dynamic path clipping
   factory DynamicShapeContainer.glass({

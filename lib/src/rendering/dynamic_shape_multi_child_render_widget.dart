@@ -126,4 +126,3 @@ class DynamicShapeMultiChildRenderWidget extends MultiChildRenderObjectWidget {
       ..semanticHint = semanticHint;
   }
 }
-

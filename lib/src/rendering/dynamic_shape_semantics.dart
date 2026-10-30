@@ -11,14 +11,17 @@ class DynamicShapeSemantics {
     VoidCallback? onLongPress,
     String? semanticLabel,
     String? semanticHint,
+    TextDirection textDirection = TextDirection.ltr,
     bool enabled = true,
   }) {
     if (semanticLabel != null && semanticLabel.isNotEmpty) {
       config.label = semanticLabel;
+      config.textDirection = textDirection;
     }
 
     if (semanticHint != null && semanticHint.isNotEmpty) {
       config.hint = semanticHint;
+      config.textDirection = textDirection;
     }
 
     if (onTap != null || onLongPress != null) {

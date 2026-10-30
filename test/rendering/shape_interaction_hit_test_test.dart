@@ -4,7 +4,9 @@ import 'package:dynamic_shape/dynamic_shape.dart';
 
 void main() {
   group('Advanced Shape Hit Testing & Contour Accuracy', () {
-    testWidgets('Diamond shape: center point hits, corner outside contour misses', (tester) async {
+    testWidgets(
+        'Diamond shape: center point hits, corner outside contour misses',
+        (tester) async {
       bool tappedShape = false;
       bool tappedBackground = false;
 
@@ -42,7 +44,8 @@ void main() {
         ),
       );
 
-      final containerRect = tester.getRect(find.byType(DynamicShapeRenderWidget));
+      final containerRect =
+          tester.getRect(find.byType(DynamicShapeRenderWidget));
 
       // 1. Center of diamond is inside the shape contour
       await tester.tapAt(containerRect.center);
@@ -62,7 +65,9 @@ void main() {
       expect(tappedBackground, isTrue);
     });
 
-    testWidgets('Arch shape: bottom-center hits, top-left/top-right corners miss', (tester) async {
+    testWidgets(
+        'Arch shape: bottom-center hits, top-left/top-right corners miss',
+        (tester) async {
       bool tappedShape = false;
       bool tappedBackground = false;
 
@@ -98,7 +103,8 @@ void main() {
         ),
       );
 
-      final containerRect = tester.getRect(find.byType(DynamicShapeRenderWidget));
+      final containerRect =
+          tester.getRect(find.byType(DynamicShapeRenderWidget));
 
       // Center is inside arch
       await tester.tapAt(containerRect.center);
@@ -129,7 +135,8 @@ void main() {
               child: DynamicShapeContainer(
                 width: 100,
                 height: 100,
-                config: const DynamicShapeConfig(type: DynamicShapeType.diamond),
+                config:
+                    const DynamicShapeConfig(type: DynamicShapeType.diamond),
                 hitTestBehavior: ShapeHitTestBehavior.shape,
                 onTap: () {
                   tapped = true;
@@ -152,7 +159,8 @@ void main() {
       expect(tapped, isTrue);
     });
 
-    testWidgets('Rectangular mode: complete bounding box is interactive', (tester) async {
+    testWidgets('Rectangular mode: complete bounding box is interactive',
+        (tester) async {
       bool tapped = false;
 
       await tester.pumpWidget(
@@ -162,7 +170,8 @@ void main() {
               child: DynamicShapeContainer(
                 width: 100,
                 height: 100,
-                config: const DynamicShapeConfig(type: DynamicShapeType.diamond),
+                config:
+                    const DynamicShapeConfig(type: DynamicShapeType.diamond),
                 hitTestBehavior: ShapeHitTestBehavior.rectangular,
                 onTap: () {
                   tapped = true;
@@ -180,7 +189,9 @@ void main() {
       expect(tapped, isTrue);
     });
 
-    testWidgets('Opaque mode: consumes pointer hits throughout bounds even without onTap', (tester) async {
+    testWidgets(
+        'Opaque mode: consumes pointer hits throughout bounds even without onTap',
+        (tester) async {
       bool backgroundTapped = false;
 
       await tester.pumpWidget(
@@ -200,7 +211,8 @@ void main() {
                   child: DynamicShapeContainer(
                     width: 100,
                     height: 100,
-                    config: const DynamicShapeConfig(type: DynamicShapeType.diamond),
+                    config: const DynamicShapeConfig(
+                        type: DynamicShapeType.diamond),
                     hitTestBehavior: ShapeHitTestBehavior.opaque,
                     // No onTap callback, but opaque consumes the hit!
                   ),
@@ -218,7 +230,9 @@ void main() {
       expect(backgroundTapped, isFalse);
     });
 
-    testWidgets('DeferToChild mode: empty shape does not claim hits; child receives taps', (tester) async {
+    testWidgets(
+        'DeferToChild mode: empty shape does not claim hits; child receives taps',
+        (tester) async {
       bool childTapped = false;
       bool containerTapped = false;
       bool backgroundTapped = false;
@@ -240,7 +254,8 @@ void main() {
                   child: DynamicShapeContainer(
                     width: 200,
                     height: 200,
-                    config: const DynamicShapeConfig(type: DynamicShapeType.smoothRounded),
+                    config: const DynamicShapeConfig(
+                        type: DynamicShapeType.smoothRounded),
                     hitTestBehavior: ShapeHitTestBehavior.deferToChild,
                     onTap: () {
                       containerTapped = true;
@@ -265,7 +280,8 @@ void main() {
         ),
       );
 
-      final containerRect = tester.getRect(find.byType(DynamicShapeRenderWidget));
+      final containerRect =
+          tester.getRect(find.byType(DynamicShapeRenderWidget));
 
       // Click on child
       await tester.tapAt(containerRect.center);
@@ -284,7 +300,9 @@ void main() {
   });
 
   group('Notch and Transparent Region Interaction', () {
-    testWidgets('Inward notch passes clicks through when enableNotchInteraction is false', (tester) async {
+    testWidgets(
+        'Inward notch passes clicks through when enableNotchInteraction is false',
+        (tester) async {
       bool shapeTapped = false;
       bool backgroundTapped = false;
 
@@ -331,10 +349,12 @@ void main() {
         ),
       );
 
-      final containerRect = tester.getRect(find.byType(DynamicShapeRenderWidget));
+      final containerRect =
+          tester.getRect(find.byType(DynamicShapeRenderWidget));
 
       // Click inside top center notch (x = 100, y = 20)
-      final notchPoint = Offset(containerRect.left + 100, containerRect.top + 20);
+      final notchPoint =
+          Offset(containerRect.left + 100, containerRect.top + 20);
       await tester.tapAt(notchPoint);
       await tester.pump();
 
@@ -342,7 +362,9 @@ void main() {
       expect(backgroundTapped, isTrue);
     });
 
-    testWidgets('Inward notch claims clicks when enableNotchInteraction is true', (tester) async {
+    testWidgets(
+        'Inward notch claims clicks when enableNotchInteraction is true',
+        (tester) async {
       bool shapeTapped = false;
       bool backgroundTapped = false;
 
@@ -389,10 +411,12 @@ void main() {
         ),
       );
 
-      final containerRect = tester.getRect(find.byType(DynamicShapeRenderWidget));
+      final containerRect =
+          tester.getRect(find.byType(DynamicShapeRenderWidget));
 
       // Click inside top center notch (x = 100, y = 20)
-      final notchPoint = Offset(containerRect.left + 100, containerRect.top + 20);
+      final notchPoint =
+          Offset(containerRect.left + 100, containerRect.top + 20);
       await tester.tapAt(notchPoint);
       await tester.pump();
 
@@ -400,7 +424,9 @@ void main() {
       expect(backgroundTapped, isFalse);
     });
 
-    testWidgets('Transparent corners claim clicks when enableTransparentRegionInteraction is true', (tester) async {
+    testWidgets(
+        'Transparent corners claim clicks when enableTransparentRegionInteraction is true',
+        (tester) async {
       bool shapeTapped = false;
 
       await tester.pumpWidget(
@@ -410,7 +436,8 @@ void main() {
               child: DynamicShapeContainer(
                 width: 150,
                 height: 150,
-                config: const DynamicShapeConfig(type: DynamicShapeType.diamond),
+                config:
+                    const DynamicShapeConfig(type: DynamicShapeType.diamond),
                 interaction: const DynamicShapeInteraction(
                   enableTransparentRegionInteraction: true,
                 ),
@@ -433,7 +460,9 @@ void main() {
   });
 
   group('Coordinate Transformations & Matrix Inversion', () {
-    testWidgets('Rotated shape hit testing accurately tests transformed contour', (tester) async {
+    testWidgets(
+        'Rotated shape hit testing accurately tests transformed contour',
+        (tester) async {
       bool shapeTapped = false;
 
       await tester.pumpWidget(
@@ -466,7 +495,8 @@ void main() {
       expect(shapeTapped, isTrue);
     });
 
-    test('Non-invertible singular matrix handles gracefully without throwing', () {
+    test('Non-invertible singular matrix handles gracefully without throwing',
+        () {
       const transform = ShapeTransform(scaleX: 0.0, scaleY: 0.0);
       const size = Size(100, 100);
 
@@ -475,7 +505,8 @@ void main() {
       expect(inverted, isNull);
 
       // transformPointForHitTest falls back gracefully without crashing
-      final point = transform.transformPointForHitTest(const Offset(50, 50), size);
+      final point =
+          transform.transformPointForHitTest(const Offset(50, 50), size);
       expect(point, equals(const Offset(50, 50)));
     });
 
@@ -504,7 +535,8 @@ void main() {
   });
 
   group('Multi-Child Hit Testing & Z-Index Ordering', () {
-    testWidgets('Multi-child hits topmost child according to zIndex', (tester) async {
+    testWidgets('Multi-child hits topmost child according to zIndex',
+        (tester) async {
       bool lowerChildTapped = false;
       bool upperChildTapped = false;
 
@@ -512,7 +544,8 @@ void main() {
         MaterialApp(
           home: Scaffold(
             body: DynamicShapeStack(
-              config: const DynamicShapeConfig(type: DynamicShapeType.smoothRounded),
+              config: const DynamicShapeConfig(
+                  type: DynamicShapeType.smoothRounded),
               width: 200,
               height: 200,
               layoutStrategy: ShapeLayoutStrategy.stack,
@@ -551,7 +584,8 @@ void main() {
         ),
       );
 
-      final stackRect = tester.getRect(find.byType(DynamicShapeMultiChildRenderWidget));
+      final stackRect =
+          tester.getRect(find.byType(DynamicShapeMultiChildRenderWidget));
       await tester.tapAt(stackRect.center);
       await tester.pump();
 
@@ -562,7 +596,9 @@ void main() {
   });
 
   group('Flutter Gesture Arena & Widgets Compatibility', () {
-    testWidgets('ElevatedButton child receives tap while shape container preserves callback', (tester) async {
+    testWidgets(
+        'ElevatedButton child receives tap while shape container preserves callback',
+        (tester) async {
       bool buttonPressed = false;
       bool containerTapped = false;
 
@@ -573,7 +609,8 @@ void main() {
               child: DynamicShapeContainer(
                 width: 250,
                 height: 150,
-                config: const DynamicShapeConfig(type: DynamicShapeType.smoothRounded),
+                config: const DynamicShapeConfig(
+                    type: DynamicShapeType.smoothRounded),
                 onTap: () {
                   containerTapped = true;
                 },
@@ -596,9 +633,11 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(buttonPressed, isTrue);
+      expect(containerTapped, isFalse);
     });
 
-    testWidgets('onLongPress and onDoubleTap callbacks trigger accurately', (tester) async {
+    testWidgets('onLongPress and onDoubleTap callbacks trigger accurately',
+        (tester) async {
       bool longPressed = false;
       bool doubleTapped = false;
 
@@ -609,7 +648,8 @@ void main() {
               child: DynamicShapeContainer(
                 width: 150,
                 height: 150,
-                config: const DynamicShapeConfig(type: DynamicShapeType.smoothRounded),
+                config: const DynamicShapeConfig(
+                    type: DynamicShapeType.smoothRounded),
                 onLongPress: () {
                   longPressed = true;
                 },
@@ -658,7 +698,8 @@ void main() {
 
     test('DynamicShapeClipManager determines clipping accurately', () {
       const config = DynamicShapeConfig();
-      const protection = ShapeContentProtection(mode: ShapeContentMode.adaptive);
+      const protection =
+          ShapeContentProtection(mode: ShapeContentMode.adaptive);
 
       expect(
         DynamicShapeClipManager.shouldClipChild(
@@ -683,7 +724,8 @@ void main() {
   });
 
   group('Accessibility & Semantics', () {
-    testWidgets('DynamicShapeContainer publishes semantic button and label', (tester) async {
+    testWidgets('DynamicShapeContainer publishes semantic button and label',
+        (tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -694,7 +736,6 @@ void main() {
                 semanticLabel: 'Submit Order Shape',
                 semanticHint: 'Double tap to place order',
                 onTap: () {},
-                child: const Text('Submit'),
               ),
             ),
           ),

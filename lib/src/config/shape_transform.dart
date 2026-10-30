@@ -177,10 +177,7 @@ class ShapeTransform {
     if (matrix == null) return null;
 
     final vec = matrix.transform3(vm.Vector3(point.dx, point.dy, 0.0));
-    if (vec.x.isNaN ||
-        vec.y.isNaN ||
-        vec.x.isInfinite ||
-        vec.y.isInfinite) {
+    if (vec.x.isNaN || vec.y.isNaN || vec.x.isInfinite || vec.y.isInfinite) {
       return null;
     }
     return Offset(vec.x, vec.y);

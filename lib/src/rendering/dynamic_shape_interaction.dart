@@ -118,3 +118,4 @@ class DynamicShapeInteraction {
       'enableNotchInteraction: $enableNotchInteraction, '
       'enableTransparentRegionInteraction: $enableTransparentRegionInteraction)';
 }
+

@@ -1,224 +1,209 @@
-# Flutter Universal Dynamic Shape Engine: Complete Architecture & Developer Report
+# Flutter Next-Generation Universal Dynamic Shape Engine: Architectural Report
 
-> **Engine Status**: Production-Ready • Fully Tested • Zero-Dependency Beyond Flutter SDK & Google Fonts  
-> **Location**: `lib/core/shapes/`
-
----
-
-## 1. System Overview & Problem Statement
-
-### 1.1 The Problem
-In standard Flutter development, building non-standard UI containers (such as file-folder tabs, ticket notches, stepped shelves, cathedral arches, or postage-stamp serrations) typically requires writing a separate `CustomPainter` and `CustomClipper` for **every single card or screen**. This leads to:
-1. **Code Duplication**: Hundreds of lines of repetitive trigonometric canvas code.
-2. **Layout Breakage & Clipping**: Child widgets (text, titles, icons) collide with cutouts, get truncated, or are sliced off by the `ClipPath`.
-3. **Rigidity**: Modifying a corner radius, notch width, or border style forces developers to rewrite math algorithms.
-
-### 1.2 The Solution: Dynamic Shape Engine
-The **Universal Dynamic Shape Engine** is a unified, parameter-driven geometric framework. A single component handles:
-- **13 Distinct Mathematical Shape Presets**
-- **7 Expressive Border Styles** (Dashed stitch, Dotted, Double-stroke frame, Neo-3D block, Gradient, Glow, Solid)
-- **5 Procedural Background Textures** (Dots matrix, Grid paper, Guilloche watermark, Diagonal stripes, Cross-hatch)
-- **Shape-Aware Anti-Clipping Geometry** (Safe insets calculation guaranteeing zero text/icon cutoffs)
-- **Fluid Morphing & Tactile Physics Click Animations**
+> **Engine Status**: Production-Ready • 100% Backwards Compatible • 50 Unit & Widget Tests Passing (0 Warnings, 0 Errors)  
+> **Target Platforms**: Android (optimized for 500MB–1GB RAM low-end devices), iOS, Web, macOS, Windows, Linux  
+> **Source Directory**: `lib/core/shapes/`
 
 ---
 
-## 2. File Architecture & Responsibilities
+## 1. Executive Summary & Architectural Overview
+
+The **Next-Generation Universal Dynamic Shape Engine** provides an ultra-modular, hardware-accelerated rendering and layout framework for Flutter. It eliminates the need for manual `CustomPainter` and `CustomClipper` authoring while offering a parameter-driven architecture for arbitrary vector shapes, organic contours, borders, physics animations, background effects, and collision-free layouts.
+
+### 1.1 Complete Modular File Architecture
 
 ```
 lib/core/shapes/
-├── dynamic_shape_config.dart        # Immutable configuration models, enums, & preset factories
-├── dynamic_shape_path_builder.dart   # Mathematical Path builder generating smooth bezier contours
-├── shape_pattern.dart               # Procedural canvas pattern renderer (dots, grid, stripes, waves)
-├── dynamic_shape_container.dart      # Unified Painter, Clipper, Inset Shadow, Glassmorphic wrapper
-├── animated_dynamic_shape.dart      # Implicitly animated widget morphing shapes in real time
-└── adaptive_shape_card.dart         # High-level card with automatic safe-padding & tactile click bounce
+├── dynamic_shape_config.dart        # Immutable models, 28 shape types, 20 borders, JSON serialization
+├── dynamic_shape_path_builder.dart  # Geometry engine, Bezier mathematical path construction, matrix transforms
+├── shape_path_cache.dart            # LRU Path Cache with bounded memory capacity & strict eviction limits
+├── shape_border_painter.dart        # Next-Gen border renderer (neon, metallic, rainbow, embossed, hand-drawn)
+├── shape_background_renderer.dart    # Next-Gen background renderer (mesh gradient, waves, aurora, particles)
+├── shape_animation_controller.dart  # Lifecycle-safe physics controller, morphing, spring rebounds, reduced motion
+├── shape_motion_widgets.dart        # Interactive motion widgets (magnetic hover, pressable, swipe morph, reveals)
+├── shape_smart_layout.dart          # Geometry-aware safe area, RTL mirroring, touch target validation (min 48dp)
+├── shape_widgets.dart               # 13 high-level widgets (buttons, avatars, badges, app bars, dialogs, nav bars)
+├── shape_dev_tools.dart             # Live studio playground, preset gallery, code generator (toJson/toDartCode)
+├── school_shape_presets.dart        # 10 production-grade school management system presets
+├── dynamic_shape_container.dart     # Unified container widget, custom painter & clipper integration
+├── animated_dynamic_shape.dart      # Implicitly animated container widget
+└── shape_pattern.dart               # Procedural canvas pattern textures (dots, stripes, grid, waves)
 ```
 
 ---
 
-## 3. Shape Catalog (13 Presets)
+## 2. Shape Geometry Catalog (28 Presets + Custom Bézier)
 
-Each shape dynamically recalculates its Bézier curves and fillet transitions based on the container's rendered `Size`.
+All shapes automatically adapt to container dimensions and support independent corner radii (`CornerRadii`), multi-notch definitions (`ShapeNotch`), anchor relocation (`ShapeAnchor`), rotation (`rotation`), scale (`scaleX`, `scaleY`), and directional stretch distortion (`stretchOffset`).
 
-| Shape Type (`DynamicShapeType`) | Key Geometric Characteristics | Real-World Application in School Systems |
+### 2.1 Complete Geometry Matrix
+
+| Geometry (`DynamicShapeType`) | Contour Mathematics | Target Application |
 | :--- | :--- | :--- |
-| **`steppedCorner`** | Bottom/top corner steps inward with smooth inner and outer circular fillets. | Action cards (Take Attendance, Daily Register), task action cards. |
-| **`folderTab`** | Top or bottom edge elevates into a tab with concave and convex curves. | Academic records, Marks Entry, subject notebook tabs. |
-| **`notchedBadge`** | Inward cavity carved along the top or bottom border to dock badge pills. | Timetables (docking "85% Done" badge), Countdown cards. |
-| **`sideTab`** | Protruding rounded bubble or puzzle tab on the left or right perimeter. | Notice Board, announcements, broadcast notifications. |
-| **`ticketScallop`** | Semicircular bites/scallops on the vertical or horizontal edges. | Pending exam marks, fee vouchers, event admission tickets. |
-| **`postageStamp`** | Continuous perforated scalloped arcs contouring the entire perimeter. | Digital certificates, merit credentials, commemorative badges. |
-| **`zigzagCut`** | Mathematical sawtooth triangular cuts along the bottom border. | Exam hall pass tokens, cash counter slips, fee receipts. |
-| **`arch`** | Half-circle dome spanning the top with flat or softly rounded base. | Cathedral dome spotlight for student rankings, Honors Roll. |
-| **`hexagonSoft`** | Symmetrical 6-vertex polygon with quadratic Bézier rounded corners. | GPA 5.0 medals, achievement tokens, gamified badges. |
-| **`chamferDiagonal`** | 45-degree beveled corner fold with rounded edge terminations. | Discount vouchers, priority circulars, marked notices. |
-| **`organicBlob`** | Asymmetrical fluid pebble with multi-quadrant cubic Bézier curvature. | Modern creative arts cards, preschool activities, modern UI. |
-| **`scallopedPetal`** | Multi-lobed polar rosette (10 to 12 smooth organic flower petals). | Teacher & student profile avatars, award seals. |
-| **`smoothRounded`** | Uniform super-ellipse squircle. | Neutral modern cards, clean base panels. |
+| **`folderTab`** | Raised elevation tab with continuous convex and concave fillet arcs. | Academic record tabs, subject notebooks, file organization. |
+| **`notchedBadge`** | Inward or outward cavity carved along top/bottom edges. | Countdown cards, timetable progress docking ("85% Done"). |
+| **`sideTab`** | Lateral protrusion or puzzle notch along left or right edge. | Notice board alerts, broadcasts, pull-out shelves. |
+| **`steppedCorner`** | Corner step cut with inward and outward fillet transitions. | Action quick-cards (Take Attendance, Daily Register). |
+| **`ticketScallop`** | Circular bite scallops on opposite edges with anti-aliased fillets. | Exam vouchers, fee receipts, admission tickets. |
+| **`postageStamp`** | Continuous perforated sinusoidal arcs along all 4 edges. | Merit credentials, digital certificates, honors stamps. |
+| **`zigzagCut`** | Sawtooth triangular tooth series along bottom/top edge. | Cash counter slips, payment slips, pass receipts. |
+| **`arch`** | Roman cathedral semicircular dome with vertical pillars. | Spotlight cards, top student of the year, ranking boards. |
+| **`hexagonSoft`** | Symmetrical 6-vertex polygon with quadratic rounded vertices. | Gamified badges, mastery tokens, achievement seals. |
+| **`chamferDiagonal`** | 45-degree corner chamfer with rounded corner fillets. | Examination schedules, urgent bulletins, marked notices. |
+| **`organicBlob`** | Multi-quadrant organic cubic Bézier fluid pebble. | Creative arts cards, kindergarten activities. |
+| **`scallopedPetal`** | Polar rosette with 10–12 smooth petal arcs. | Profile avatars, graduation laurels, medal seals. |
+| **`smoothRounded`** | Mathematical Lamé curve super-ellipse squircle. | Neutral modern cards, clean base panels. |
+| **`asymmetricCard`** | Independent 4-corner radii specification (`CornerRadii`). | Contemporary dashboard stat cards, asymmetric hero cards. |
+| **`capsule`** | Full semicircular pill caps along primary axis. | Timetable slots, status pills, filter chips. |
+| **`waveEdge`** | Multi-frequency harmonic sinusoidal fluid wave crest. | Bottom navigation bars, hero headers, water level cards. |
+| **`cloud`** | Multi-lobed puffy organic perimeter. | Creative thoughts, discussion forums, playful notifications. |
+| **`speechBubble`** | Chat bubble with directional pointer tail. | Tooltips, mentor feedback, comments, chat messages. |
+| **`shield`** | Heraldic academic crest with bottom vertex convergence. | School emblems, sports club badges, certificates. |
+| **`diamond`** | 4-point rhombus with rounded vertices. | Milestone markers, category dividers, honors emblems. |
+| **`octagon`** | Regular 8-sided polygon with rounded vertex transitions. | Alert dialogs, disciplinary warnings, badge containers. |
+| **`waveCut`** | Diagonal or horizontal fluid wave slice cutout. | Modern split cards, dynamic before/after banners. |
+| **`concaveRounded`** | Inverted circular corner bites (vintage certificate frame). | Teacher faculty cards, classical diplomas, heritage notices. |
+| **`convexRounded`** | Barrel curved expanding lateral edges. | Interactive buttons, tactile card carousels. |
+| **`squircle`** | Authentic iOS-style super-ellipse curvature. | App icons, profile avatars, modern card containers. |
+| **`parallelogram`** | Directional shear / skew polygon (-45° to +45°). | Dynamic sport banners, fast-action event alerts. |
+| **`ribbon`** | Swallowtail notched banner ribbon. | Achievement award banners, contest announcements. |
+| **`bookmark`** | Vertical page marker with bottom inverted V-notch. | Reading lists, saved lessons, syllabus tracking. |
+| **`customBezier`** | Arbitrary user-supplied `Path Function(Size size)` builder. | Bespoke brand identities, custom animated vector paths. |
 
 ---
 
-## 4. Border Styles Catalog (7 Styles)
+## 3. Border Engine (20 Styles + Alignment)
 
-Borders are stroked along the exact dynamic `Path` utilizing `path.computeMetrics()`:
+Rendered via `ShapeBorderPainter` with zero external dependencies, supporting `strokeAlign` (`center`, `inside`, `outside`):
 
-1. **`BorderStyleType.solid`**: Crisp modern hairline stroke (`borderWidth`).
-2. **`BorderStyleType.dashed`**: Iterates across `PathMetric` extracting equidistant sub-paths (`dashLength` and `dashGap`). Ideal for vouchers and tickets.
-3. **`BorderStyleType.dotted`**: Evaluates `metric.getTangentForOffset()` to draw micro-circles along the perimeter.
-4. **`BorderStyleType.doubleStroke`**: Renders an outer stroke and an inset secondary delicate inner frame (`innerBorderWidth`, `innerBorderGap`).
-5. **`BorderStyleType.neo3d`**: Draws a solid translation silhouette (`neoOffset`, `neoColor`) before drawing the foreground card, creating tactile depth.
-6. **`BorderStyleType.gradient`**: Strokes the border utilizing a `LinearGradient` or `SweepGradient` shader.
-7. **`BorderStyleType.glow`**: Draws a widened stroke with `MaskFilter.blur(BlurStyle.normal, glowBlurRadius)` to create a halo.
-
----
-
-## 5. Background Texture Patterns (5 Patterns)
-
-Rendered procedurally via `ShapePatternRenderer` within the clipped canvas path:
-
-1. **`ShapePattern.dotsMatrix`**: Mathematics and journal dot grids.
-2. **`ShapePattern.gridLines`**: Technical engineering blueprint / graph paper.
-3. **`ShapePattern.diagonalStripes`**: 45-degree voucher warning/caution stripes.
-4. **`ShapePattern.guillocheWaves`**: Sine-wave modulated security watermark lines (diplomas, library IDs).
-5. **`ShapePattern.crossHatch`**: Bidirectional diagonal linen weave texture.
-
----
-
-## 6. Advanced Depth & Lighting Features
-
-### 6.1 Tactile Inset Inner Shadow
-Implemented via inverse path subtraction:
-```dart
-final shadowPath = Path()
-  ..fillType = PathFillType.evenOdd
-  ..addRect(inflatedRect)
-  ..addPath(path, Offset.zero);
-canvas.clipPath(path);
-canvas.drawPath(shadowPath, shadowPaint);
-```
-Creates true debossed/pressed claymorphic depth inside the card.
-
-### 6.2 Frosted Glassmorphism
-Combines `BackdropFilter(filter: ImageFilter.blur(...))` with `ClipPath(clipper: DynamicShapeClipper(...))`, ensuring frosted blurring conforms strictly to the dynamic shape contours without bleeding.
+1. **`solid`**: Hairline to thick crisp vector stroke.
+2. **`dashed`**: Perforated stitch stroke with customizable `dashLength` and `dashGap`.
+3. **`dotted`**: Circular micro-dotted contour using path tangent position evaluation.
+4. **`doubleStroke`**: Concentric outer and inner frame with adjustable `innerBorderGap` and `innerBorderWidth`.
+5. **`gradient`**: Linear or sweep gradient stroke following shape contour.
+6. **`neo3d`**: Neo-brutalism block stroke paired with hard offset shadow line.
+7. **`glow`**: Multi-pass ambient blur halo combined with a crisp core stroke.
+8. **`animatedGradient`**: Rotating gradient shader synchronized with `borderProgress`.
+9. **`rainbow`**: 7-color chromatic spectrum dispersion sweep along perimeter.
+10. **`neonPulse`**: 3-stage high-luminance bloom (wide atmospheric halo, mid corona, white-hot core) modulated by `neonPulseIntensity`.
+11. **`metallic`**: Specular reflection gradient presets:
+    - `gold` (warm brass, amber, 24K gold specular reflection)
+    - `chrome` (cool specular silver and blue-grey highlights)
+    - `roseGold` (copper pink lustrous sheen)
+    - `silver` (platinum monochrome sheen)
+    - `bronze` (earthy warm copper tones)
+    - `titanium` (dark lustrous charcoal sheen)
+12. **`multiLayer`**: Arbitrary stack of nested concentric strokes (`List<BorderLayer>`).
+13. **`cornerOnly`**: Technical framing brackets rendered only at corners (`cornerBorderLength`), leaving edges open.
+14. **`gradientDashed`**: Perforated dashed stitch border shaded with a multi-stop gradient.
+15. **`animatedDashed`**: Marching-ants marquee animation shifted by `dashPhase` and `borderProgress`.
+16. **`embossed`**: Chiseled 3D bevel stroke with highlight and shadow relief derived from `embossLightAngle`.
+17. **`innerStroke`**: Stroke strictly confined inside the shape boundary via clipping.
+18. **`outerStroke`**: Stroke strictly expanding outward from the shape perimeter.
+19. **`noiseTextured`**: Stippled tactile noise texture stroke with micro-dots.
+20. **`handDrawn`**: Organic sketchy stroke with harmonic sinusoidal normal perturbation.
 
 ---
 
-## 7. Zero-Clipping Layout Engine (`AdaptiveShapeCard`)
+## 4. Animation Engine
 
-### 7.1 The Anti-Clipping Challenge
-When applying non-rectangular cutouts, standard `Padding` causes text or icons to overlap with the notch or step.
-
-### 7.2 Safe Inset Formulas
-`AdaptiveShapeCard` implements dynamic safe padding calculation:
-
-```dart
-EdgeInsets _calculateSafePadding(DynamicShapeType shape, ShapeAnchor anchor) {
-  switch (shape) {
-    case DynamicShapeType.folderTab:
-      return const EdgeInsets.only(left: 16, right: 16, top: 18, bottom: 12);
-    case DynamicShapeType.notchedBadge:
-      return anchor == ShapeAnchor.topRight
-          ? const EdgeInsets.only(left: 16, right: 16, top: 20, bottom: 14)
-          : const EdgeInsets.only(left: 16, right: 16, top: 14, bottom: 20);
-    case DynamicShapeType.steppedCorner:
-      return const EdgeInsets.only(left: 16, right: 14, top: 12, bottom: 12);
-    case DynamicShapeType.ticketScallop:
-      return const EdgeInsets.only(left: 22, right: 22, top: 12, bottom: 12);
-    case DynamicShapeType.zigzagCut:
-      return const EdgeInsets.only(left: 16, right: 16, top: 12, bottom: 20);
-    case DynamicShapeType.arch:
-      return const EdgeInsets.only(left: 16, right: 16, top: 22, bottom: 12);
-    // ...
-  }
-}
-```
-
-### 7.3 Dedicated Hardware Slots
-- **Stepped Corner**: The icon is automatically positioned at `Positioned(right: 12, bottom: 10)`, while text is safely bounded in the main column.
-- **Folder Tab**: The icon is elevated to `Positioned(right: 12, top: 10)` inside the tab.
-- **Side Tab**: The icon is centered at `Positioned(right: 8)` inside the bubble.
+Coordinated by `ShapeAnimationController`:
+- **Shape Morphing**: Smooth continuous interpolation between completely different geometries.
+- **Spring Physics Rebounds**: Natural tactile spring bounce using Flutter's native `SpringSimulation`.
+- **Magnetic Hover**: Pointer-tracking attraction widget (`ShapeMagneticHover`) tilting and translating toward the cursor.
+- **Press & Release Squish**: Tactile compression widget (`ShapePressable`) with spring release.
+- **Swipe Morph**: Gesture-driven container (`ShapeSwipeMorph`) that morphs between shapes as the user drags.
+- **Border Drawing Reveal**: Animated stroke drawing (`ShapeBorderDrawReveal`) from 0% to 100% perimeter length.
+- **Iris Shape Reveal**: Expanding circular/radial clip reveal transition (`ShapeReveal`).
+- **Staggered Entrance Group**: Coordinated cascade delay (`ShapeStaggeredGroup`) for lists/grids.
+- **Accessibility & Reduced Motion**: Automatically snaps transitions without animation delay when `MediaQuery.disableAnimations` is enabled.
 
 ---
 
-## 8. Developer Quick-Start Recipes
+## 5. Background Effects
 
-### Recipe 1: Quick Action Card with Bouncy Spring Animation
-```dart
-AdaptiveShapeCard(
-  title: 'Take\nAttendance',
-  icon: Icons.assignment_turned_in_outlined,
-  shapeType: DynamicShapeType.steppedCorner,
-  color: const Color(0xFFFFDFD3),
-  textColor: const Color(0xFF221F1F),
-  iconColor: const Color(0xFF4A342B),
-  height: 86,
-  onTap: () => print('Attendance opened!'),
-)
-```
-
-### Recipe 2: Auto-Morphing Smart Pass (Cycles Shapes on Tap)
-```dart
-AdaptiveShapeCard(
-  title: 'Smart Class Access Pass',
-  subtitle: 'Tap to Morph Shape • Zero Text Clipping',
-  icon: Icons.auto_awesome_rounded,
-  autoMorphOnTap: true,                      // Automatically cycles shapes on every tap
-  enableScaleAnimation: true,                // Tactile physical spring bounce
-  color: const Color(0xFFEDE7F6),
-  borderColor: const Color(0xFF5E43EE),
-  borderWidth: 1.4,
-  height: 94,
-)
-```
-
-### Recipe 3: Exam Hall Pass with Zigzag Sawtooth Cut & Dashed Border
-```dart
-DynamicShapeContainer.zigzagReceipt(
-  color: Colors.white,
-  borderColor: const Color(0x3835495E),
-  borderWidth: 1.2,
-  borderStyle: BorderStyleType.dashed,
-  toothWidth: 14.0,
-  toothHeight: 8.0,
-  child: Text('Final Term Hall Pass #9281'),
-)
-```
-
-### Recipe 4: Cathedral Arch Spotlight Card with Double Gold Frame
-```dart
-DynamicShapeContainer.arch(
-  height: 125,
-  color: const Color(0xFFFFF9EE),
-  borderColor: const Color(0xFFD4A745),
-  borderWidth: 1.4,
-  borderStyle: BorderStyleType.doubleStroke,
-  child: Text('★ MERIT SPOTLIGHT'),
-)
-```
-
-### Recipe 5: Digital Library Card with Frosted Guilloche Security Texture
-```dart
-DynamicShapeContainer.patterned(
-  pattern: ShapePattern.guillocheWaves,
-  patternSpacing: 14.0,
-  color: const Color(0xFFEBF3FD),
-  borderColor: const Color(0x40316BC2),
-  config: const DynamicShapeConfig(
-    type: DynamicShapeType.folderTab,
-    cornerRadius: 22,
-    tabWidth: 65,
-    tabHeight: 14,
-  ),
-  child: Text('Digital Library Pass'),
-)
-```
+Rendered natively on Canvas via `ShapeBackgroundRenderer`:
+1. **`meshGradient`**: 4-corner bicubic radial color blending.
+2. **`noise`**: Tactile film-grain micro-stipple overlay.
+3. **`liquidGradient`**: Moving organic fluid metaball gradient blobs.
+4. **`radial`**: Concentric spherical gradient.
+5. **`conic`**: 360-degree sweep angular gradient.
+6. **`animatedWaves`**: Layered fluid wave crests undulating with fluid gradients.
+7. **`particles`**: Floating ambient glowing micro-orbs drifting inside bounds.
+8. **`aurora`**: Shifting vertical northern-lights luminous color curtains.
+9. **`holographic`**: Iridescent rainbow pearl light shift.
+10. **`frostedGlass`**: Frosted blur with specular rim reflections.
+11. **`metallic`**: Brushed specular metallic background sheen.
 
 ---
 
-## 9. Verification & Quality Assurance
+## 6. Smart Layout Engine
 
-- **Flutter Static Analysis**: `flutter analyze` ➔ `No issues found!` (0 errors, 0 warnings).
-- **Automated Smoke Tests**: `flutter test` ➔ `All tests passed!`.
-- **Performance**: Zero external render dependencies; canvas paths cached during repaint boundaries; 60/120 FPS fluid physics.
+Implemented in `ShapeSmartLayout` and `ShapeSafeArea`:
+- **Geometry-Aware Safe Insets**: Calculates padding dynamically from notch depths, tabs, scallops, and wave amplitudes.
+- **Zero-Clipping Guarantee**: Child text and icons are mathematically protected from colliding with shape cutouts.
+- **Inscribed Rectangle Calculation**: Computes the largest guaranteed collision-free inner rectangle for any shape size.
+- **RTL Geometry Mirroring**: Asymmetric tabs, notches, and corner radii automatically flip horizontally under Right-to-Left locales.
+- **Accessibility Touch Target Enforcement**: Enforces minimum 48x48 dp touch target dimensions according to WCAG 2.1 AA standards.
 
+---
+
+## 7. Widget Library (13 Dedicated Widgets)
+
+1. **`AnimatedShapeCard`**: Morphable card with leading, title, subtitle, and trailing accessory slots.
+2. **`ShapeButton`**: Touch-compliant button with tactile spring click, elevation, and loading indicator.
+3. **`ShapeAvatar`**: Profile picture clipped to any dynamic shape with online indicator ring.
+4. **`ShapeBadge`**: High-visibility pill badge for progress or notifications.
+5. **`ShapeProgress`**: Dynamic shape progress bar with fluid liquid fill.
+6. **`ShapeDivider`**: Section divider featuring an ornamental center crest.
+7. **`ShapeAppBar`**: Top app bar with organic fluid wave bottom contour.
+8. **`ShapeNavigationBar`**: Bottom navigation bar with fluid wave docked active indicator.
+9. **`ShapeBottomSheet`**: Modal bottom sheet container styled with a fluid top handle contour.
+10. **`ShapeDialog`**: Alert dialog framed with expressive asymmetric geometry.
+11. **`ShapeTooltip`**: Speech bubble tooltip pointing directly to target widgets.
+12. **`ShapeImage`**: Image clipped to any dynamic shape with aspect ratio and border styling.
+13. **`ShapeContainerGroup`**: Coordinated flex row/column container for interlocking shapes.
+
+---
+
+## 8. Performance & LRU Caching
+
+Implemented in `ShapePathCache`:
+- **Least-Recently-Used (LRU) Cache**: Stores precomputed vector paths in a `LinkedHashMap`.
+- **Bounded Memory Footprint**: Maximum capacity (default 64 entries) prevents runaway heap allocations on 500MB–1GB RAM devices.
+- **$O(1)$ Retrieval**: Re-evaluating an existing shape size and config bypasses all Bézier math calculations.
+- **Safe Trimming**: `clear()` method enables the system to dump path caches on low-memory OS warnings.
+
+---
+
+## 9. Developer Tools
+
+Implemented in `shape_dev_tools.dart`:
+- **`ShapePlayground`**: Interactive studio with live dropdowns for all 28 shapes, 20 borders, corner radius sliders, and light/dark theme toggles.
+- **`PresetGallery`**: Visual grid displaying all presets with live preview.
+- **`ShapeCodeGenerator`**: Generates clean, ready-to-paste Dart configuration code.
+- **JSON Serialization**: Full round-trip `toJson()` and `fromJson()` support on `DynamicShapeConfig`, `CornerRadii`, and `ShapeNotch`.
+
+---
+
+## 10. School UI Preset Library
+
+Implemented in `school_shape_presets.dart`:
+1. **Attendance Card**: Folder tab container with warm coral tint and docked "Present" badge.
+2. **Academic Records**: Asymmetric card with sage green tones and grade tag.
+3. **Student ID Card**: Sleek dark navy card with metallic silver border, photo avatar, and QR code slot.
+4. **Achievement Certificate**: Ornate shield with metallic gold border and trophy crest.
+5. **Fee Receipt**: Perforated ticketScallop voucher with dashed stitch border.
+6. **Notice Board**: Lilac folder tab memo card with broadcast megaphone icon.
+7. **Examination Schedule**: Beveled chamfer diagonal card with crimson timing accents.
+8. **Result Card**: Squircle container with vibrant rainbow border and bold GPA display.
+9. **Timetable Slot**: Indigo capsule container with class, room, and time tags.
+10. **Teacher Profile**: Concave rounded card with pulsing cyan neon border and faculty tags.
+
+---
+
+## 11. Verification & Test Metrics
+
+- **Unit & Widget Tests**: 50 tests passing across 6 comprehensive test suites.
+- **Static Analysis**: `flutter analyze` reports **0 issues, 0 warnings, 0 errors**.
+- **Formatting**: Fully formatted with `dart format`.

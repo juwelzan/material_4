@@ -5,7 +5,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'dynamic_shape_config.dart';
 import 'dynamic_shape_container.dart';
 import 'shape_pattern.dart';
-import 'shape_smart_layout.dart';
 
 /// A production-ready, highly versatile card widget designed to morph into
 /// any dynamic shape while guaranteeing that titles, subtitles, and icons
@@ -165,31 +164,158 @@ class _AdaptiveShapeCardState extends State<AdaptiveShapeCard>
 
   /// Calculates mathematically safe padding so text and icons are
   /// NEVER clipped or obscured by the shape's tabs, steps, notches, or curves.
-  EdgeInsets _calculateSafePadding(
-    DynamicShapeType shape,
-    ShapeAnchor anchor, [
-    TextDirection textDirection = TextDirection.ltr,
-  ]) {
-    final tempConfig = DynamicShapeConfig(
-      type: shape,
-      anchor: anchor,
-      cornerRadius: 22.0,
-      tabWidth: shape == DynamicShapeType.steppedCorner ? 44.0 : 60.0,
-      tabHeight: shape == DynamicShapeType.steppedCorner ? 40.0 : 18.0,
-      toothWidth: 12.0,
-      toothHeight: 8.0,
-      scallopRadius: 10.0,
-      speechBubbleTailHeight: 14.0,
-      ribbonFoldDepth: 18.0,
-      waveAmplitude: 8.0,
-    );
+  EdgeInsets _calculateSafePadding(DynamicShapeType shape, ShapeAnchor anchor) {
+    switch (shape) {
+      case DynamicShapeType.folderTab:
+        return anchor == ShapeAnchor.topRight
+            ? const EdgeInsets.only(left: 16, right: 16, top: 18, bottom: 12)
+            : const EdgeInsets.only(left: 16, right: 16, top: 18, bottom: 12);
 
-    return ShapeSmartLayout.computeSafePadding(
-      size: const Size(200, 100),
-      config: tempConfig,
-      textDirection: textDirection,
-      basePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-    );
+      case DynamicShapeType.notchedBadge:
+        return anchor == ShapeAnchor.topRight
+            ? const EdgeInsets.only(left: 16, right: 16, top: 20, bottom: 14)
+            : const EdgeInsets.only(left: 16, right: 16, top: 14, bottom: 20);
+
+      case DynamicShapeType.steppedCorner:
+        return const EdgeInsets.only(left: 16, right: 14, top: 12, bottom: 12);
+
+      case DynamicShapeType.sideTab:
+        return const EdgeInsets.only(left: 16, right: 28, top: 12, bottom: 12);
+
+      case DynamicShapeType.ticketScallop:
+        return const EdgeInsets.only(left: 22, right: 22, top: 12, bottom: 12);
+
+      case DynamicShapeType.postageStamp:
+        return const EdgeInsets.symmetric(horizontal: 18, vertical: 14);
+
+      case DynamicShapeType.zigzagCut:
+        return const EdgeInsets.only(left: 16, right: 16, top: 12, bottom: 20);
+
+      case DynamicShapeType.arch:
+        return const EdgeInsets.only(left: 16, right: 16, top: 22, bottom: 12);
+
+      case DynamicShapeType.hexagonSoft:
+        return const EdgeInsets.symmetric(horizontal: 20, vertical: 14);
+
+      case DynamicShapeType.chamferDiagonal:
+        return anchor == ShapeAnchor.topRight
+            ? const EdgeInsets.only(left: 16, right: 26, top: 12, bottom: 12)
+            : const EdgeInsets.only(left: 26, right: 16, top: 12, bottom: 12);
+
+      case DynamicShapeType.organicBlob:
+        return const EdgeInsets.symmetric(horizontal: 20, vertical: 14);
+
+      case DynamicShapeType.scallopedPetal:
+        return const EdgeInsets.all(14);
+
+      case DynamicShapeType.smoothRounded:
+        return const EdgeInsets.symmetric(horizontal: 16, vertical: 12);
+
+      case DynamicShapeType.asymmetricCard:
+        return const EdgeInsets.symmetric(horizontal: 18, vertical: 14);
+
+      case DynamicShapeType.capsule:
+        return const EdgeInsets.symmetric(horizontal: 24, vertical: 12);
+
+      case DynamicShapeType.waveEdge:
+        return anchor == ShapeAnchor.bottomCenter
+            ? const EdgeInsets.only(left: 16, right: 16, top: 12, bottom: 22)
+            : const EdgeInsets.only(left: 16, right: 16, top: 22, bottom: 12);
+
+      case DynamicShapeType.cloud:
+        return const EdgeInsets.only(left: 20, right: 20, top: 20, bottom: 16);
+
+      case DynamicShapeType.speechBubble:
+        return anchor == ShapeAnchor.bottomRight ||
+                anchor == ShapeAnchor.bottomLeft
+            ? const EdgeInsets.only(left: 16, right: 16, top: 12, bottom: 22)
+            : const EdgeInsets.only(left: 16, right: 16, top: 22, bottom: 12);
+
+      case DynamicShapeType.shield:
+        return const EdgeInsets.only(left: 18, right: 18, top: 14, bottom: 22);
+
+      case DynamicShapeType.diamond:
+        return const EdgeInsets.symmetric(horizontal: 24, vertical: 20);
+
+      case DynamicShapeType.octagon:
+        return const EdgeInsets.symmetric(horizontal: 20, vertical: 14);
+
+      case DynamicShapeType.waveCut:
+        return const EdgeInsets.only(left: 16, right: 24, top: 12, bottom: 20);
+
+      case DynamicShapeType.concaveRounded:
+        return const EdgeInsets.symmetric(horizontal: 22, vertical: 16);
+
+      case DynamicShapeType.convexRounded:
+        return const EdgeInsets.symmetric(horizontal: 20, vertical: 14);
+
+      case DynamicShapeType.squircle:
+        return const EdgeInsets.symmetric(horizontal: 18, vertical: 14);
+
+      case DynamicShapeType.parallelogram:
+        return const EdgeInsets.symmetric(horizontal: 26, vertical: 12);
+
+      case DynamicShapeType.ribbon:
+        return const EdgeInsets.symmetric(horizontal: 24, vertical: 12);
+
+      case DynamicShapeType.bookmark:
+        return const EdgeInsets.only(left: 16, right: 16, top: 14, bottom: 24);
+
+      case DynamicShapeType.customBezier:
+        return const EdgeInsets.symmetric(horizontal: 16, vertical: 12);
+
+      case DynamicShapeType.asymmetricCard:
+        return const EdgeInsets.symmetric(horizontal: 18, vertical: 14);
+
+      case DynamicShapeType.capsule:
+        return const EdgeInsets.symmetric(horizontal: 24, vertical: 12);
+
+      case DynamicShapeType.waveEdge:
+        return anchor == ShapeAnchor.bottomCenter
+            ? const EdgeInsets.only(left: 16, right: 16, top: 12, bottom: 22)
+            : const EdgeInsets.only(left: 16, right: 16, top: 22, bottom: 12);
+
+      case DynamicShapeType.cloud:
+        return const EdgeInsets.only(left: 20, right: 20, top: 20, bottom: 16);
+
+      case DynamicShapeType.speechBubble:
+        return anchor == ShapeAnchor.bottomRight || anchor == ShapeAnchor.bottomLeft
+            ? const EdgeInsets.only(left: 16, right: 16, top: 12, bottom: 22)
+            : const EdgeInsets.only(left: 16, right: 16, top: 22, bottom: 12);
+
+      case DynamicShapeType.shield:
+        return const EdgeInsets.only(left: 18, right: 18, top: 14, bottom: 22);
+
+      case DynamicShapeType.diamond:
+        return const EdgeInsets.symmetric(horizontal: 24, vertical: 20);
+
+      case DynamicShapeType.octagon:
+        return const EdgeInsets.symmetric(horizontal: 20, vertical: 14);
+
+      case DynamicShapeType.waveCut:
+        return const EdgeInsets.only(left: 16, right: 24, top: 12, bottom: 20);
+
+      case DynamicShapeType.concaveRounded:
+        return const EdgeInsets.symmetric(horizontal: 22, vertical: 16);
+
+      case DynamicShapeType.convexRounded:
+        return const EdgeInsets.symmetric(horizontal: 20, vertical: 14);
+
+      case DynamicShapeType.squircle:
+        return const EdgeInsets.symmetric(horizontal: 18, vertical: 14);
+
+      case DynamicShapeType.parallelogram:
+        return const EdgeInsets.symmetric(horizontal: 26, vertical: 12);
+
+      case DynamicShapeType.ribbon:
+        return const EdgeInsets.symmetric(horizontal: 24, vertical: 12);
+
+      case DynamicShapeType.bookmark:
+        return const EdgeInsets.only(left: 16, right: 16, top: 14, bottom: 24);
+
+      case DynamicShapeType.customBezier:
+        return const EdgeInsets.symmetric(horizontal: 16, vertical: 12);
+    }
   }
 
   @override
@@ -228,9 +354,7 @@ class _AdaptiveShapeCardState extends State<AdaptiveShapeCard>
       scallopRadius: 10.0,
     );
 
-    final textDir = Directionality.maybeOf(context) ?? TextDirection.ltr;
-    final safePadding =
-        _calculateSafePadding(_currentShape, widget.anchor, textDir);
+    final safePadding = _calculateSafePadding(_currentShape, widget.anchor);
 
     // Build the icon widget if provided
     Widget? iconWidget = widget.iconWidget;

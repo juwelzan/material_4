@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 
 import 'dynamic_shape_config.dart';
@@ -93,8 +94,13 @@ class ShapeBackgroundRenderer {
   // --- Background Effect Implementations ---
   // =========================================================================
 
-  static void _drawMeshGradient(Canvas canvas, Size size, DynamicShapeConfig config) {
-    final colors = config.meshColors ??
+  static void _drawMeshGradient(
+    Canvas canvas,
+    Size size,
+    DynamicShapeConfig config,
+  ) {
+    final colors =
+        config.meshColors ??
         const [
           Color(0xFF6C5CE7), // Top-Left
           Color(0xFFFF7675), // Top-Right
@@ -107,22 +113,14 @@ class ShapeBackgroundRenderer {
     final maxDim = math.max(w, h);
 
     // Render 4 overlapping radial gradient corner anchors
-    final corners = [
-      Offset.zero,
-      Offset(w, 0),
-      Offset(0, h),
-      Offset(w, h),
-    ];
+    final corners = [Offset.zero, Offset(w, 0), Offset(0, h), Offset(w, h)];
 
     for (int i = 0; i < 4 && i < colors.length; i++) {
       final paint = Paint()
         ..shader = ui.Gradient.radial(
           corners[i],
           maxDim * 0.95,
-          [
-            colors[i].withValues(alpha: 0.85),
-            colors[i].withValues(alpha: 0.0),
-          ],
+          [colors[i].withValues(alpha: 0.85), colors[i].withValues(alpha: 0.0)],
           [0.0, 1.0],
         );
       canvas.drawRect(Offset.zero & size, paint);
@@ -159,10 +157,7 @@ class ShapeBackgroundRenderer {
 
     // Moving fluid organic metaball blobs
     final blobs = [
-      Offset(
-        w * (0.3 + 0.2 * math.sin(t)),
-        h * (0.3 + 0.2 * math.cos(t)),
-      ),
+      Offset(w * (0.3 + 0.2 * math.sin(t)), h * (0.3 + 0.2 * math.cos(t))),
       Offset(
         w * (0.7 + 0.18 * math.cos(t * 1.3)),
         h * (0.6 + 0.22 * math.sin(t * 0.9)),
@@ -181,14 +176,10 @@ class ShapeBackgroundRenderer {
 
     for (int i = 0; i < blobs.length; i++) {
       final paint = Paint()
-        ..shader = ui.Gradient.radial(
-          blobs[i],
-          math.max(w, h) * 0.65,
-          [
-            blobColors[i].withValues(alpha: 0.6),
-            blobColors[i].withValues(alpha: 0.0),
-          ],
-        );
+        ..shader = ui.Gradient.radial(blobs[i], math.max(w, h) * 0.65, [
+          blobColors[i].withValues(alpha: 0.6),
+          blobColors[i].withValues(alpha: 0.0),
+        ]);
       canvas.drawRect(Offset.zero & size, paint);
     }
   }
@@ -199,18 +190,19 @@ class ShapeBackgroundRenderer {
     final color = baseColor ?? const Color(0xFF6C5CE7);
 
     final paint = Paint()
-      ..shader = ui.Gradient.radial(
-        center,
-        radius,
-        [
-          color.withValues(alpha: 0.9),
-          color.withValues(alpha: 0.2),
-        ],
-      );
+      ..shader = ui.Gradient.radial(center, radius, [
+        color.withValues(alpha: 0.9),
+        color.withValues(alpha: 0.2),
+      ]);
     canvas.drawRect(Offset.zero & size, paint);
   }
 
-  static void _drawConic(Canvas canvas, Size size, double progress, Color? baseColor) {
+  static void _drawConic(
+    Canvas canvas,
+    Size size,
+    double progress,
+    Color? baseColor,
+  ) {
     final angle = progress * 2 * math.pi;
     final color = baseColor ?? const Color(0xFF6C5CE7);
 
@@ -230,7 +222,11 @@ class ShapeBackgroundRenderer {
     canvas.drawRect(Offset.zero & size, paint);
   }
 
-  static void _drawAnimatedWaves(Canvas canvas, Size size, DynamicShapeConfig config) {
+  static void _drawAnimatedWaves(
+    Canvas canvas,
+    Size size,
+    DynamicShapeConfig config,
+  ) {
     final w = size.width;
     final h = size.height;
     final phase = config.backgroundProgress * 2 * math.pi;
@@ -259,7 +255,10 @@ class ShapeBackgroundRenderer {
     // Wave Layer 2 (Front Crest)
     final frontWavePath = Path()..moveTo(0, h);
     for (double x = 0; x <= w; x += 4) {
-      final y = baseLevel + math.sin((x / w * 2 * math.pi * 2.0) - phase + 1.2) * 6.0 + 4.0;
+      final y =
+          baseLevel +
+          math.sin((x / w * 2 * math.pi * 2.0) - phase + 1.2) * 6.0 +
+          4.0;
       frontWavePath.lineTo(x, y);
     }
     frontWavePath.lineTo(w, h);
@@ -277,7 +276,11 @@ class ShapeBackgroundRenderer {
     canvas.drawPath(frontWavePath, frontPaint);
   }
 
-  static void _drawParticles(Canvas canvas, Size size, DynamicShapeConfig config) {
+  static void _drawParticles(
+    Canvas canvas,
+    Size size,
+    DynamicShapeConfig config,
+  ) {
     final count = config.particleCount.clamp(4, 40);
     final progress = config.backgroundProgress;
     final particlePaint = Paint()..style = PaintingStyle.fill;
@@ -358,7 +361,11 @@ class ShapeBackgroundRenderer {
     canvas.drawRect(Offset.zero & size, paint);
   }
 
-  static void _drawFrostedGlass(Canvas canvas, Size size, DynamicShapeConfig config) {
+  static void _drawFrostedGlass(
+    Canvas canvas,
+    Size size,
+    DynamicShapeConfig config,
+  ) {
     final tint = config.glassTint ?? Colors.white.withValues(alpha: 0.18);
     final glassPaint = Paint()..color = tint;
     canvas.drawRect(Offset.zero & size, glassPaint);
@@ -374,53 +381,56 @@ class ShapeBackgroundRenderer {
         ],
       ).createShader(Rect.fromLTWH(0, 0, size.width, size.height * 0.3));
 
-    canvas.drawRect(Rect.fromLTWH(0, 0, size.width, size.height * 0.3), specularPaint);
+    canvas.drawRect(
+      Rect.fromLTWH(0, 0, size.width, size.height * 0.3),
+      specularPaint,
+    );
   }
 
   static void _drawMetallic(Canvas canvas, Size size, MetallicType type) {
     final colors = switch (type) {
       MetallicType.gold => const [
-          Color(0xFFFFECB3),
-          Color(0xFFFFD54F),
-          Color(0xFFFFF8E1),
-          Color(0xFFFFC107),
-          Color(0xFFFFECB3),
-        ],
+        Color(0xFFFFECB3),
+        Color(0xFFFFD54F),
+        Color(0xFFFFF8E1),
+        Color(0xFFFFC107),
+        Color(0xFFFFECB3),
+      ],
       MetallicType.chrome => const [
-          Color(0xFFFFFFFF),
-          Color(0xFFCFD8DC),
-          Color(0xFFFFFFFF),
-          Color(0xFF90A4AE),
-          Color(0xFFFFFFFF),
-        ],
+        Color(0xFFFFFFFF),
+        Color(0xFFCFD8DC),
+        Color(0xFFFFFFFF),
+        Color(0xFF90A4AE),
+        Color(0xFFFFFFFF),
+      ],
       MetallicType.silver => const [
-          Color(0xFFECEFF1),
-          Color(0xFFCFD8DC),
-          Color(0xFFFFFFFF),
-          Color(0xFFB0BEC5),
-          Color(0xFFECEFF1),
-        ],
+        Color(0xFFECEFF1),
+        Color(0xFFCFD8DC),
+        Color(0xFFFFFFFF),
+        Color(0xFFB0BEC5),
+        Color(0xFFECEFF1),
+      ],
       MetallicType.roseGold => const [
-          Color(0xFFFCE4EC),
-          Color(0xFFF48FB1),
-          Color(0xFFFFFFFF),
-          Color(0xFFE91E63),
-          Color(0xFFFCE4EC),
-        ],
+        Color(0xFFFCE4EC),
+        Color(0xFFF48FB1),
+        Color(0xFFFFFFFF),
+        Color(0xFFE91E63),
+        Color(0xFFFCE4EC),
+      ],
       MetallicType.bronze => const [
-          Color(0xFFEFEBE9),
-          Color(0xFFBCAAA4),
-          Color(0xFFFFFFFF),
-          Color(0xFF8D6E63),
-          Color(0xFFEFEBE9),
-        ],
+        Color(0xFFEFEBE9),
+        Color(0xFFBCAAA4),
+        Color(0xFFFFFFFF),
+        Color(0xFF8D6E63),
+        Color(0xFFEFEBE9),
+      ],
       MetallicType.titanium => const [
-          Color(0xFFB0BEC5),
-          Color(0xFF78909C),
-          Color(0xFFCFD8DC),
-          Color(0xFF455A64),
-          Color(0xFFB0BEC5),
-        ],
+        Color(0xFFB0BEC5),
+        Color(0xFF78909C),
+        Color(0xFFCFD8DC),
+        Color(0xFF455A64),
+        Color(0xFFB0BEC5),
+      ],
     };
 
     final paint = Paint()

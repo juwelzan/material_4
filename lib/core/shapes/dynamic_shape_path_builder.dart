@@ -3,11 +3,30 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import 'dynamic_shape_config.dart';
+import 'shape_path_cache.dart';
 
 /// Builds a customized, mathematically precise [Path] for any [DynamicShapeConfig]
-/// across arbitrary container dimensions with extreme dimension guards and transform support.
+/// across arbitrary container dimensions with extreme dimension guards, LRU caching, and transform support.
 class DynamicShapePathBuilder {
-  static Path buildPath(Size size, DynamicShapeConfig config) {
+  /// Global LRU path cache limiting memory usage and avoiding recomputation.
+  static final ShapePathCache defaultCache = ShapePathCache();
+
+  static Path buildPath(
+    Size size,
+    DynamicShapeConfig config, {
+    bool useCache = true,
+  }) {
+    if (!useCache || config.type == DynamicShapeType.customBezier) {
+      return _buildPathDirect(size, config);
+    }
+    return defaultCache.getOrCreate(
+      size: size,
+      config: config,
+      computePath: () => _buildPathDirect(size, config),
+    );
+  }
+
+  static Path _buildPathDirect(Size size, DynamicShapeConfig config) {
     // 1. Guard against non-positive, zero, infinite, or NaN dimensions
     if (size.width <= 0 ||
         size.height <= 0 ||

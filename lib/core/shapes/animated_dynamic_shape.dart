@@ -125,6 +125,10 @@ class _AnimatedDynamicShapeContainerState
       rotation: _rotationTween?.evaluate(animation) ?? widget.config.rotation,
       scaleX: _scaleXTween?.evaluate(animation) ?? widget.config.scaleX,
       scaleY: _scaleYTween?.evaluate(animation) ?? widget.config.scaleY,
+      rotation: _rotationTween?.evaluate(animation) ?? widget.config.rotation,
+      scaleX: _scaleXTween?.evaluate(animation) ?? widget.config.scaleX,
+      scaleY: _scaleYTween?.evaluate(animation) ?? widget.config.scaleY,
+    );
     );
 
     return DynamicShapeContainer(

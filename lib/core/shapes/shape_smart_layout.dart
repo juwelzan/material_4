@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 import 'dynamic_shape_config.dart';
@@ -25,7 +26,12 @@ class ShapeSmartLayout {
     TextDirection textDirection = TextDirection.ltr,
     EdgeInsets basePadding = const EdgeInsets.all(12.0),
   }) {
-    if (size.width <= 0 || size.height <= 0) return basePadding;
+    final effectiveWidth = (size.width.isFinite && size.width > 0)
+        ? size.width
+        : 300.0;
+    final effectiveHeight = (size.height.isFinite && size.height > 0)
+        ? size.height
+        : 150.0;
 
     final isRtl = textDirection == TextDirection.rtl;
     final strokeAllowance = (borderWidth > 0 ? borderWidth : 1.0);
@@ -44,10 +50,22 @@ class ShapeSmartLayout {
       final effectiveBottomLeft = isRtl ? radii.bottomRight : radii.bottomLeft;
       final effectiveBottomRight = isRtl ? radii.bottomLeft : radii.bottomRight;
 
-      leftInset = math.max(leftInset, math.max(effectiveTopLeft, effectiveBottomLeft) * 0.35);
-      rightInset = math.max(rightInset, math.max(effectiveTopRight, effectiveBottomRight) * 0.35);
-      topInset = math.max(topInset, math.max(effectiveTopLeft, effectiveTopRight) * 0.35);
-      bottomInset = math.max(bottomInset, math.max(effectiveBottomLeft, effectiveBottomRight) * 0.35);
+      leftInset = math.max(
+        leftInset,
+        math.max(effectiveTopLeft, effectiveBottomLeft) * 0.35,
+      );
+      rightInset = math.max(
+        rightInset,
+        math.max(effectiveTopRight, effectiveBottomRight) * 0.35,
+      );
+      topInset = math.max(
+        topInset,
+        math.max(effectiveTopLeft, effectiveTopRight) * 0.35,
+      );
+      bottomInset = math.max(
+        bottomInset,
+        math.max(effectiveBottomLeft, effectiveBottomRight) * 0.35,
+      );
     } else {
       final cornerSafety = config.cornerRadius * 0.32;
       leftInset = math.max(leftInset, cornerSafety);
@@ -60,7 +78,8 @@ class ShapeSmartLayout {
     switch (config.type) {
       case DynamicShapeType.folderTab:
         final effectiveAnchor = _resolveRtlAnchor(config.anchor, isRtl);
-        if (effectiveAnchor == ShapeAnchor.topLeft || effectiveAnchor == ShapeAnchor.topRight) {
+        if (effectiveAnchor == ShapeAnchor.topLeft ||
+            effectiveAnchor == ShapeAnchor.topRight) {
           topInset = math.max(topInset, config.tabHeight + 8.0);
         } else {
           bottomInset = math.max(bottomInset, config.tabHeight + 8.0);
@@ -69,7 +88,8 @@ class ShapeSmartLayout {
 
       case DynamicShapeType.notchedBadge:
         final effectiveAnchor = _resolveRtlAnchor(config.anchor, isRtl);
-        if (effectiveAnchor == ShapeAnchor.topRight || effectiveAnchor == ShapeAnchor.topLeft) {
+        if (effectiveAnchor == ShapeAnchor.topRight ||
+            effectiveAnchor == ShapeAnchor.topLeft) {
           topInset = math.max(topInset, config.tabHeight + 10.0);
         } else {
           bottomInset = math.max(bottomInset, config.tabHeight + 10.0);
@@ -78,7 +98,8 @@ class ShapeSmartLayout {
 
       case DynamicShapeType.sideTab:
         final effectiveAnchor = _resolveRtlAnchor(config.anchor, isRtl);
-        if (effectiveAnchor == ShapeAnchor.rightCenter || effectiveAnchor == ShapeAnchor.topRight) {
+        if (effectiveAnchor == ShapeAnchor.rightCenter ||
+            effectiveAnchor == ShapeAnchor.topRight) {
           rightInset = math.max(rightInset, config.protrusionDepth + 12.0);
         } else {
           leftInset = math.max(leftInset, config.protrusionDepth + 12.0);
@@ -128,20 +149,23 @@ class ShapeSmartLayout {
         break;
 
       case DynamicShapeType.shield:
-        bottomInset = math.max(bottomInset, size.height * 0.16);
+        bottomInset = math.max(bottomInset, effectiveHeight * 0.16);
         leftInset = math.max(leftInset, 16.0);
         rightInset = math.max(rightInset, 16.0);
         break;
 
       case DynamicShapeType.diamond:
-        leftInset = math.max(leftInset, size.width * 0.18);
-        rightInset = math.max(rightInset, size.width * 0.18);
-        topInset = math.max(topInset, size.height * 0.18);
-        bottomInset = math.max(bottomInset, size.height * 0.18);
+        leftInset = math.max(leftInset, effectiveWidth * 0.18);
+        rightInset = math.max(rightInset, effectiveWidth * 0.18);
+        topInset = math.max(topInset, effectiveHeight * 0.18);
+        bottomInset = math.max(bottomInset, effectiveHeight * 0.18);
         break;
 
       case DynamicShapeType.parallelogram:
-        final skewOffset = (math.tan(config.skewAngle * math.pi / 180.0).abs() * size.height * 0.35);
+        final skewOffset =
+            (math.tan(config.skewAngle * math.pi / 180.0).abs() *
+            effectiveHeight *
+            0.35);
         leftInset = math.max(leftInset, skewOffset + 12.0);
         rightInset = math.max(rightInset, skewOffset + 12.0);
         break;
@@ -157,7 +181,7 @@ class ShapeSmartLayout {
         break;
 
       case DynamicShapeType.capsule:
-        final capRadius = math.min(size.width, size.height) * 0.32;
+        final capRadius = math.min(effectiveWidth, effectiveHeight) * 0.32;
         leftInset = math.max(leftInset, capRadius);
         rightInset = math.max(rightInset, capRadius);
         break;
@@ -210,6 +234,8 @@ class ShapeSmartLayout {
               leftInset = math.max(leftInset, notchAllowance);
             }
             break;
+          case ShapeAnchor.center:
+            break;
         }
       }
     }
@@ -223,8 +249,16 @@ class ShapeSmartLayout {
   }
 
   /// Calculates the largest guaranteed collision-free inscribed rectangular text/content box.
-  static Rect computeInscribedRect(Size size, DynamicShapeConfig config, {TextDirection textDirection = TextDirection.ltr}) {
-    final padding = computeSafePadding(size: size, config: config, textDirection: textDirection);
+  static Rect computeInscribedRect(
+    Size size,
+    DynamicShapeConfig config, {
+    TextDirection textDirection = TextDirection.ltr,
+  }) {
+    final padding = computeSafePadding(
+      size: size,
+      config: config,
+      textDirection: textDirection,
+    );
     return Rect.fromLTWH(
       padding.left,
       padding.top,
@@ -234,7 +268,10 @@ class ShapeSmartLayout {
   }
 
   /// Enforces accessible touch target dimensions (min 48x48) on interactive shapes.
-  static Size validateTouchTarget(Size requestedSize, {double minDimension = minAccessibleTouchTarget}) {
+  static Size validateTouchTarget(
+    Size requestedSize, {
+    double minDimension = minAccessibleTouchTarget,
+  }) {
     return Size(
       math.max(requestedSize.width, minDimension),
       math.max(requestedSize.height, minDimension),
@@ -275,7 +312,15 @@ class ShapeSafeArea extends StatelessWidget {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final size = Size(constraints.maxWidth, constraints.maxHeight);
+        final w =
+            constraints.hasBoundedWidth && !constraints.maxWidth.isInfinite
+            ? constraints.maxWidth
+            : 300.0;
+        final h =
+            constraints.hasBoundedHeight && !constraints.maxHeight.isInfinite
+            ? constraints.maxHeight
+            : 150.0;
+        final size = Size(w, h);
         final safePadding = ShapeSmartLayout.computeSafePadding(
           size: size,
           config: config,
@@ -283,10 +328,7 @@ class ShapeSafeArea extends StatelessWidget {
           basePadding: basePadding,
         );
 
-        return Padding(
-          padding: safePadding,
-          child: child,
-        );
+        return Padding(padding: safePadding, child: child);
       },
     );
   }

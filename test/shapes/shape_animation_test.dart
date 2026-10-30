@@ -73,10 +73,7 @@ void main() {
       );
 
       controller.morphTo(
-        const DynamicShapeConfig(
-          cornerRadius: 30.0,
-          tabWidth: 80.0,
-        ),
+        const DynamicShapeConfig(cornerRadius: 30.0, tabWidth: 80.0),
         duration: const Duration(milliseconds: 400),
       );
 
@@ -210,11 +207,7 @@ void main() {
           home: Scaffold(
             body: ShapeStaggeredGroup(
               animation: animController,
-              children: const [
-                Text('Item 1'),
-                Text('Item 2'),
-                Text('Item 3'),
-              ],
+              children: const [Text('Item 1'), Text('Item 2'), Text('Item 3')],
             ),
           ),
         ),

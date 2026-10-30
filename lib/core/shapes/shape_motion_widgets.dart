@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/physics.dart';
 
@@ -55,9 +56,10 @@ class _ShapePressableState extends State<ShapePressable>
   void initState() {
     super.initState();
     _controller = AnimationController(vsync: this, duration: widget.duration);
-    _scaleAnimation = Tween<double>(begin: 1.0, end: widget.pressScale).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic),
-    );
+    _scaleAnimation = Tween<double>(
+      begin: 1.0,
+      end: widget.pressScale,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic));
   }
 
   void _onTapDown(TapDownDetails details) {
@@ -191,10 +193,7 @@ class _ShapeMagneticHoverState extends State<ShapeMagneticHover>
             duration: const Duration(milliseconds: 180),
             curve: Curves.easeOutQuad,
             builder: (context, offset, child) {
-              return Transform.translate(
-                offset: offset,
-                child: child,
-              );
+              return Transform.translate(offset: offset, child: child);
             },
             child: widget.child,
           ),
@@ -228,7 +227,10 @@ class ShapeSwipeMorph extends StatefulWidget {
     this.borderColor = const Color(0x1F1A1A1A),
     this.borderWidth = 1.0,
     this.onShapeChanged,
-  }) : assert(shapes.length >= 2, 'At least 2 shapes required for swipe morphing');
+  }) : assert(
+         shapes.length >= 2,
+         'At least 2 shapes required for swipe morphing',
+       );
 
   @override
   State<ShapeSwipeMorph> createState() => _ShapeSwipeMorphState();
@@ -250,7 +252,8 @@ class _ShapeSwipeMorphState extends State<ShapeSwipeMorph> {
       if (_dragProgress > 0.35 && _currentIndex > 0) {
         _currentIndex--;
         widget.onShapeChanged?.call(_currentIndex);
-      } else if (_dragProgress < -0.35 && _currentIndex < widget.shapes.length - 1) {
+      } else if (_dragProgress < -0.35 &&
+          _currentIndex < widget.shapes.length - 1) {
         _currentIndex++;
         widget.onShapeChanged?.call(_currentIndex);
       }
@@ -260,13 +263,16 @@ class _ShapeSwipeMorphState extends State<ShapeSwipeMorph> {
 
   @override
   Widget build(BuildContext context) {
-    final nextIndex = (_dragProgress < 0
-            ? _currentIndex + 1
-            : _currentIndex - 1)
-        .clamp(0, widget.shapes.length - 1);
+    final nextIndex =
+        (_dragProgress < 0 ? _currentIndex + 1 : _currentIndex - 1).clamp(
+          0,
+          widget.shapes.length - 1,
+        );
 
     final t = _dragProgress.abs();
-    final activeConfig = t > 0.5 ? widget.shapes[nextIndex] : widget.shapes[_currentIndex];
+    final activeConfig = t > 0.5
+        ? widget.shapes[nextIndex]
+        : widget.shapes[_currentIndex];
 
     return GestureDetector(
       onHorizontalDragUpdate: _onHorizontalDragUpdate,
@@ -331,11 +337,15 @@ class _ShapeRevealClipper extends CustomClipper<Path> {
       return path;
     }
 
-    final maxDim = math.sqrt(size.width * size.width + size.height * size.height);
+    final maxDim = math.sqrt(
+      size.width * size.width + size.height * size.height,
+    );
     final cx = size.width * (origin.x + 1.0) / 2.0;
     final cy = size.height * (origin.y + 1.0) / 2.0;
 
-    path.addOval(Rect.fromCircle(center: Offset(cx, cy), radius: maxDim * progress));
+    path.addOval(
+      Rect.fromCircle(center: Offset(cx, cy), radius: maxDim * progress),
+    );
     return path;
   }
 
@@ -374,11 +384,7 @@ class ShapeBorderDrawReveal extends StatelessWidget {
         borderColor: borderColor,
         borderWidth: borderWidth,
       ),
-      child: SizedBox(
-        width: size.width,
-        height: size.height,
-        child: child,
-      ),
+      child: SizedBox(width: size.width, height: size.height, child: child),
     );
   }
 }

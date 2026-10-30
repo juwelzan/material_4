@@ -169,6 +169,34 @@ class CornerRadii {
 
   @override
   int get hashCode => Object.hash(topLeft, topRight, bottomLeft, bottomRight);
+
+  Map<String, dynamic> toJson() => {
+    'topLeft': topLeft,
+    'topRight': topRight,
+    'bottomLeft': bottomLeft,
+    'bottomRight': bottomRight,
+  };
+
+  factory CornerRadii.fromJson(Map<String, dynamic> json) => CornerRadii(
+    topLeft: (json['topLeft'] as num?)?.toDouble() ?? 0.0,
+    topRight: (json['topRight'] as num?)?.toDouble() ?? 0.0,
+    bottomLeft: (json['bottomLeft'] as num?)?.toDouble() ?? 0.0,
+    bottomRight: (json['bottomRight'] as num?)?.toDouble() ?? 0.0,
+  );
+
+  Map<String, dynamic> toJson() => {
+        'topLeft': topLeft,
+        'topRight': topRight,
+        'bottomLeft': bottomLeft,
+        'bottomRight': bottomRight,
+      };
+
+  factory CornerRadii.fromJson(Map<String, dynamic> json) => CornerRadii(
+        topLeft: (json['topLeft'] as num?)?.toDouble() ?? 0.0,
+        topRight: (json['topRight'] as num?)?.toDouble() ?? 0.0,
+        bottomLeft: (json['bottomLeft'] as num?)?.toDouble() ?? 0.0,
+        bottomRight: (json['bottomRight'] as num?)?.toDouble() ?? 0.0,
+      );
 }
 
 /// Multi-notch specification for embedding multiple slots/cavities into a shape contour.
@@ -188,6 +216,48 @@ class ShapeNotch {
     this.offset = 0.0,
     this.isInward = true,
   });
+
+  Map<String, dynamic> toJson() => {
+    'position': position.name,
+    'width': width,
+    'height': height,
+    'filletRadius': filletRadius,
+    'offset': offset,
+    'isInward': isInward,
+  };
+
+  factory ShapeNotch.fromJson(Map<String, dynamic> json) => ShapeNotch(
+    position: ShapeAnchor.values.firstWhere(
+      (e) => e.name == json['position'],
+      orElse: () => ShapeAnchor.topRight,
+    ),
+    width: (json['width'] as num?)?.toDouble() ?? 80.0,
+    height: (json['height'] as num?)?.toDouble() ?? 24.0,
+    filletRadius: (json['filletRadius'] as num?)?.toDouble() ?? 12.0,
+    offset: (json['offset'] as num?)?.toDouble() ?? 0.0,
+    isInward: json['isInward'] as bool? ?? true,
+  );
+
+  Map<String, dynamic> toJson() => {
+        'position': position.name,
+        'width': width,
+        'height': height,
+        'filletRadius': filletRadius,
+        'offset': offset,
+        'isInward': isInward,
+      };
+
+  factory ShapeNotch.fromJson(Map<String, dynamic> json) => ShapeNotch(
+        position: ShapeAnchor.values.firstWhere(
+          (e) => e.name == json['position'],
+          orElse: () => ShapeAnchor.topRight,
+        ),
+        width: (json['width'] as num?)?.toDouble() ?? 80.0,
+        height: (json['height'] as num?)?.toDouble() ?? 24.0,
+        filletRadius: (json['filletRadius'] as num?)?.toDouble() ?? 12.0,
+        offset: (json['offset'] as num?)?.toDouble() ?? 0.0,
+        isInward: json['isInward'] as bool? ?? true,
+      );
 
   @override
   bool operator ==(Object other) =>
@@ -1271,4 +1341,222 @@ class DynamicShapeConfig {
       particleCount: particleCount ?? this.particleCount,
     );
   }
+
+  /// Serializes this configuration into a JSON-compatible map for persistence or network transport.
+  Map<String, dynamic> toJson() => {
+    'type': type.name,
+    'borderStyle': borderStyle.name,
+    'cornerRadius': cornerRadius,
+    'cornerRadii': cornerRadii?.toJson(),
+    'anchor': anchor.name,
+    'tabWidth': tabWidth,
+    'tabHeight': tabHeight,
+    'filletRadius': filletRadius,
+    'scallopRadius': scallopRadius,
+    'petalCount': petalCount,
+    'protrusionDepth': protrusionDepth,
+    'toothWidth': toothWidth,
+    'toothHeight': toothHeight,
+    'dashLength': dashLength,
+    'dashGap': dashGap,
+    'innerBorderGap': innerBorderGap,
+    'innerBorderWidth': innerBorderWidth,
+    'rotation': rotation,
+    'scaleX': scaleX,
+    'scaleY': scaleY,
+    'stretchOffsetX': stretchOffset.dx,
+    'stretchOffsetY': stretchOffset.dy,
+    'speechBubbleTailWidth': speechBubbleTailWidth,
+    'speechBubbleTailHeight': speechBubbleTailHeight,
+    'waveCount': waveCount,
+    'waveAmplitude': waveAmplitude,
+    'skewAngle': skewAngle,
+    'ribbonFoldDepth': ribbonFoldDepth,
+    'backgroundEffect': backgroundEffect.name,
+    'noiseOpacity': noiseOpacity,
+    'waveLevel': waveLevel,
+    'particleCount': particleCount,
+    'cornerBorderLength': cornerBorderLength,
+    'metallicType': metallicType.name,
+    'handDrawnRoughness': handDrawnRoughness,
+    'neonPulseIntensity': neonPulseIntensity,
+    'notches': notches?.map((n) => n.toJson()).toList(),
+  };
+
+  /// Constructs a [DynamicShapeConfig] from serialized JSON data.
+  factory DynamicShapeConfig.fromJson(
+    Map<String, dynamic> json,
+  ) => DynamicShapeConfig(
+    type: DynamicShapeType.values.firstWhere(
+      (e) => e.name == json['type'],
+      orElse: () => DynamicShapeType.smoothRounded,
+    ),
+    borderStyle: BorderStyleType.values.firstWhere(
+      (e) => e.name == json['borderStyle'],
+      orElse: () => BorderStyleType.solid,
+    ),
+    cornerRadius: (json['cornerRadius'] as num?)?.toDouble() ?? 24.0,
+    cornerRadii: json['cornerRadii'] != null
+        ? CornerRadii.fromJson(json['cornerRadii'] as Map<String, dynamic>)
+        : null,
+    anchor: ShapeAnchor.values.firstWhere(
+      (e) => e.name == json['anchor'],
+      orElse: () => ShapeAnchor.topRight,
+    ),
+    tabWidth: (json['tabWidth'] as num?)?.toDouble() ?? 80.0,
+    tabHeight: (json['tabHeight'] as num?)?.toDouble() ?? 24.0,
+    filletRadius: (json['filletRadius'] as num?)?.toDouble() ?? 12.0,
+    scallopRadius: (json['scallopRadius'] as num?)?.toDouble() ?? 12.0,
+    petalCount: (json['petalCount'] as num?)?.toInt() ?? 10,
+    protrusionDepth: (json['protrusionDepth'] as num?)?.toDouble() ?? 16.0,
+    toothWidth: (json['toothWidth'] as num?)?.toDouble() ?? 14.0,
+    toothHeight: (json['toothHeight'] as num?)?.toDouble() ?? 8.0,
+    dashLength: (json['dashLength'] as num?)?.toDouble() ?? 7.0,
+    dashGap: (json['dashGap'] as num?)?.toDouble() ?? 4.0,
+    innerBorderGap: (json['innerBorderGap'] as num?)?.toDouble() ?? 4.0,
+    innerBorderWidth: (json['innerBorderWidth'] as num?)?.toDouble() ?? 1.0,
+    rotation: (json['rotation'] as num?)?.toDouble() ?? 0.0,
+    scaleX: (json['scaleX'] as num?)?.toDouble() ?? 1.0,
+    scaleY: (json['scaleY'] as num?)?.toDouble() ?? 1.0,
+    stretchOffset: Offset(
+      (json['stretchOffsetX'] as num?)?.toDouble() ?? 0.0,
+      (json['stretchOffsetY'] as num?)?.toDouble() ?? 0.0,
+    ),
+    speechBubbleTailWidth:
+        (json['speechBubbleTailWidth'] as num?)?.toDouble() ?? 18.0,
+    speechBubbleTailHeight:
+        (json['speechBubbleTailHeight'] as num?)?.toDouble() ?? 14.0,
+    waveCount: (json['waveCount'] as num?)?.toDouble() ?? 3.0,
+    waveAmplitude: (json['waveAmplitude'] as num?)?.toDouble() ?? 8.0,
+    skewAngle: (json['skewAngle'] as num?)?.toDouble() ?? 14.0,
+    ribbonFoldDepth: (json['ribbonFoldDepth'] as num?)?.toDouble() ?? 18.0,
+    backgroundEffect: BackgroundEffectType.values.firstWhere(
+      (e) => e.name == json['backgroundEffect'],
+      orElse: () => BackgroundEffectType.none,
+    ),
+    noiseOpacity: (json['noiseOpacity'] as num?)?.toDouble() ?? 0.05,
+    waveLevel: (json['waveLevel'] as num?)?.toDouble() ?? 0.5,
+    particleCount: (json['particleCount'] as num?)?.toInt() ?? 12,
+    cornerBorderLength:
+        (json['cornerBorderLength'] as num?)?.toDouble() ?? 24.0,
+    metallicType: MetallicType.values.firstWhere(
+      (e) => e.name == json['metallicType'],
+      orElse: () => MetallicType.gold,
+    ),
+    handDrawnRoughness: (json['handDrawnRoughness'] as num?)?.toDouble() ?? 1.6,
+    neonPulseIntensity: (json['neonPulseIntensity'] as num?)?.toDouble() ?? 1.0,
+    notches: (json['notches'] as List?)
+        ?.map((n) => ShapeNotch.fromJson(n as Map<String, dynamic>))
+        .toList(),
+  );
+
+  /// Serializes this configuration into a JSON-compatible map for persistence or network transport.
+  Map<String, dynamic> toJson() => {
+        'type': type.name,
+        'borderStyle': borderStyle.name,
+        'cornerRadius': cornerRadius,
+        'cornerRadii': cornerRadii?.toJson(),
+        'anchor': anchor.name,
+        'tabWidth': tabWidth,
+        'tabHeight': tabHeight,
+        'filletRadius': filletRadius,
+        'scallopRadius': scallopRadius,
+        'petalCount': petalCount,
+        'protrusionDepth': protrusionDepth,
+        'toothWidth': toothWidth,
+        'toothHeight': toothHeight,
+        'dashLength': dashLength,
+        'dashGap': dashGap,
+        'innerBorderGap': innerBorderGap,
+        'innerBorderWidth': innerBorderWidth,
+        'rotation': rotation,
+        'scaleX': scaleX,
+        'scaleY': scaleY,
+        'stretchOffsetX': stretchOffset.dx,
+        'stretchOffsetY': stretchOffset.dy,
+        'speechBubbleTailWidth': speechBubbleTailWidth,
+        'speechBubbleTailHeight': speechBubbleTailHeight,
+        'waveCount': waveCount,
+        'waveAmplitude': waveAmplitude,
+        'skewAngle': skewAngle,
+        'ribbonFoldDepth': ribbonFoldDepth,
+        'backgroundEffect': backgroundEffect.name,
+        'noiseOpacity': noiseOpacity,
+        'waveLevel': waveLevel,
+        'particleCount': particleCount,
+        'cornerBorderLength': cornerBorderLength,
+        'metallicType': metallicType.name,
+        'handDrawnRoughness': handDrawnRoughness,
+        'neonPulseIntensity': neonPulseIntensity,
+        'notches': notches?.map((n) => n.toJson()).toList(),
+      };
+
+  /// Constructs a [DynamicShapeConfig] from serialized JSON data.
+  factory DynamicShapeConfig.fromJson(Map<String, dynamic> json) =>
+      DynamicShapeConfig(
+        type: DynamicShapeType.values.firstWhere(
+          (e) => e.name == json['type'],
+          orElse: () => DynamicShapeType.smoothRounded,
+        ),
+        borderStyle: BorderStyleType.values.firstWhere(
+          (e) => e.name == json['borderStyle'],
+          orElse: () => BorderStyleType.solid,
+        ),
+        cornerRadius: (json['cornerRadius'] as num?)?.toDouble() ?? 24.0,
+        cornerRadii: json['cornerRadii'] != null
+            ? CornerRadii.fromJson(json['cornerRadii'] as Map<String, dynamic>)
+            : null,
+        anchor: ShapeAnchor.values.firstWhere(
+          (e) => e.name == json['anchor'],
+          orElse: () => ShapeAnchor.topRight,
+        ),
+        tabWidth: (json['tabWidth'] as num?)?.toDouble() ?? 80.0,
+        tabHeight: (json['tabHeight'] as num?)?.toDouble() ?? 24.0,
+        filletRadius: (json['filletRadius'] as num?)?.toDouble() ?? 12.0,
+        scallopRadius: (json['scallopRadius'] as num?)?.toDouble() ?? 12.0,
+        petalCount: (json['petalCount'] as num?)?.toInt() ?? 10,
+        protrusionDepth: (json['protrusionDepth'] as num?)?.toDouble() ?? 16.0,
+        toothWidth: (json['toothWidth'] as num?)?.toDouble() ?? 14.0,
+        toothHeight: (json['toothHeight'] as num?)?.toDouble() ?? 8.0,
+        dashLength: (json['dashLength'] as num?)?.toDouble() ?? 7.0,
+        dashGap: (json['dashGap'] as num?)?.toDouble() ?? 4.0,
+        innerBorderGap: (json['innerBorderGap'] as num?)?.toDouble() ?? 4.0,
+        innerBorderWidth: (json['innerBorderWidth'] as num?)?.toDouble() ?? 1.0,
+        rotation: (json['rotation'] as num?)?.toDouble() ?? 0.0,
+        scaleX: (json['scaleX'] as num?)?.toDouble() ?? 1.0,
+        scaleY: (json['scaleY'] as num?)?.toDouble() ?? 1.0,
+        stretchOffset: Offset(
+          (json['stretchOffsetX'] as num?)?.toDouble() ?? 0.0,
+          (json['stretchOffsetY'] as num?)?.toDouble() ?? 0.0,
+        ),
+        speechBubbleTailWidth:
+            (json['speechBubbleTailWidth'] as num?)?.toDouble() ?? 18.0,
+        speechBubbleTailHeight:
+            (json['speechBubbleTailHeight'] as num?)?.toDouble() ?? 14.0,
+        waveCount: (json['waveCount'] as num?)?.toDouble() ?? 3.0,
+        waveAmplitude: (json['waveAmplitude'] as num?)?.toDouble() ?? 8.0,
+        skewAngle: (json['skewAngle'] as num?)?.toDouble() ?? 14.0,
+        ribbonFoldDepth:
+            (json['ribbonFoldDepth'] as num?)?.toDouble() ?? 18.0,
+        backgroundEffect: BackgroundEffectType.values.firstWhere(
+          (e) => e.name == json['backgroundEffect'],
+          orElse: () => BackgroundEffectType.none,
+        ),
+        noiseOpacity: (json['noiseOpacity'] as num?)?.toDouble() ?? 0.05,
+        waveLevel: (json['waveLevel'] as num?)?.toDouble() ?? 0.5,
+        particleCount: (json['particleCount'] as num?)?.toInt() ?? 12,
+        cornerBorderLength:
+            (json['cornerBorderLength'] as num?)?.toDouble() ?? 24.0,
+        metallicType: MetallicType.values.firstWhere(
+          (e) => e.name == json['metallicType'],
+          orElse: () => MetallicType.gold,
+        ),
+        handDrawnRoughness:
+            (json['handDrawnRoughness'] as num?)?.toDouble() ?? 1.6,
+        neonPulseIntensity:
+            (json['neonPulseIntensity'] as num?)?.toDouble() ?? 1.0,
+        notches: (json['notches'] as List?)
+            ?.map((n) => ShapeNotch.fromJson(n as Map<String, dynamic>))
+            .toList(),
+      );
 }

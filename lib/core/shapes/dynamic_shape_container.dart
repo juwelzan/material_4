@@ -1,11 +1,10 @@
+import 'dart:math' as math;
 import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
 
 import 'dynamic_shape_config.dart';
 import 'dynamic_shape_path_builder.dart';
-import 'shape_background_renderer.dart';
-import 'shape_border_painter.dart';
 import 'shape_pattern.dart';
 
 /// CustomClipper that clips any child widget to the exact contour
@@ -88,15 +87,14 @@ class DynamicShapePainter extends CustomPainter {
       canvas.drawPath(path, glowPaint);
     }
 
-    // 4. Background Fill & Next-Gen Procedural Effects
-    ShapeBackgroundRenderer.renderBackground(
-      canvas: canvas,
-      size: size,
-      clipPath: path,
-      config: config,
-      baseColor: color,
-      baseGradient: gradient,
-    );
+    // 4. Background Fill (Gradient or Solid Color)
+    final fillPaint = Paint()..style = PaintingStyle.fill;
+    if (gradient != null) {
+      fillPaint.shader = gradient!.createShader(Offset.zero & size);
+    } else {
+      fillPaint.color = color ?? Colors.white;
+    }
+    canvas.drawPath(path, fillPaint);
 
     // 5. Procedural Pattern Textures (Stripes, Dots, Grid, Waves)
     if (config.pattern != ShapePattern.none) {
@@ -185,14 +183,125 @@ class DynamicShapePainter extends CustomPainter {
   }
 
   void _drawUniqueBorder(Canvas canvas, Size size, Path path) {
-    ShapeBorderPainter.paintBorder(
-      canvas: canvas,
-      size: size,
-      path: path,
-      config: config,
-      borderColor: borderColor,
-      borderWidth: borderWidth,
-    );
+    if (borderWidth <= 0 || borderColor.a <= 0) return;
+
+    switch (config.borderStyle) {
+      case BorderStyleType.solid:
+      case BorderStyleType.neo3d:
+        final borderPaint = Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = borderWidth
+          ..color = borderColor
+          ..isAntiAlias = true;
+        canvas.drawPath(path, borderPaint);
+        break;
+
+      case BorderStyleType.dashed:
+        _drawDashedBorder(canvas, path);
+        break;
+
+      case BorderStyleType.dotted:
+        _drawDottedBorder(canvas, path);
+        break;
+
+      case BorderStyleType.doubleStroke:
+        _drawDoubleBorder(canvas, size, path);
+        break;
+
+      case BorderStyleType.gradient:
+        final borderPaint = Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = borderWidth
+          ..isAntiAlias = true;
+        if (config.borderGradient != null) {
+          borderPaint.shader = config.borderGradient!.createShader(
+            Offset.zero & size,
+          );
+        } else {
+          borderPaint.color = borderColor;
+        }
+        canvas.drawPath(path, borderPaint);
+        break;
+
+      case BorderStyleType.glow:
+        final borderPaint = Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = borderWidth
+          ..color = borderColor
+          ..isAntiAlias = true;
+        canvas.drawPath(path, borderPaint);
+        break;
+    }
+  }
+
+  void _drawDashedBorder(Canvas canvas, Path path) {
+    final dashPaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = borderWidth
+      ..strokeCap = StrokeCap.round
+      ..color = borderColor
+      ..isAntiAlias = true;
+
+    final dashWidth = config.dashLength;
+    final dashSpace = config.dashGap;
+
+    for (final metric in path.computeMetrics()) {
+      double distance = 0.0;
+      while (distance < metric.length) {
+        final length = math.min(dashWidth, metric.length - distance);
+        final dashPath = metric.extractPath(distance, distance + length);
+        canvas.drawPath(dashPath, dashPaint);
+        distance += dashWidth + dashSpace;
+      }
+    }
+  }
+
+  void _drawDottedBorder(Canvas canvas, Path path) {
+    final dotPaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = borderWidth
+      ..strokeCap = StrokeCap.round
+      ..color = borderColor
+      ..isAntiAlias = true;
+
+    final dotSpacing = config.dashGap + borderWidth;
+
+    for (final metric in path.computeMetrics()) {
+      double distance = 0.0;
+      while (distance < metric.length) {
+        final tangent = metric.getTangentForOffset(distance);
+        if (tangent != null) {
+          canvas.drawCircle(tangent.position, borderWidth * 0.5, dotPaint);
+        }
+        distance += dotSpacing;
+      }
+    }
+  }
+
+  void _drawDoubleBorder(Canvas canvas, Size size, Path path) {
+    final outerPaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = borderWidth
+      ..color = borderColor
+      ..isAntiAlias = true;
+    canvas.drawPath(path, outerPaint);
+
+    final innerPaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = config.innerBorderWidth
+      ..color = config.innerBorderColor ?? borderColor.withValues(alpha: 0.4)
+      ..isAntiAlias = true;
+
+    final gap = config.innerBorderGap;
+    if (size.width > gap * 2 && size.height > gap * 2) {
+      canvas.save();
+      final scaleX = (size.width - gap * 2) / size.width;
+      final scaleY = (size.height - gap * 2) / size.height;
+      canvas.translate(gap, gap);
+      canvas.scale(scaleX, scaleY);
+      canvas.drawPath(path, innerPaint);
+      canvas.restore();
+    }
   }
 
   @override
@@ -347,203 +456,6 @@ class DynamicShapeContainer extends StatelessWidget {
     return DynamicShapeContainer(
       key: key,
       config: config.copyWith(innerShadows: innerShadows),
-      width: width,
-      height: height,
-      padding: padding,
-      margin: margin,
-      color: color,
-      borderColor: borderColor,
-      borderWidth: borderWidth,
-      onTap: onTap,
-      child: child,
-    );
-  }
-
-  /// Factory for Luminous Pulsing Neon Bloom Border
-  factory DynamicShapeContainer.neon({
-    Key? key,
-    Widget? child,
-    DynamicShapeConfig config = const DynamicShapeConfig(),
-    double? width,
-    double? height,
-    EdgeInsetsGeometry? padding,
-    EdgeInsetsGeometry? margin,
-    Color? color,
-    Color neonColor = const Color(0xFF00E5FF),
-    double borderWidth = 2.0,
-    double pulseIntensity = 1.0,
-    VoidCallback? onTap,
-  }) {
-    return DynamicShapeContainer(
-      key: key,
-      config: config.copyWith(
-        borderStyle: BorderStyleType.neonPulse,
-        neonPulseIntensity: pulseIntensity,
-        neonGlowColor: neonColor,
-      ),
-      width: width,
-      height: height,
-      padding: padding,
-      margin: margin,
-      color: color,
-      borderColor: neonColor,
-      borderWidth: borderWidth,
-      onTap: onTap,
-      child: child,
-    );
-  }
-
-  /// Factory for Specular Reflective Metallic Border
-  factory DynamicShapeContainer.metallic({
-    Key? key,
-    Widget? child,
-    DynamicShapeConfig config = const DynamicShapeConfig(),
-    double? width,
-    double? height,
-    EdgeInsetsGeometry? padding,
-    EdgeInsetsGeometry? margin,
-    Color? color,
-    MetallicType metallicType = MetallicType.gold,
-    double borderWidth = 2.0,
-    VoidCallback? onTap,
-  }) {
-    return DynamicShapeContainer(
-      key: key,
-      config: config.copyWith(
-        borderStyle: BorderStyleType.metallic,
-        metallicType: metallicType,
-      ),
-      width: width,
-      height: height,
-      padding: padding,
-      margin: margin,
-      color: color,
-      borderColor: const Color(0xFFFFD54F),
-      borderWidth: borderWidth,
-      onTap: onTap,
-      child: child,
-    );
-  }
-
-  /// Factory for Chromatic Dispersion Rainbow Border
-  factory DynamicShapeContainer.rainbow({
-    Key? key,
-    Widget? child,
-    DynamicShapeConfig config = const DynamicShapeConfig(),
-    double? width,
-    double? height,
-    EdgeInsetsGeometry? padding,
-    EdgeInsetsGeometry? margin,
-    Color? color,
-    double borderWidth = 2.0,
-    double progress = 0.0,
-    VoidCallback? onTap,
-  }) {
-    return DynamicShapeContainer(
-      key: key,
-      config: config.copyWith(
-        borderStyle: BorderStyleType.rainbow,
-        borderProgress: progress,
-      ),
-      width: width,
-      height: height,
-      padding: padding,
-      margin: margin,
-      color: color,
-      borderColor: const Color(0xFFFF3B30),
-      borderWidth: borderWidth,
-      onTap: onTap,
-      child: child,
-    );
-  }
-
-  /// Factory for Multi-Layered Concentric Border Stack
-  factory DynamicShapeContainer.multiLayer({
-    Key? key,
-    Widget? child,
-    DynamicShapeConfig config = const DynamicShapeConfig(),
-    double? width,
-    double? height,
-    EdgeInsetsGeometry? padding,
-    EdgeInsetsGeometry? margin,
-    Color? color,
-    required List<BorderLayer> layers,
-    VoidCallback? onTap,
-  }) {
-    return DynamicShapeContainer(
-      key: key,
-      config: config.copyWith(
-        borderStyle: BorderStyleType.multiLayer,
-        multiLayerBorders: layers,
-      ),
-      width: width,
-      height: height,
-      padding: padding,
-      margin: margin,
-      color: color,
-      borderColor: layers.isNotEmpty
-          ? layers.first.color
-          : const Color(0xFF000000),
-      borderWidth: layers.isNotEmpty ? layers.first.width : 1.5,
-      onTap: onTap,
-      child: child,
-    );
-  }
-
-  /// Factory for Technical Corner Framing Brackets
-  factory DynamicShapeContainer.cornerOnly({
-    Key? key,
-    Widget? child,
-    DynamicShapeConfig config = const DynamicShapeConfig(),
-    double? width,
-    double? height,
-    EdgeInsetsGeometry? padding,
-    EdgeInsetsGeometry? margin,
-    Color? color,
-    Color borderColor = const Color(0xFF1E1E24),
-    double borderWidth = 2.0,
-    double cornerLength = 24.0,
-    VoidCallback? onTap,
-  }) {
-    return DynamicShapeContainer(
-      key: key,
-      config: config.copyWith(
-        borderStyle: BorderStyleType.cornerOnly,
-        cornerBorderLength: cornerLength,
-      ),
-      width: width,
-      height: height,
-      padding: padding,
-      margin: margin,
-      color: color,
-      borderColor: borderColor,
-      borderWidth: borderWidth,
-      onTap: onTap,
-      child: child,
-    );
-  }
-
-  /// Factory for Artisanal Hand-Drawn Sketchy Border
-  factory DynamicShapeContainer.handDrawn({
-    Key? key,
-    Widget? child,
-    DynamicShapeConfig config = const DynamicShapeConfig(),
-    double? width,
-    double? height,
-    EdgeInsetsGeometry? padding,
-    EdgeInsetsGeometry? margin,
-    Color? color,
-    Color borderColor = const Color(0xFF1E1E24),
-    double borderWidth = 1.5,
-    double roughness = 1.6,
-    VoidCallback? onTap,
-  }) {
-    return DynamicShapeContainer(
-      key: key,
-      config: config.copyWith(
-        borderStyle: BorderStyleType.handDrawn,
-        handDrawnRoughness: roughness,
-      ),
       width: width,
       height: height,
       padding: padding,
@@ -1071,6 +983,612 @@ class DynamicShapeContainer extends StatelessWidget {
       gradient: gradient,
       borderColor: borderColor,
       borderWidth: borderWidth,
+      onTap: onTap,
+      child: child,
+    );
+  }
+
+  /// Factory for Asymmetric Card Container
+  factory DynamicShapeContainer.asymmetricCard({
+    Key? key,
+    Widget? child,
+    CornerRadii cornerRadii = const CornerRadii.asymmetric(),
+    double? width,
+    double? height,
+    EdgeInsetsGeometry? padding,
+    EdgeInsetsGeometry? margin,
+    Color? color,
+    Gradient? gradient,
+    Color borderColor = const Color(0x1F1A1A1A),
+    double borderWidth = 1.0,
+    BorderStyleType borderStyle = BorderStyleType.solid,
+    List<BoxShadow>? shadows,
+    VoidCallback? onTap,
+  }) {
+    return DynamicShapeContainer(
+      key: key,
+      config: DynamicShapeConfig.asymmetricCard(
+        cornerRadii: cornerRadii,
+        borderStyle: borderStyle,
+      ),
+      width: width,
+      height: height,
+      padding: padding,
+      margin: margin,
+      color: color,
+      gradient: gradient,
+      borderColor: borderColor,
+      borderWidth: borderWidth,
+      shadows: shadows,
+      onTap: onTap,
+      child: child,
+    );
+  }
+
+  /// Factory for Capsule / Pill Container
+  factory DynamicShapeContainer.capsule({
+    Key? key,
+    Widget? child,
+    double? width,
+    double? height,
+    EdgeInsetsGeometry? padding,
+    EdgeInsetsGeometry? margin,
+    Color? color,
+    Gradient? gradient,
+    Color borderColor = const Color(0x1F1A1A1A),
+    double borderWidth = 1.0,
+    BorderStyleType borderStyle = BorderStyleType.solid,
+    List<BoxShadow>? shadows,
+    VoidCallback? onTap,
+  }) {
+    return DynamicShapeContainer(
+      key: key,
+      config: DynamicShapeConfig.capsule(borderStyle: borderStyle),
+      width: width,
+      height: height,
+      padding: padding,
+      margin: margin,
+      color: color,
+      gradient: gradient,
+      borderColor: borderColor,
+      borderWidth: borderWidth,
+      shadows: shadows,
+      onTap: onTap,
+      child: child,
+    );
+  }
+
+  /// Factory for Wave Edge Container
+  factory DynamicShapeContainer.waveEdge({
+    Key? key,
+    Widget? child,
+    ShapeAnchor anchor = ShapeAnchor.bottomCenter,
+    double waveCount = 3.0,
+    double waveAmplitude = 10.0,
+    double cornerRadius = 20.0,
+    double? width,
+    double? height,
+    EdgeInsetsGeometry? padding,
+    EdgeInsetsGeometry? margin,
+    Color? color,
+    Gradient? gradient,
+    Color borderColor = const Color(0x1F1A1A1A),
+    double borderWidth = 1.0,
+    BorderStyleType borderStyle = BorderStyleType.solid,
+    List<BoxShadow>? shadows,
+    VoidCallback? onTap,
+  }) {
+    return DynamicShapeContainer(
+      key: key,
+      config: DynamicShapeConfig.waveEdge(
+        anchor: anchor,
+        waveCount: waveCount,
+        waveAmplitude: waveAmplitude,
+        cornerRadius: cornerRadius,
+        borderStyle: borderStyle,
+      ),
+      width: width,
+      height: height,
+      padding: padding,
+      margin: margin,
+      color: color,
+      gradient: gradient,
+      borderColor: borderColor,
+      borderWidth: borderWidth,
+      shadows: shadows,
+      onTap: onTap,
+      child: child,
+    );
+  }
+
+  /// Factory for Cloud Shape Container
+  factory DynamicShapeContainer.cloud({
+    Key? key,
+    Widget? child,
+    double? width,
+    double? height,
+    EdgeInsetsGeometry? padding,
+    EdgeInsetsGeometry? margin,
+    Color? color,
+    Gradient? gradient,
+    Color borderColor = const Color(0x1F1A1A1A),
+    double borderWidth = 1.0,
+    BorderStyleType borderStyle = BorderStyleType.solid,
+    List<BoxShadow>? shadows,
+    VoidCallback? onTap,
+  }) {
+    return DynamicShapeContainer(
+      key: key,
+      config: DynamicShapeConfig.cloud(borderStyle: borderStyle),
+      width: width,
+      height: height,
+      padding: padding,
+      margin: margin,
+      color: color,
+      gradient: gradient,
+      borderColor: borderColor,
+      borderWidth: borderWidth,
+      shadows: shadows,
+      onTap: onTap,
+      child: child,
+    );
+  }
+
+  /// Factory for Speech Bubble Container
+  factory DynamicShapeContainer.speechBubble({
+    Key? key,
+    Widget? child,
+    ShapeAnchor anchor = ShapeAnchor.bottomLeft,
+    double tailWidth = 18.0,
+    double tailHeight = 14.0,
+    double cornerRadius = 22.0,
+    double? width,
+    double? height,
+    EdgeInsetsGeometry? padding,
+    EdgeInsetsGeometry? margin,
+    Color? color,
+    Gradient? gradient,
+    Color borderColor = const Color(0x1F1A1A1A),
+    double borderWidth = 1.0,
+    BorderStyleType borderStyle = BorderStyleType.solid,
+    List<BoxShadow>? shadows,
+    VoidCallback? onTap,
+  }) {
+    return DynamicShapeContainer(
+      key: key,
+      config: DynamicShapeConfig.speechBubble(
+        anchor: anchor,
+        tailWidth: tailWidth,
+        tailHeight: tailHeight,
+        cornerRadius: cornerRadius,
+        borderStyle: borderStyle,
+      ),
+      width: width,
+      height: height,
+      padding: padding,
+      margin: margin,
+      color: color,
+      gradient: gradient,
+      borderColor: borderColor,
+      borderWidth: borderWidth,
+      shadows: shadows,
+      onTap: onTap,
+      child: child,
+    );
+  }
+
+  /// Factory for Shield / Academic Crest Container
+  factory DynamicShapeContainer.shield({
+    Key? key,
+    Widget? child,
+    double cornerRadius = 20.0,
+    double? width,
+    double? height,
+    EdgeInsetsGeometry? padding,
+    EdgeInsetsGeometry? margin,
+    Color? color,
+    Gradient? gradient,
+    Color borderColor = const Color(0x1F1A1A1A),
+    double borderWidth = 1.0,
+    BorderStyleType borderStyle = BorderStyleType.solid,
+    List<BoxShadow>? shadows,
+    VoidCallback? onTap,
+  }) {
+    return DynamicShapeContainer(
+      key: key,
+      config: DynamicShapeConfig.shield(
+        cornerRadius: cornerRadius,
+        borderStyle: borderStyle,
+      ),
+      width: width,
+      height: height,
+      padding: padding,
+      margin: margin,
+      color: color,
+      gradient: gradient,
+      borderColor: borderColor,
+      borderWidth: borderWidth,
+      shadows: shadows,
+      onTap: onTap,
+      child: child,
+    );
+  }
+
+  /// Factory for Diamond Badge Container
+  factory DynamicShapeContainer.diamond({
+    Key? key,
+    Widget? child,
+    double cornerRadius = 14.0,
+    double? width,
+    double? height,
+    EdgeInsetsGeometry? padding,
+    EdgeInsetsGeometry? margin,
+    Color? color,
+    Gradient? gradient,
+    Color borderColor = const Color(0x1F1A1A1A),
+    double borderWidth = 1.0,
+    BorderStyleType borderStyle = BorderStyleType.solid,
+    List<BoxShadow>? shadows,
+    VoidCallback? onTap,
+  }) {
+    return DynamicShapeContainer(
+      key: key,
+      config: DynamicShapeConfig.diamond(
+        cornerRadius: cornerRadius,
+        borderStyle: borderStyle,
+      ),
+      width: width,
+      height: height,
+      padding: padding,
+      margin: margin,
+      color: color,
+      gradient: gradient,
+      borderColor: borderColor,
+      borderWidth: borderWidth,
+      shadows: shadows,
+      onTap: onTap,
+      child: child,
+    );
+  }
+
+  /// Factory for Regular 8-sided Octagon Container
+  factory DynamicShapeContainer.octagon({
+    Key? key,
+    Widget? child,
+    double cornerRadius = 16.0,
+    double? width,
+    double? height,
+    EdgeInsetsGeometry? padding,
+    EdgeInsetsGeometry? margin,
+    Color? color,
+    Gradient? gradient,
+    Color borderColor = const Color(0x1F1A1A1A),
+    double borderWidth = 1.0,
+    BorderStyleType borderStyle = BorderStyleType.solid,
+    List<BoxShadow>? shadows,
+    VoidCallback? onTap,
+  }) {
+    return DynamicShapeContainer(
+      key: key,
+      config: DynamicShapeConfig.octagon(
+        cornerRadius: cornerRadius,
+        borderStyle: borderStyle,
+      ),
+      width: width,
+      height: height,
+      padding: padding,
+      margin: margin,
+      color: color,
+      gradient: gradient,
+      borderColor: borderColor,
+      borderWidth: borderWidth,
+      shadows: shadows,
+      onTap: onTap,
+      child: child,
+    );
+  }
+
+  /// Factory for Wave Cut Sliced Container
+  factory DynamicShapeContainer.waveCut({
+    Key? key,
+    Widget? child,
+    ShapeAnchor anchor = ShapeAnchor.bottomRight,
+    double waveAmplitude = 16.0,
+    double cornerRadius = 22.0,
+    double? width,
+    double? height,
+    EdgeInsetsGeometry? padding,
+    EdgeInsetsGeometry? margin,
+    Color? color,
+    Gradient? gradient,
+    Color borderColor = const Color(0x1F1A1A1A),
+    double borderWidth = 1.0,
+    BorderStyleType borderStyle = BorderStyleType.solid,
+    List<BoxShadow>? shadows,
+    VoidCallback? onTap,
+  }) {
+    return DynamicShapeContainer(
+      key: key,
+      config: DynamicShapeConfig.waveCut(
+        anchor: anchor,
+        waveAmplitude: waveAmplitude,
+        cornerRadius: cornerRadius,
+        borderStyle: borderStyle,
+      ),
+      width: width,
+      height: height,
+      padding: padding,
+      margin: margin,
+      color: color,
+      gradient: gradient,
+      borderColor: borderColor,
+      borderWidth: borderWidth,
+      shadows: shadows,
+      onTap: onTap,
+      child: child,
+    );
+  }
+
+  /// Factory for Concave Rounded Frame Container
+  factory DynamicShapeContainer.concaveRounded({
+    Key? key,
+    Widget? child,
+    double cornerRadius = 20.0,
+    double? width,
+    double? height,
+    EdgeInsetsGeometry? padding,
+    EdgeInsetsGeometry? margin,
+    Color? color,
+    Gradient? gradient,
+    Color borderColor = const Color(0x1F1A1A1A),
+    double borderWidth = 1.0,
+    BorderStyleType borderStyle = BorderStyleType.solid,
+    List<BoxShadow>? shadows,
+    VoidCallback? onTap,
+  }) {
+    return DynamicShapeContainer(
+      key: key,
+      config: DynamicShapeConfig.concaveRounded(
+        cornerRadius: cornerRadius,
+        borderStyle: borderStyle,
+      ),
+      width: width,
+      height: height,
+      padding: padding,
+      margin: margin,
+      color: color,
+      gradient: gradient,
+      borderColor: borderColor,
+      borderWidth: borderWidth,
+      shadows: shadows,
+      onTap: onTap,
+      child: child,
+    );
+  }
+
+  /// Factory for Convex Rounded Barrel Container
+  factory DynamicShapeContainer.convexRounded({
+    Key? key,
+    Widget? child,
+    double curvature = 16.0,
+    double? width,
+    double? height,
+    EdgeInsetsGeometry? padding,
+    EdgeInsetsGeometry? margin,
+    Color? color,
+    Gradient? gradient,
+    Color borderColor = const Color(0x1F1A1A1A),
+    double borderWidth = 1.0,
+    BorderStyleType borderStyle = BorderStyleType.solid,
+    List<BoxShadow>? shadows,
+    VoidCallback? onTap,
+  }) {
+    return DynamicShapeContainer(
+      key: key,
+      config: DynamicShapeConfig.convexRounded(
+        curvature: curvature,
+        borderStyle: borderStyle,
+      ),
+      width: width,
+      height: height,
+      padding: padding,
+      margin: margin,
+      color: color,
+      gradient: gradient,
+      borderColor: borderColor,
+      borderWidth: borderWidth,
+      shadows: shadows,
+      onTap: onTap,
+      child: child,
+    );
+  }
+
+  /// Factory for Squircle (iOS super-ellipse) Container
+  factory DynamicShapeContainer.squircle({
+    Key? key,
+    Widget? child,
+    double cornerRadius = 32.0,
+    double? width,
+    double? height,
+    EdgeInsetsGeometry? padding,
+    EdgeInsetsGeometry? margin,
+    Color? color,
+    Gradient? gradient,
+    Color borderColor = const Color(0x1F1A1A1A),
+    double borderWidth = 1.0,
+    BorderStyleType borderStyle = BorderStyleType.solid,
+    List<BoxShadow>? shadows,
+    VoidCallback? onTap,
+  }) {
+    return DynamicShapeContainer(
+      key: key,
+      config: DynamicShapeConfig.squircle(
+        cornerRadius: cornerRadius,
+        borderStyle: borderStyle,
+      ),
+      width: width,
+      height: height,
+      padding: padding,
+      margin: margin,
+      color: color,
+      gradient: gradient,
+      borderColor: borderColor,
+      borderWidth: borderWidth,
+      shadows: shadows,
+      onTap: onTap,
+      child: child,
+    );
+  }
+
+  /// Factory for Slanted Parallelogram Container
+  factory DynamicShapeContainer.parallelogram({
+    Key? key,
+    Widget? child,
+    double skewAngle = 14.0,
+    double cornerRadius = 16.0,
+    double? width,
+    double? height,
+    EdgeInsetsGeometry? padding,
+    EdgeInsetsGeometry? margin,
+    Color? color,
+    Gradient? gradient,
+    Color borderColor = const Color(0x1F1A1A1A),
+    double borderWidth = 1.0,
+    BorderStyleType borderStyle = BorderStyleType.solid,
+    List<BoxShadow>? shadows,
+    VoidCallback? onTap,
+  }) {
+    return DynamicShapeContainer(
+      key: key,
+      config: DynamicShapeConfig.parallelogram(
+        skewAngle: skewAngle,
+        cornerRadius: cornerRadius,
+        borderStyle: borderStyle,
+      ),
+      width: width,
+      height: height,
+      padding: padding,
+      margin: margin,
+      color: color,
+      gradient: gradient,
+      borderColor: borderColor,
+      borderWidth: borderWidth,
+      shadows: shadows,
+      onTap: onTap,
+      child: child,
+    );
+  }
+
+  /// Factory for Banner Ribbon Container
+  factory DynamicShapeContainer.ribbon({
+    Key? key,
+    Widget? child,
+    double foldDepth = 20.0,
+    double cornerRadius = 6.0,
+    double? width,
+    double? height,
+    EdgeInsetsGeometry? padding,
+    EdgeInsetsGeometry? margin,
+    Color? color,
+    Gradient? gradient,
+    Color borderColor = const Color(0x1F1A1A1A),
+    double borderWidth = 1.0,
+    BorderStyleType borderStyle = BorderStyleType.solid,
+    List<BoxShadow>? shadows,
+    VoidCallback? onTap,
+  }) {
+    return DynamicShapeContainer(
+      key: key,
+      config: DynamicShapeConfig.ribbon(
+        foldDepth: foldDepth,
+        cornerRadius: cornerRadius,
+        borderStyle: borderStyle,
+      ),
+      width: width,
+      height: height,
+      padding: padding,
+      margin: margin,
+      color: color,
+      gradient: gradient,
+      borderColor: borderColor,
+      borderWidth: borderWidth,
+      shadows: shadows,
+      onTap: onTap,
+      child: child,
+    );
+  }
+
+  /// Factory for Hanging Bookmark Container
+  factory DynamicShapeContainer.bookmark({
+    Key? key,
+    Widget? child,
+    double notchDepth = 22.0,
+    double cornerRadius = 16.0,
+    double? width,
+    double? height,
+    EdgeInsetsGeometry? padding,
+    EdgeInsetsGeometry? margin,
+    Color? color,
+    Gradient? gradient,
+    Color borderColor = const Color(0x1F1A1A1A),
+    double borderWidth = 1.0,
+    BorderStyleType borderStyle = BorderStyleType.solid,
+    List<BoxShadow>? shadows,
+    VoidCallback? onTap,
+  }) {
+    return DynamicShapeContainer(
+      key: key,
+      config: DynamicShapeConfig.bookmark(
+        notchDepth: notchDepth,
+        cornerRadius: cornerRadius,
+        borderStyle: borderStyle,
+      ),
+      width: width,
+      height: height,
+      padding: padding,
+      margin: margin,
+      color: color,
+      gradient: gradient,
+      borderColor: borderColor,
+      borderWidth: borderWidth,
+      shadows: shadows,
+      onTap: onTap,
+      child: child,
+    );
+  }
+
+  /// Factory for Custom Bézier Geometry Container
+  factory DynamicShapeContainer.customBezier({
+    Key? key,
+    Widget? child,
+    required Path Function(Size size) builder,
+    double? width,
+    double? height,
+    EdgeInsetsGeometry? padding,
+    EdgeInsetsGeometry? margin,
+    Color? color,
+    Gradient? gradient,
+    Color borderColor = const Color(0x1F1A1A1A),
+    double borderWidth = 1.0,
+    BorderStyleType borderStyle = BorderStyleType.solid,
+    List<BoxShadow>? shadows,
+    VoidCallback? onTap,
+  }) {
+    return DynamicShapeContainer(
+      key: key,
+      config: DynamicShapeConfig.customBezier(
+        builder: builder,
+        borderStyle: borderStyle,
+      ),
+      width: width,
+      height: height,
+      padding: padding,
+      margin: margin,
+      color: color,
+      gradient: gradient,
+      borderColor: borderColor,
+      borderWidth: borderWidth,
+      shadows: shadows,
       onTap: onTap,
       child: child,
     );

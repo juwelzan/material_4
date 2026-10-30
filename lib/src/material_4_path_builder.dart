@@ -2,22 +2,26 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-import 'dynamic_shape_config.dart';
+import 'material_4_config.dart';
 import 'shape_path_cache.dart';
 
-/// Builds a customized, mathematically precise [Path] for any [DynamicShapeConfig]
+/// Builds a customized, mathematically precise [Path] for any [Material4Config]
 /// across arbitrary container dimensions with extreme dimension guards, LRU caching, and transform support.
-class DynamicShapePathBuilder {
+
+/// Type alias for [Material4PathBuilder].
+typedef Material4ShapePathBuilder = Material4PathBuilder;
+
+class Material4PathBuilder {
   /// Global LRU path cache limiting memory usage and avoiding recomputation.
   static final ShapePathCache defaultCache = ShapePathCache();
 
   static Path buildPath(
     Size size,
-    DynamicShapeConfig config, {
+    Material4Config config, {
     bool useCache = true,
   }) {
     if (!useCache ||
-        (config.type == DynamicShapeType.customBezier &&
+        (config.type == Material4Type.customBezier &&
             config.customBezierBuilder != null)) {
       return _buildPathDirect(size, config);
     }
@@ -28,7 +32,7 @@ class DynamicShapePathBuilder {
     );
   }
 
-  static Path _buildPathDirect(Size size, DynamicShapeConfig config) {
+  static Path _buildPathDirect(Size size, Material4Config config) {
     // 1. Guard against non-positive, zero, infinite, or NaN dimensions
     if (size.width <= 0 ||
         size.height <= 0 ||
@@ -52,93 +56,93 @@ class DynamicShapePathBuilder {
     } else {
       switch (config.type) {
         // --- Original 13 Shapes ---
-        case DynamicShapeType.folderTab:
+        case Material4Type.folderTab:
           path = _buildFolderTabPath(effectiveSize, config);
           break;
-        case DynamicShapeType.notchedBadge:
+        case Material4Type.notchedBadge:
           path = _buildNotchedBadgePath(effectiveSize, config);
           break;
-        case DynamicShapeType.sideTab:
+        case Material4Type.sideTab:
           path = _buildSideTabPath(effectiveSize, config);
           break;
-        case DynamicShapeType.steppedCorner:
+        case Material4Type.steppedCorner:
           path = _buildSteppedCornerPath(effectiveSize, config);
           break;
-        case DynamicShapeType.ticketScallop:
+        case Material4Type.ticketScallop:
           path = _buildTicketScallopPath(effectiveSize, config);
           break;
-        case DynamicShapeType.postageStamp:
+        case Material4Type.postageStamp:
           path = _buildPostageStampPath(effectiveSize, config);
           break;
-        case DynamicShapeType.zigzagCut:
+        case Material4Type.zigzagCut:
           path = _buildZigzagCutPath(effectiveSize, config);
           break;
-        case DynamicShapeType.arch:
+        case Material4Type.arch:
           path = _buildArchPath(effectiveSize, config);
           break;
-        case DynamicShapeType.hexagonSoft:
+        case Material4Type.hexagonSoft:
           path = _buildHexagonSoftPath(effectiveSize, config);
           break;
-        case DynamicShapeType.chamferDiagonal:
+        case Material4Type.chamferDiagonal:
           path = _buildChamferDiagonalPath(effectiveSize, config);
           break;
-        case DynamicShapeType.organicBlob:
+        case Material4Type.organicBlob:
           path = _buildOrganicBlobPath(effectiveSize, config);
           break;
-        case DynamicShapeType.scallopedPetal:
+        case Material4Type.scallopedPetal:
           path = _buildScallopedPetalPath(effectiveSize, config);
           break;
-        case DynamicShapeType.smoothRounded:
+        case Material4Type.smoothRounded:
           path = _buildSmoothRoundedPath(effectiveSize, config);
           break;
 
         // --- Next-Gen Geometry Additions ---
-        case DynamicShapeType.asymmetricCard:
+        case Material4Type.asymmetricCard:
           path = _buildAsymmetricCardPath(effectiveSize, config);
           break;
-        case DynamicShapeType.capsule:
+        case Material4Type.capsule:
           path = _buildCapsulePath(effectiveSize, config);
           break;
-        case DynamicShapeType.waveEdge:
+        case Material4Type.waveEdge:
           path = _buildWaveEdgePath(effectiveSize, config);
           break;
-        case DynamicShapeType.cloud:
+        case Material4Type.cloud:
           path = _buildCloudPath(effectiveSize, config);
           break;
-        case DynamicShapeType.speechBubble:
+        case Material4Type.speechBubble:
           path = _buildSpeechBubblePath(effectiveSize, config);
           break;
-        case DynamicShapeType.shield:
+        case Material4Type.shield:
           path = _buildShieldPath(effectiveSize, config);
           break;
-        case DynamicShapeType.diamond:
+        case Material4Type.diamond:
           path = _buildDiamondPath(effectiveSize, config);
           break;
-        case DynamicShapeType.octagon:
+        case Material4Type.octagon:
           path = _buildOctagonPath(effectiveSize, config);
           break;
-        case DynamicShapeType.waveCut:
+        case Material4Type.waveCut:
           path = _buildWaveCutPath(effectiveSize, config);
           break;
-        case DynamicShapeType.concaveRounded:
+        case Material4Type.concaveRounded:
           path = _buildConcaveRoundedPath(effectiveSize, config);
           break;
-        case DynamicShapeType.convexRounded:
+        case Material4Type.convexRounded:
           path = _buildConvexRoundedPath(effectiveSize, config);
           break;
-        case DynamicShapeType.squircle:
+        case Material4Type.squircle:
           path = _buildSquirclePath(effectiveSize, config);
           break;
-        case DynamicShapeType.parallelogram:
+        case Material4Type.parallelogram:
           path = _buildParallelogramPath(effectiveSize, config);
           break;
-        case DynamicShapeType.ribbon:
+        case Material4Type.ribbon:
           path = _buildRibbonPath(effectiveSize, config);
           break;
-        case DynamicShapeType.bookmark:
+        case Material4Type.bookmark:
           path = _buildBookmarkPath(effectiveSize, config);
           break;
-        case DynamicShapeType.customBezier:
+        case Material4Type.customBezier:
           path = _buildCustomBezierPath(effectiveSize, config);
           break;
       }
@@ -163,7 +167,7 @@ class DynamicShapePathBuilder {
   // --- ORIGINAL 13 SHAPES (100% Backwards Compatible) ---
   // =========================================================================
 
-  static Path _buildFolderTabPath(Size size, DynamicShapeConfig config) {
+  static Path _buildFolderTabPath(Size size, Material4Config config) {
     final path = Path();
     final w = size.width;
     final h = size.height;
@@ -237,7 +241,7 @@ class DynamicShapePathBuilder {
     return path;
   }
 
-  static Path _buildNotchedBadgePath(Size size, DynamicShapeConfig config) {
+  static Path _buildNotchedBadgePath(Size size, Material4Config config) {
     final path = Path();
     final w = size.width;
     final h = size.height;
@@ -302,7 +306,7 @@ class DynamicShapePathBuilder {
     return path;
   }
 
-  static Path _buildSideTabPath(Size size, DynamicShapeConfig config) {
+  static Path _buildSideTabPath(Size size, Material4Config config) {
     final path = Path();
     final w = size.width;
     final h = size.height;
@@ -345,7 +349,7 @@ class DynamicShapePathBuilder {
     return path;
   }
 
-  static Path _buildSteppedCornerPath(Size size, DynamicShapeConfig config) {
+  static Path _buildSteppedCornerPath(Size size, Material4Config config) {
     final path = Path();
     final w = size.width;
     final h = size.height;
@@ -370,7 +374,7 @@ class DynamicShapePathBuilder {
     return path;
   }
 
-  static Path _buildTicketScallopPath(Size size, DynamicShapeConfig config) {
+  static Path _buildTicketScallopPath(Size size, Material4Config config) {
     final path = Path();
     final w = size.width;
     final h = size.height;
@@ -403,7 +407,7 @@ class DynamicShapePathBuilder {
     return path;
   }
 
-  static Path _buildPostageStampPath(Size size, DynamicShapeConfig config) {
+  static Path _buildPostageStampPath(Size size, Material4Config config) {
     final path = Path();
     final w = size.width;
     final h = size.height;
@@ -469,7 +473,7 @@ class DynamicShapePathBuilder {
     return path;
   }
 
-  static Path _buildZigzagCutPath(Size size, DynamicShapeConfig config) {
+  static Path _buildZigzagCutPath(Size size, Material4Config config) {
     final path = Path();
     final w = size.width;
     final h = size.height;
@@ -497,7 +501,7 @@ class DynamicShapePathBuilder {
     return path;
   }
 
-  static Path _buildArchPath(Size size, DynamicShapeConfig config) {
+  static Path _buildArchPath(Size size, Material4Config config) {
     final path = Path();
     final w = size.width;
     final h = size.height;
@@ -519,7 +523,7 @@ class DynamicShapePathBuilder {
     return path;
   }
 
-  static Path _buildHexagonSoftPath(Size size, DynamicShapeConfig config) {
+  static Path _buildHexagonSoftPath(Size size, Material4Config config) {
     final path = Path();
     final w = size.width;
     final h = size.height;
@@ -561,7 +565,7 @@ class DynamicShapePathBuilder {
     return path;
   }
 
-  static Path _buildChamferDiagonalPath(Size size, DynamicShapeConfig config) {
+  static Path _buildChamferDiagonalPath(Size size, Material4Config config) {
     final path = Path();
     final w = size.width;
     final h = size.height;
@@ -592,7 +596,7 @@ class DynamicShapePathBuilder {
     return path;
   }
 
-  static Path _buildOrganicBlobPath(Size size, DynamicShapeConfig config) {
+  static Path _buildOrganicBlobPath(Size size, Material4Config config) {
     final path = Path();
     final w = size.width;
     final h = size.height;
@@ -606,7 +610,7 @@ class DynamicShapePathBuilder {
     return path;
   }
 
-  static Path _buildScallopedPetalPath(Size size, DynamicShapeConfig config) {
+  static Path _buildScallopedPetalPath(Size size, Material4Config config) {
     final path = Path();
     final count = math.max(config.petalCount, 4);
     final cx = size.width / 2;
@@ -642,7 +646,7 @@ class DynamicShapePathBuilder {
     return path;
   }
 
-  static Path _buildSmoothRoundedPath(Size size, DynamicShapeConfig config) {
+  static Path _buildSmoothRoundedPath(Size size, Material4Config config) {
     // If independent cornerRadii provided, use them
     if (config.cornerRadii != null) {
       return _buildAsymmetricCardPath(size, config);
@@ -662,14 +666,14 @@ class DynamicShapePathBuilder {
   // =========================================================================
 
   /// 1. Asymmetric Card with 4 independent corner radii and CSS proportional downscaling.
-  static Path _buildAsymmetricCardPath(Size size, DynamicShapeConfig config) {
+  static Path _buildAsymmetricCardPath(Size size, Material4Config config) {
     final sanitizedCorners = config.resolvedCorners.sanitize(size);
     final rrect = sanitizedCorners.toRRect(Offset.zero & size);
     return Path()..addRRect(rrect);
   }
 
   /// 2. Capsule / Pill shape with semicircular rounded ends.
-  static Path _buildCapsulePath(Size size, DynamicShapeConfig config) {
+  static Path _buildCapsulePath(Size size, Material4Config config) {
     final radius = math.min(size.width, size.height) / 2;
     return Path()
       ..addRRect(
@@ -678,7 +682,7 @@ class DynamicShapePathBuilder {
   }
 
   /// 3. Wave Edge container with a flowing sine wave along the anchor edge.
-  static Path _buildWaveEdgePath(Size size, DynamicShapeConfig config) {
+  static Path _buildWaveEdgePath(Size size, Material4Config config) {
     final path = Path();
     final w = size.width;
     final h = size.height;
@@ -712,7 +716,7 @@ class DynamicShapePathBuilder {
   }
 
   /// 4. Cloud shape with overlapping rounded lobes.
-  static Path _buildCloudPath(Size size, DynamicShapeConfig config) {
+  static Path _buildCloudPath(Size size, Material4Config config) {
     final path = Path();
     final w = size.width;
     final h = size.height;
@@ -748,7 +752,7 @@ class DynamicShapePathBuilder {
   }
 
   /// 5. Speech Bubble with an integrated pointer tail.
-  static Path _buildSpeechBubblePath(Size size, DynamicShapeConfig config) {
+  static Path _buildSpeechBubblePath(Size size, Material4Config config) {
     final path = Path();
     final w = size.width;
     final h = size.height;
@@ -784,7 +788,7 @@ class DynamicShapePathBuilder {
   }
 
   /// 6. Shield / Heraldic academic crest shape.
-  static Path _buildShieldPath(Size size, DynamicShapeConfig config) {
+  static Path _buildShieldPath(Size size, Material4Config config) {
     final path = Path();
     final w = size.width;
     final h = size.height;
@@ -807,7 +811,7 @@ class DynamicShapePathBuilder {
   }
 
   /// 7. Diamond / Rhombus with rounded vertices.
-  static Path _buildDiamondPath(Size size, DynamicShapeConfig config) {
+  static Path _buildDiamondPath(Size size, Material4Config config) {
     final path = Path();
     final w = size.width;
     final h = size.height;
@@ -848,7 +852,7 @@ class DynamicShapePathBuilder {
   }
 
   /// 8. Regular 8-sided Octagon with rounded vertex transitions.
-  static Path _buildOctagonPath(Size size, DynamicShapeConfig config) {
+  static Path _buildOctagonPath(Size size, Material4Config config) {
     final path = Path();
     final w = size.width;
     final h = size.height;
@@ -895,7 +899,7 @@ class DynamicShapePathBuilder {
   }
 
   /// 9. Wave Cut sliced container.
-  static Path _buildWaveCutPath(Size size, DynamicShapeConfig config) {
+  static Path _buildWaveCutPath(Size size, Material4Config config) {
     final path = Path();
     final w = size.width;
     final h = size.height;
@@ -918,7 +922,7 @@ class DynamicShapePathBuilder {
   }
 
   /// 10. Concave Rounded corners (inward curved corners for ornate frames).
-  static Path _buildConcaveRoundedPath(Size size, DynamicShapeConfig config) {
+  static Path _buildConcaveRoundedPath(Size size, Material4Config config) {
     final path = Path();
     final w = size.width;
     final h = size.height;
@@ -947,7 +951,7 @@ class DynamicShapePathBuilder {
   }
 
   /// 11. Convex Rounded (barrel curved expanding edges).
-  static Path _buildConvexRoundedPath(Size size, DynamicShapeConfig config) {
+  static Path _buildConvexRoundedPath(Size size, Material4Config config) {
     final path = Path();
     final w = size.width;
     final h = size.height;
@@ -968,7 +972,7 @@ class DynamicShapePathBuilder {
   }
 
   /// 12. True mathematical Squircle (iOS super-ellipse approximation).
-  static Path _buildSquirclePath(Size size, DynamicShapeConfig config) {
+  static Path _buildSquirclePath(Size size, Material4Config config) {
     final path = Path();
     final w = size.width;
     final h = size.height;
@@ -989,7 +993,7 @@ class DynamicShapePathBuilder {
   }
 
   /// 13. Slanted Parallelogram with customizable skew angle.
-  static Path _buildParallelogramPath(Size size, DynamicShapeConfig config) {
+  static Path _buildParallelogramPath(Size size, Material4Config config) {
     final path = Path();
     final w = size.width;
     final h = size.height;
@@ -1032,7 +1036,7 @@ class DynamicShapePathBuilder {
   }
 
   /// 14. Banner Ribbon with triangular swallowtail cutouts.
-  static Path _buildRibbonPath(Size size, DynamicShapeConfig config) {
+  static Path _buildRibbonPath(Size size, Material4Config config) {
     final path = Path();
     final w = size.width;
     final h = size.height;
@@ -1049,7 +1053,7 @@ class DynamicShapePathBuilder {
   }
 
   /// 15. Hanging Bookmark with an inverted bottom V-tail.
-  static Path _buildBookmarkPath(Size size, DynamicShapeConfig config) {
+  static Path _buildBookmarkPath(Size size, Material4Config config) {
     final path = Path();
     final w = size.width;
     final h = size.height;
@@ -1073,7 +1077,7 @@ class DynamicShapePathBuilder {
   }
 
   /// 16. Custom Bézier path builder (supporting declarative CustomBezierConfig and legacy callback).
-  static Path _buildCustomBezierPath(Size size, DynamicShapeConfig config) {
+  static Path _buildCustomBezierPath(Size size, Material4Config config) {
     if (config.bezierConfig != null) {
       return config.bezierConfig!.toPath(size);
     }
@@ -1087,7 +1091,7 @@ class DynamicShapePathBuilder {
   // --- INDEPENDENT 4-EDGE GEOMETRY BUILDER ---
   // =========================================================================
 
-  static Path _buildCustomEdgesPath(Size size, DynamicShapeConfig config) {
+  static Path _buildCustomEdgesPath(Size size, Material4Config config) {
     final corners = config.resolvedCorners.sanitize(size);
     final edges = config.edges!;
     final w = size.width;

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'dynamic_shape_config.dart';
-import 'dynamic_shape_container.dart';
+import 'material_4_config.dart';
+import 'material_4_container.dart';
 import 'shape_smart_layout.dart';
 import 'shape_widgets.dart';
 
@@ -16,11 +16,11 @@ class SchoolShapePresets {
   // =========================================================================
   // 1. Attendance Card Preset
   // =========================================================================
-  static DynamicShapeConfig attendanceConfig({
+  static Material4Config attendanceConfig({
     ShapeAnchor anchor = ShapeAnchor.topRight,
   }) =>
-      DynamicShapeConfig(
-        type: DynamicShapeType.folderTab,
+      Material4Config(
+        type: Material4Type.folderTab,
         anchor: anchor,
         cornerRadius: 22.0,
         tabWidth: 80.0,
@@ -34,7 +34,7 @@ class SchoolShapePresets {
     required String time,
     VoidCallback? onTap,
   }) {
-    return DynamicShapeContainer(
+    return Material4Container(
       config: attendanceConfig(),
       color: const Color(0xFFFFECE5),
       borderColor: const Color(0xFFFFB099),
@@ -98,8 +98,8 @@ class SchoolShapePresets {
   // =========================================================================
   // 2. Academic Records Preset
   // =========================================================================
-  static DynamicShapeConfig academicConfig() => const DynamicShapeConfig(
-        type: DynamicShapeType.asymmetricCard,
+  static Material4Config academicConfig() => const Material4Config(
+        type: Material4Type.asymmetricCard,
         cornerRadii: CornerRadii(
           topLeft: 28,
           topRight: 10,
@@ -115,7 +115,7 @@ class SchoolShapePresets {
     required String term,
     VoidCallback? onTap,
   }) {
-    return DynamicShapeContainer(
+    return Material4Container(
       config: academicConfig(),
       color: const Color(0xFFE8F5E9),
       borderColor: const Color(0xFFA5D6A7),
@@ -182,8 +182,8 @@ class SchoolShapePresets {
   // =========================================================================
   // 3. Student ID Card Preset
   // =========================================================================
-  static DynamicShapeConfig studentIdConfig() => const DynamicShapeConfig(
-        type: DynamicShapeType.smoothRounded,
+  static Material4Config studentIdConfig() => const Material4Config(
+        type: Material4Type.smoothRounded,
         cornerRadius: 24.0,
         borderStyle: BorderStyleType.metallic,
         metallicType: MetallicType.silver,
@@ -196,7 +196,7 @@ class SchoolShapePresets {
     required String studentId,
     required String gradeClass,
   }) {
-    return DynamicShapeContainer(
+    return Material4Container(
       config: studentIdConfig(),
       color: const Color(0xFF1E293B),
       child: ShapeSafeArea(
@@ -257,8 +257,8 @@ class SchoolShapePresets {
   // =========================================================================
   // 4. Achievement Certificate Card Preset
   // =========================================================================
-  static DynamicShapeConfig achievementConfig() => const DynamicShapeConfig(
-        type: DynamicShapeType.shield,
+  static Material4Config achievementConfig() => const Material4Config(
+        type: Material4Type.shield,
         cornerRadius: 20.0,
         borderStyle: BorderStyleType.metallic,
         metallicType: MetallicType.gold,
@@ -268,7 +268,7 @@ class SchoolShapePresets {
     required String title,
     required String subtitle,
   }) {
-    return DynamicShapeContainer(
+    return Material4Container(
       config: achievementConfig(),
       color: const Color(0xFFFFFBEB),
       child: ShapeSafeArea(
@@ -307,8 +307,8 @@ class SchoolShapePresets {
   // =========================================================================
   // 5. Fee Receipt Preset
   // =========================================================================
-  static DynamicShapeConfig feeReceiptConfig() => const DynamicShapeConfig(
-        type: DynamicShapeType.ticketScallop,
+  static Material4Config feeReceiptConfig() => const Material4Config(
+        type: Material4Type.ticketScallop,
         scallopRadius: 12.0,
         borderStyle: BorderStyleType.dashed,
         dashLength: 6.0,
@@ -321,7 +321,7 @@ class SchoolShapePresets {
     required String date,
     bool isPaid = true,
   }) {
-    return DynamicShapeContainer(
+    return Material4Container(
       config: feeReceiptConfig(),
       color: Colors.white,
       borderColor: const Color(0xFFCBD5E1),
@@ -390,8 +390,8 @@ class SchoolShapePresets {
   // =========================================================================
   // 6. Notice Board Preset
   // =========================================================================
-  static DynamicShapeConfig noticeBoardConfig() => const DynamicShapeConfig(
-        type: DynamicShapeType.folderTab,
+  static Material4Config noticeBoardConfig() => const Material4Config(
+        type: Material4Type.folderTab,
         anchor: ShapeAnchor.topLeft,
         tabWidth: 70.0,
         tabHeight: 16.0,
@@ -404,7 +404,7 @@ class SchoolShapePresets {
     required String date,
     VoidCallback? onTap,
   }) {
-    return DynamicShapeContainer(
+    return Material4Container(
       config: noticeBoardConfig(),
       color: const Color(0xFFFAF5FF),
       borderColor: const Color(0xFFE9D5FF),
@@ -463,8 +463,8 @@ class SchoolShapePresets {
   // =========================================================================
   // 7. Examination Schedule Preset
   // =========================================================================
-  static DynamicShapeConfig examScheduleConfig() => const DynamicShapeConfig(
-        type: DynamicShapeType.chamferDiagonal,
+  static Material4Config examScheduleConfig() => const Material4Config(
+        type: Material4Type.chamferDiagonal,
         anchor: ShapeAnchor.topRight,
         filletRadius: 14.0,
         borderStyle: BorderStyleType.solid,
@@ -476,7 +476,7 @@ class SchoolShapePresets {
     required String hall,
     required String timing,
   }) {
-    return DynamicShapeContainer(
+    return Material4Container(
       config: examScheduleConfig(),
       color: const Color(0xFFFFF1F2),
       borderColor: const Color(0xFFFECDD3),
@@ -531,8 +531,8 @@ class SchoolShapePresets {
   // =========================================================================
   // 8. Result Card Preset
   // =========================================================================
-  static DynamicShapeConfig resultConfig() => const DynamicShapeConfig(
-        type: DynamicShapeType.squircle,
+  static Material4Config resultConfig() => const Material4Config(
+        type: Material4Type.squircle,
         cornerRadius: 22.0,
         borderStyle: BorderStyleType.rainbow,
       );
@@ -542,7 +542,7 @@ class SchoolShapePresets {
     required String gpa,
     required String status,
   }) {
-    return DynamicShapeContainer(
+    return Material4Container(
       config: resultConfig(),
       color: Colors.white,
       borderWidth: 2.5,
@@ -605,8 +605,8 @@ class SchoolShapePresets {
   // =========================================================================
   // 9. Timetable Slot Preset
   // =========================================================================
-  static DynamicShapeConfig timetableConfig() => const DynamicShapeConfig(
-        type: DynamicShapeType.capsule,
+  static Material4Config timetableConfig() => const Material4Config(
+        type: Material4Type.capsule,
         borderStyle: BorderStyleType.solid,
       );
 
@@ -616,7 +616,7 @@ class SchoolShapePresets {
     required String room,
     bool isCurrent = false,
   }) {
-    return DynamicShapeContainer(
+    return Material4Container(
       config: timetableConfig(),
       color: isCurrent ? const Color(0xFF6366F1) : const Color(0xFFF1F5F9),
       borderColor:
@@ -664,8 +664,8 @@ class SchoolShapePresets {
   // =========================================================================
   // 10. Teacher Profile Preset
   // =========================================================================
-  static DynamicShapeConfig teacherProfileConfig() => const DynamicShapeConfig(
-        type: DynamicShapeType.concaveRounded,
+  static Material4Config teacherProfileConfig() => const Material4Config(
+        type: Material4Type.concaveRounded,
         cornerRadius: 18.0,
         borderStyle: BorderStyleType.neonPulse,
         neonPulseIntensity: 0.9,
@@ -676,7 +676,7 @@ class SchoolShapePresets {
     required String designation,
     required String department,
   }) {
-    return DynamicShapeContainer(
+    return Material4Container(
       config: teacherProfileConfig(),
       color: const Color(0xFF0F172A),
       borderColor: const Color(0xFF38BDF8),

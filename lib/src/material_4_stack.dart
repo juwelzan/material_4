@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 
-import 'dynamic_shape_config.dart';
+import 'material_4_config.dart';
 import 'layout/shape_collision_detector.dart';
 import 'layout/shape_content_protection.dart';
-import 'rendering/dynamic_shape_hit_test.dart';
-import 'rendering/dynamic_shape_interaction.dart';
-import 'rendering/dynamic_shape_multi_child_parent_data.dart';
-import 'rendering/dynamic_shape_multi_child_render_widget.dart';
+import 'rendering/material_4_hit_test.dart';
+import 'rendering/material_4_interaction.dart';
+import 'rendering/material_4_multi_child_parent_data.dart';
+import 'rendering/material_4_multi_child_render_widget.dart';
 
-/// Layout strategy determining how multiple children are positioned inside a dynamic shape.
+/// Layout strategy determining how multiple children are positioned inside a Material 4 shape.
 enum ShapeLayoutStrategy {
   /// Stack layout: children are positioned according to their individual [alignment] or [anchor].
   stack,
@@ -26,8 +26,8 @@ enum ShapeLayoutStrategy {
   adaptive,
 }
 
-/// A ParentDataWidget for configuring layout options of children inside [DynamicShapeStack].
-class ShapeChild extends ParentDataWidget<DynamicShapeMultiChildParentData> {
+/// A ParentDataWidget for configuring layout options of children inside [Material4Stack].
+class ShapeChild extends ParentDataWidget<Material4MultiChildParentData> {
   /// Target alignment within the safe region.
   final AlignmentGeometry? alignment;
 
@@ -153,9 +153,9 @@ class ShapeChild extends ParentDataWidget<DynamicShapeMultiChildParentData> {
 
   @override
   void applyParentData(RenderObject renderObject) {
-    assert(renderObject.parentData is DynamicShapeMultiChildParentData);
+    assert(renderObject.parentData is Material4MultiChildParentData);
     final parentData =
-        renderObject.parentData! as DynamicShapeMultiChildParentData;
+        renderObject.parentData! as Material4MultiChildParentData;
     bool needsLayout = false;
 
     if (parentData.alignment != alignment) {
@@ -214,20 +214,23 @@ class ShapeChild extends ParentDataWidget<DynamicShapeMultiChildParentData> {
   }
 
   @override
-  Type get debugTypicalAncestorWidgetClass =>
-      DynamicShapeMultiChildRenderWidget;
+  Type get debugTypicalAncestorWidgetClass => Material4MultiChildRenderWidget;
 }
 
 /// A shape-aware multi-child layout container.
 ///
 /// Intelligently measures, positions, constrains and protects multiple child widgets
 /// according to the actual generated custom shape geometry, safe regions, and collision policies.
-class DynamicShapeStack extends StatelessWidget {
+
+/// Type alias for [Material4Stack].
+typedef Material4ShapeStack = Material4Stack;
+
+class Material4Stack extends StatelessWidget {
   /// The list of children to lay out inside the shape.
   final List<Widget> children;
 
   /// The dynamic vector shape configuration.
-  final DynamicShapeConfig config;
+  final Material4Config config;
 
   /// Base background fill color.
   final Color? color;
@@ -254,7 +257,7 @@ class DynamicShapeStack extends StatelessWidget {
   final ShapeHitTestBehavior hitTestBehavior;
 
   /// Shape-aware interaction and pointer routing configuration.
-  final DynamicShapeInteraction? interaction;
+  final Material4Interaction? interaction;
 
   /// Granular layer-specific clipping configuration.
   final ShapeClipConfig? clipConfig;
@@ -295,10 +298,10 @@ class DynamicShapeStack extends StatelessWidget {
   /// Accessibility semantic hint.
   final String? semanticHint;
 
-  const DynamicShapeStack({
+  const Material4Stack({
     super.key,
     required this.children,
-    this.config = const DynamicShapeConfig(),
+    this.config = const Material4Config(),
     this.color,
     this.gradient,
     this.borderColor = const Color(0x18000000),
@@ -324,10 +327,10 @@ class DynamicShapeStack extends StatelessWidget {
   });
 
   /// Multi-child container that arranges children in a vertical flow.
-  const DynamicShapeStack.vertical({
+  const Material4Stack.vertical({
     super.key,
     required this.children,
-    this.config = const DynamicShapeConfig(),
+    this.config = const Material4Config(),
     this.color,
     this.gradient,
     this.borderColor = const Color(0x18000000),
@@ -352,10 +355,10 @@ class DynamicShapeStack extends StatelessWidget {
   }) : layoutStrategy = ShapeLayoutStrategy.flowVertical;
 
   /// Multi-child container that arranges children in a horizontal flow.
-  const DynamicShapeStack.horizontal({
+  const Material4Stack.horizontal({
     super.key,
     required this.children,
-    this.config = const DynamicShapeConfig(),
+    this.config = const Material4Config(),
     this.color,
     this.gradient,
     this.borderColor = const Color(0x18000000),
@@ -380,10 +383,10 @@ class DynamicShapeStack extends StatelessWidget {
   }) : layoutStrategy = ShapeLayoutStrategy.flowHorizontal;
 
   /// Multi-child container that anchors children to landmark positions.
-  const DynamicShapeStack.anchor({
+  const Material4Stack.anchor({
     super.key,
     required this.children,
-    this.config = const DynamicShapeConfig(),
+    this.config = const Material4Config(),
     this.color,
     this.gradient,
     this.borderColor = const Color(0x18000000),
@@ -408,10 +411,10 @@ class DynamicShapeStack extends StatelessWidget {
   }) : layoutStrategy = ShapeLayoutStrategy.anchor;
 
   /// Multi-child container that adaptively distributes children across available safe regions.
-  const DynamicShapeStack.adaptive({
+  const Material4Stack.adaptive({
     super.key,
     required this.children,
-    this.config = const DynamicShapeConfig(),
+    this.config = const Material4Config(),
     this.color,
     this.gradient,
     this.borderColor = const Color(0x18000000),
@@ -437,7 +440,7 @@ class DynamicShapeStack extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DynamicShapeMultiChildRenderWidget(
+    return Material4MultiChildRenderWidget(
       config: config,
       color: color,
       gradient: gradient,

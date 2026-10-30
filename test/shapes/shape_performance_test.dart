@@ -1,4 +1,4 @@
-import 'package:dynamic_shape/dynamic_shape.dart';
+import 'package:material_4/material_4.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -14,14 +14,14 @@ void main() {
       'Caches path on initial lookup and returns cached instance on repeat',
       () {
         const testSize = Size(150, 80);
-        const config = DynamicShapeConfig(type: DynamicShapeType.squircle);
+        const config = Material4Config(type: Material4Type.squircle);
 
         expect(cache.currentSize, 0);
 
         final path1 = cache.getOrCreate(
           size: testSize,
           config: config,
-          computePath: () => DynamicShapePathBuilder.buildPath(
+          computePath: () => Material4PathBuilder.buildPath(
             testSize,
             config,
             useCache: false,
@@ -35,7 +35,7 @@ void main() {
         final path2 = cache.getOrCreate(
           size: testSize,
           config: config,
-          computePath: () => DynamicShapePathBuilder.buildPath(
+          computePath: () => Material4PathBuilder.buildPath(
             testSize,
             config,
             useCache: false,
@@ -53,11 +53,11 @@ void main() {
     test(
       'Evicts oldest entry when maxCapacity is exceeded (strict LRU order)',
       () {
-        const configA = DynamicShapeConfig(type: DynamicShapeType.folderTab);
-        const configB = DynamicShapeConfig(type: DynamicShapeType.capsule);
-        const configC = DynamicShapeConfig(type: DynamicShapeType.shield);
-        const configD = DynamicShapeConfig(type: DynamicShapeType.diamond);
-        const configE = DynamicShapeConfig(type: DynamicShapeType.octagon);
+        const configA = Material4Config(type: Material4Type.folderTab);
+        const configB = Material4Config(type: Material4Type.capsule);
+        const configC = Material4Config(type: Material4Type.shield);
+        const configD = Material4Config(type: Material4Type.diamond);
+        const configE = Material4Config(type: Material4Type.octagon);
 
         const size = Size(100, 100);
 
@@ -87,7 +87,7 @@ void main() {
       'clear() resets size and hit counters safely for low-memory events',
       () {
         const size = Size(120, 60);
-        const config = DynamicShapeConfig(type: DynamicShapeType.cloud);
+        const config = Material4Config(type: Material4Type.cloud);
 
         cache.getOrCreate(size: size, config: config, computePath: Path.new);
         expect(cache.currentSize, 1);
@@ -100,18 +100,18 @@ void main() {
       },
     );
 
-    test('DynamicShapePathBuilder defaultCache operates seamlessly', () {
-      DynamicShapePathBuilder.defaultCache.clear();
+    test('Material4PathBuilder defaultCache operates seamlessly', () {
+      Material4PathBuilder.defaultCache.clear();
 
       const size = Size(200, 100);
-      const config = DynamicShapeConfig(type: DynamicShapeType.waveEdge);
+      const config = Material4Config(type: Material4Type.waveEdge);
 
-      final p1 = DynamicShapePathBuilder.buildPath(size, config);
-      final p2 = DynamicShapePathBuilder.buildPath(size, config);
+      final p1 = Material4PathBuilder.buildPath(size, config);
+      final p2 = Material4PathBuilder.buildPath(size, config);
 
       expect(identical(p1, p2), isTrue);
       expect(
-        DynamicShapePathBuilder.defaultCache.hits,
+        Material4PathBuilder.defaultCache.hits,
         greaterThanOrEqualTo(1),
       );
     });

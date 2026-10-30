@@ -1,11 +1,11 @@
-import 'package:dynamic_shape/dynamic_shape.dart';
+import 'package:material_4/material_4.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   const testSize = Size(200.0, 100.0);
 
-  group('DynamicShapeConfig Phase 2 Integration Tests', () {
+  group('Material4Config Phase 2 Integration Tests', () {
     test(
         'Constructs with modern ShapeCorners and backward compatible CornerRadii',
         () {
@@ -16,7 +16,7 @@ void main() {
         bottomRight: const Radius.circular(4),
       );
 
-      final config = DynamicShapeConfig(corners: corners);
+      final config = Material4Config(corners: corners);
 
       expect(config.corners, equals(corners));
       expect(config.resolvedCorners, equals(corners));
@@ -35,7 +35,7 @@ void main() {
         bottomRight: 40,
       );
 
-      const config = DynamicShapeConfig(cornerRadii: radii);
+      const config = Material4Config(cornerRadii: radii);
 
       expect(config.cornerRadii, equals(radii));
       final resolved = config.resolvedCorners;
@@ -56,7 +56,7 @@ void main() {
         stretchOffset: Offset(5, -5),
       );
 
-      const config = DynamicShapeConfig(transform: transform);
+      const config = Material4Config(transform: transform);
 
       expect(config.transform, equals(transform));
       expect(config.resolvedTransform, equals(transform));
@@ -68,7 +68,7 @@ void main() {
 
     test('Legacy rotation, scale, stretch construct valid resolvedTransform',
         () {
-      const config = DynamicShapeConfig(
+      const config = Material4Config(
         rotation: 0.5,
         scaleX: 1.2,
         scaleY: 0.9,
@@ -83,9 +83,9 @@ void main() {
       expect(resolved.hasTransform, isTrue);
     });
 
-    test('Deep equality and hashCode on DynamicShapeConfig', () {
-      const config1 = DynamicShapeConfig(
-        type: DynamicShapeType.smoothRounded,
+    test('Deep equality and hashCode on Material4Config', () {
+      const config1 = Material4Config(
+        type: Material4Type.smoothRounded,
         cornerRadius: 16.0,
         edges: ShapeEdges(
           top: ShapeEdgeConfig.convex(depth: 12.0),
@@ -94,8 +94,8 @@ void main() {
         constraints: ShapeConstraints(minWidth: 10.0, maxWidth: 300.0),
       );
 
-      const config2 = DynamicShapeConfig(
-        type: DynamicShapeType.smoothRounded,
+      const config2 = Material4Config(
+        type: Material4Type.smoothRounded,
         cornerRadius: 16.0,
         edges: ShapeEdges(
           top: ShapeEdgeConfig.convex(depth: 12.0),
@@ -111,10 +111,10 @@ void main() {
       expect(config1 == config3, isFalse);
     });
 
-    test('DynamicShapeConfig full serialization and deserialization round-trip',
+    test('Material4Config full serialization and deserialization round-trip',
         () {
-      const original = DynamicShapeConfig(
-        type: DynamicShapeType.speechBubble,
+      const original = Material4Config(
+        type: Material4Type.speechBubble,
         cornerRadius: 18.0,
         transform: ShapeTransform(rotation: 0.1, scaleX: 1.1),
         constraints: ShapeConstraints(minWidth: 20, minHeight: 20),
@@ -134,7 +134,7 @@ void main() {
       );
 
       final json = original.toJson();
-      final restored = DynamicShapeConfig.fromJson(json);
+      final restored = Material4Config.fromJson(json);
 
       expect(restored.type, original.type);
       expect(restored.cornerRadius, original.cornerRadius);
@@ -146,11 +146,11 @@ void main() {
     });
   });
 
-  group('DynamicShapePathBuilder Phase 2 Geometry Tests', () {
+  group('Material4PathBuilder Phase 2 Geometry Tests', () {
     test(
         'Builds custom 4-edge shape with straight, convex, concave, wave, zigzag',
         () {
-      const config = DynamicShapeConfig(
+      const config = Material4Config(
         edges: ShapeEdges(
           top: ShapeEdgeConfig.convex(depth: 15.0),
           right: ShapeEdgeConfig.zigzag(toothWidth: 12.0, depth: 6.0),
@@ -159,7 +159,7 @@ void main() {
         ),
       );
 
-      final path = DynamicShapePathBuilder.buildPath(testSize, config);
+      final path = Material4PathBuilder.buildPath(testSize, config);
       expect(path, isNotNull);
       final bounds = path.getBounds();
       expect(bounds.isEmpty, isFalse);
@@ -168,7 +168,7 @@ void main() {
     });
 
     test('Builds shape with edge CustomBezier segment', () {
-      const config = DynamicShapeConfig(
+      const config = Material4Config(
         edges: ShapeEdges(
           top: ShapeEdgeConfig.customBezier(
             BezierSegmentConfig(
@@ -181,13 +181,13 @@ void main() {
         ),
       );
 
-      final path = DynamicShapePathBuilder.buildPath(testSize, config);
+      final path = Material4PathBuilder.buildPath(testSize, config);
       expect(path.getBounds().isEmpty, isFalse);
     });
 
     test('Builds shape using declarative CustomBezierConfig', () {
-      const config = DynamicShapeConfig(
-        type: DynamicShapeType.customBezier,
+      const config = Material4Config(
+        type: Material4Type.customBezier,
         bezierConfig: CustomBezierConfig(
           segments: [
             BezierSegmentConfig(
@@ -206,14 +206,14 @@ void main() {
         ),
       );
 
-      final path = DynamicShapePathBuilder.buildPath(testSize, config);
+      final path = Material4PathBuilder.buildPath(testSize, config);
       expect(path.getBounds().isEmpty, isFalse);
     });
 
     test(
         'Multi-notch placement across all four edges with collision evaluation',
         () {
-      const config = DynamicShapeConfig(
+      const config = Material4Config(
         cornerRadius: 12.0,
         notches: [
           ShapeNotch(
@@ -247,12 +247,12 @@ void main() {
         ],
       );
 
-      final path = DynamicShapePathBuilder.buildPath(testSize, config);
+      final path = Material4PathBuilder.buildPath(testSize, config);
       expect(path.getBounds().isEmpty, isFalse);
     });
 
     test('Respects ShapeConstraints clampSize during path generation', () {
-      const config = DynamicShapeConfig(
+      const config = Material4Config(
         constraints: ShapeConstraints(
           minWidth: 100.0,
           maxWidth: 150.0,
@@ -262,7 +262,7 @@ void main() {
       );
 
       // Pass size larger than max constraints
-      final pathLarge = DynamicShapePathBuilder.buildPath(
+      final pathLarge = Material4PathBuilder.buildPath(
         const Size(500.0, 400.0),
         config,
       );
@@ -271,7 +271,7 @@ void main() {
       expect(boundsLarge.height, closeTo(80.0, 1.0));
 
       // Pass size smaller than min constraints
-      final pathSmall = DynamicShapePathBuilder.buildPath(
+      final pathSmall = Material4PathBuilder.buildPath(
         const Size(20.0, 20.0),
         config,
       );
@@ -285,10 +285,10 @@ void main() {
         () {
       final cache = ShapePathCache(maxCapacity: 3);
 
-      const configA = DynamicShapeConfig(
+      const configA = Material4Config(
         edges: ShapeEdges(top: ShapeEdgeConfig.convex(depth: 10)),
       );
-      const configB = DynamicShapeConfig(
+      const configB = Material4Config(
         edges: ShapeEdges(top: ShapeEdgeConfig.convex(depth: 20)),
       );
 
@@ -331,7 +331,7 @@ void main() {
       ];
 
       for (final preset in presets) {
-        final path = DynamicShapePathBuilder.buildPath(testSize, preset);
+        final path = Material4PathBuilder.buildPath(testSize, preset);
         expect(path.getBounds().isEmpty, isFalse,
             reason: 'Failed for ${preset.type}');
       }

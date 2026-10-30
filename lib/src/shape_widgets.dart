@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'dynamic_shape_config.dart';
-import 'dynamic_shape_container.dart';
+import 'material_4_config.dart';
+import 'material_4_container.dart';
 import 'shape_smart_layout.dart';
 
 // =========================================================================
@@ -14,7 +14,7 @@ class AnimatedShapeCard extends StatelessWidget {
   final Widget title;
   final Widget? subtitle;
   final Widget? trailing;
-  final DynamicShapeConfig config;
+  final Material4Config config;
   final Color? color;
   final Gradient? gradient;
   final Color borderColor;
@@ -30,7 +30,7 @@ class AnimatedShapeCard extends StatelessWidget {
     required this.title,
     this.subtitle,
     this.trailing,
-    this.config = const DynamicShapeConfig(),
+    this.config = const Material4Config(),
     this.color,
     this.gradient,
     this.borderColor = const Color(0x1F1A1A1A),
@@ -43,7 +43,7 @@ class AnimatedShapeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DynamicShapeContainer(
+    return Material4Container(
       config: config,
       color: color,
       gradient: gradient,
@@ -87,11 +87,11 @@ class AnimatedShapeCard extends StatelessWidget {
 // 2. ShapeButton
 // =========================================================================
 
-/// Accessible touch-compliant button wrapped in any dynamic shape contour.
+/// Accessible touch-compliant button wrapped in any Material 4 shape contour.
 class ShapeButton extends StatelessWidget {
   final Widget child;
   final VoidCallback? onPressed;
-  final DynamicShapeConfig config;
+  final Material4Config config;
   final Color? color;
   final Gradient? gradient;
   final Color borderColor;
@@ -103,7 +103,7 @@ class ShapeButton extends StatelessWidget {
     super.key,
     required this.child,
     this.onPressed,
-    this.config = const DynamicShapeConfig(type: DynamicShapeType.capsule),
+    this.config = const Material4Config(type: Material4Type.capsule),
     this.color = const Color(0xFF6C5CE7),
     this.gradient,
     this.borderColor = Colors.transparent,
@@ -119,7 +119,7 @@ class ShapeButton extends StatelessWidget {
         minWidth: ShapeSmartLayout.minAccessibleTouchTarget,
         minHeight: ShapeSmartLayout.minAccessibleTouchTarget,
       ),
-      child: DynamicShapeContainer(
+      child: Material4Container(
         config: config,
         color: color,
         gradient: gradient,
@@ -155,7 +155,7 @@ class ShapeAvatar extends StatelessWidget {
   final ImageProvider? image;
   final Widget? fallback;
   final double size;
-  final DynamicShapeConfig config;
+  final Material4Config config;
   final Color borderColor;
   final double borderWidth;
   final bool isOnline;
@@ -165,8 +165,8 @@ class ShapeAvatar extends StatelessWidget {
     this.image,
     this.fallback,
     this.size = 56.0,
-    this.config = const DynamicShapeConfig(
-      type: DynamicShapeType.squircle,
+    this.config = const Material4Config(
+      type: Material4Type.squircle,
       cornerRadius: 16.0,
     ),
     this.borderColor = Colors.white,
@@ -179,7 +179,7 @@ class ShapeAvatar extends StatelessWidget {
     Widget avatarContent = SizedBox(
       width: size,
       height: size,
-      child: DynamicShapeContainer(
+      child: Material4Container(
         config: config,
         width: size,
         height: size,
@@ -222,12 +222,12 @@ class ShapeAvatar extends StatelessWidget {
 // 4. ShapeBadge
 // =========================================================================
 
-/// High-visibility status or count badge clipped into a dynamic shape.
+/// High-visibility status or count badge clipped into a Material 4 shape.
 class ShapeBadge extends StatelessWidget {
   final String label;
   final Color backgroundColor;
   final Color textColor;
-  final DynamicShapeConfig config;
+  final Material4Config config;
   final double fontSize;
 
   const ShapeBadge({
@@ -235,13 +235,13 @@ class ShapeBadge extends StatelessWidget {
     required this.label,
     this.backgroundColor = const Color(0xFFFF4757),
     this.textColor = Colors.white,
-    this.config = const DynamicShapeConfig(type: DynamicShapeType.capsule),
+    this.config = const Material4Config(type: Material4Type.capsule),
     this.fontSize = 11.0,
   });
 
   @override
   Widget build(BuildContext context) {
-    return DynamicShapeContainer(
+    return Material4Container(
       config: config,
       color: backgroundColor,
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -261,14 +261,14 @@ class ShapeBadge extends StatelessWidget {
 // 5. ShapeProgress
 // =========================================================================
 
-/// Dynamic shape progress bar with animated fluid fill.
+/// Material 4 shape progress bar with animated fluid fill.
 class ShapeProgress extends StatelessWidget {
   final double value; // 0.0 to 1.0
   final double height;
   final Color trackColor;
   final Color progressColor;
   final Gradient? progressGradient;
-  final DynamicShapeConfig config;
+  final Material4Config config;
 
   const ShapeProgress({
     super.key,
@@ -277,7 +277,7 @@ class ShapeProgress extends StatelessWidget {
     this.trackColor = const Color(0x1F000000),
     this.progressColor = const Color(0xFF6C5CE7),
     this.progressGradient,
-    this.config = const DynamicShapeConfig(type: DynamicShapeType.capsule),
+    this.config = const Material4Config(type: Material4Type.capsule),
   });
 
   @override
@@ -290,7 +290,7 @@ class ShapeProgress extends StatelessWidget {
         final fillWidth = totalWidth * clamped;
 
         return ClipPath(
-          clipper: DynamicShapeClipper(config: config),
+          clipper: Material4Clipper(config: config),
           child: Container(
             width: totalWidth,
             height: height,
@@ -321,14 +321,14 @@ class ShapeProgress extends StatelessWidget {
 class ShapeDivider extends StatelessWidget {
   final double height;
   final Color color;
-  final DynamicShapeType crestShape;
+  final Material4Type crestShape;
   final double crestSize;
 
   const ShapeDivider({
     super.key,
     this.height = 1.5,
     this.color = const Color(0x221E1E24),
-    this.crestShape = DynamicShapeType.diamond,
+    this.crestShape = Material4Type.diamond,
     this.crestSize = 14.0,
   });
 
@@ -341,8 +341,8 @@ class ShapeDivider extends StatelessWidget {
         ),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10),
-          child: DynamicShapeContainer(
-            config: DynamicShapeConfig(type: crestShape),
+          child: Material4Container(
+            config: Material4Config(type: crestShape),
             width: crestSize,
             height: crestSize,
             color: color,
@@ -366,7 +366,7 @@ class ShapeAppBar extends StatelessWidget implements PreferredSizeWidget {
   final List<Widget>? actions;
   final Widget? leading;
   final Color backgroundColor;
-  final DynamicShapeConfig config;
+  final Material4Config config;
   final double elevation;
 
   const ShapeAppBar({
@@ -375,8 +375,8 @@ class ShapeAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.actions,
     this.leading,
     this.backgroundColor = Colors.white,
-    this.config = const DynamicShapeConfig(
-      type: DynamicShapeType.waveEdge,
+    this.config = const Material4Config(
+      type: Material4Type.waveEdge,
       anchor: ShapeAnchor.bottomCenter,
       waveAmplitude: 6.0,
       waveCount: 3.0,
@@ -391,7 +391,7 @@ class ShapeAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     final topPadding = MediaQuery.of(context).padding.top;
 
-    return DynamicShapeContainer(
+    return Material4Container(
       config: config,
       color: backgroundColor,
       shadows: elevation > 0
@@ -436,7 +436,7 @@ class ShapeNavigationBar extends StatelessWidget {
   final int currentIndex;
   final ValueChanged<int> onTap;
   final List<NavigationDestination> destinations;
-  final DynamicShapeConfig config;
+  final Material4Config config;
   final Color backgroundColor;
 
   const ShapeNavigationBar({
@@ -444,8 +444,8 @@ class ShapeNavigationBar extends StatelessWidget {
     required this.currentIndex,
     required this.onTap,
     required this.destinations,
-    this.config = const DynamicShapeConfig(
-      type: DynamicShapeType.waveEdge,
+    this.config = const Material4Config(
+      type: Material4Type.waveEdge,
       anchor: ShapeAnchor.topCenter,
       waveAmplitude: 6.0,
     ),
@@ -456,7 +456,7 @@ class ShapeNavigationBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final bottomPadding = MediaQuery.of(context).padding.bottom;
 
-    return DynamicShapeContainer(
+    return Material4Container(
       config: config,
       color: backgroundColor,
       shadows: [
@@ -516,14 +516,14 @@ class ShapeNavigationBar extends StatelessWidget {
 /// Modal bottom sheet container styled with fluid top contour.
 class ShapeBottomSheet extends StatelessWidget {
   final Widget child;
-  final DynamicShapeConfig config;
+  final Material4Config config;
   final Color backgroundColor;
 
   const ShapeBottomSheet({
     super.key,
     required this.child,
-    this.config = const DynamicShapeConfig(
-      type: DynamicShapeType.folderTab,
+    this.config = const Material4Config(
+      type: Material4Type.folderTab,
       anchor: ShapeAnchor.topCenter,
       tabWidth: 60.0,
       tabHeight: 8.0,
@@ -533,7 +533,7 @@ class ShapeBottomSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DynamicShapeContainer(
+    return Material4Container(
       config: config,
       color: backgroundColor,
       width: double.infinity,
@@ -555,7 +555,7 @@ class ShapeDialog extends StatelessWidget {
   final Widget? title;
   final Widget? content;
   final List<Widget>? actions;
-  final DynamicShapeConfig config;
+  final Material4Config config;
   final Color backgroundColor;
 
   const ShapeDialog({
@@ -563,8 +563,8 @@ class ShapeDialog extends StatelessWidget {
     this.title,
     this.content,
     this.actions,
-    this.config = const DynamicShapeConfig(
-      type: DynamicShapeType.asymmetricCard,
+    this.config = const Material4Config(
+      type: Material4Type.asymmetricCard,
       cornerRadii: CornerRadii(
         topLeft: 32,
         topRight: 12,
@@ -580,7 +580,7 @@ class ShapeDialog extends StatelessWidget {
     return Dialog(
       backgroundColor: Colors.transparent,
       elevation: 0,
-      child: DynamicShapeContainer(
+      child: Material4Container(
         config: config,
         color: backgroundColor,
         shadows: [
@@ -651,9 +651,9 @@ class ShapeTooltip extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        DynamicShapeContainer(
-          config: DynamicShapeConfig(
-            type: DynamicShapeType.speechBubble,
+        Material4Container(
+          config: Material4Config(
+            type: Material4Type.speechBubble,
             anchor: pointerAnchor,
             speechBubbleTailWidth: 12.0,
             speechBubbleTailHeight: 8.0,
@@ -681,10 +681,10 @@ class ShapeTooltip extends StatelessWidget {
 // 12. ShapeImage
 // =========================================================================
 
-/// Image widget clipped to any dynamic shape with aspect ratio and border.
+/// Image widget clipped to any Material 4 shape with aspect ratio and border.
 class ShapeImage extends StatelessWidget {
   final ImageProvider image;
-  final DynamicShapeConfig config;
+  final Material4Config config;
   final double? width;
   final double? height;
   final BoxFit fit;
@@ -694,7 +694,7 @@ class ShapeImage extends StatelessWidget {
   const ShapeImage({
     super.key,
     required this.image,
-    this.config = const DynamicShapeConfig(type: DynamicShapeType.squircle),
+    this.config = const Material4Config(type: Material4Type.squircle),
     this.width,
     this.height,
     this.fit = BoxFit.cover,
@@ -704,7 +704,7 @@ class ShapeImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DynamicShapeContainer(
+    return Material4Container(
       config: config,
       width: width,
       height: height,

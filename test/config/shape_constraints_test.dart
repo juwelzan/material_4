@@ -1,8 +1,8 @@
 import 'dart:ui';
-import 'package:dynamic_shape/src/config/shape_corners.dart';
-import 'package:dynamic_shape/src/config/shape_constraints.dart';
-import 'package:dynamic_shape/src/config/shape_edge_config.dart';
-import 'package:dynamic_shape/src/config/shape_notch.dart';
+import 'package:material_4/src/config/shape_corners.dart';
+import 'package:material_4/src/config/shape_constraints.dart';
+import 'package:material_4/src/config/shape_edge_config.dart';
+import 'package:material_4/src/config/shape_notch.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

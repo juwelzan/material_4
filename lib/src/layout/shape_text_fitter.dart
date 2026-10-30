@@ -35,7 +35,7 @@ class TextFitResult {
       'TextFitResult(fontSize: $fontSize, didFit: $didFit, lines: $lineCount, size: $renderedSize)';
 }
 
-/// Smart text layout, measurement, and accessible auto-fitting engine for dynamic shapes.
+/// Smart text layout, measurement, and accessible auto-fitting engine for Material 4 shapes.
 ///
 /// Ensures text (including complex scripts such as Bengali and RTL Arabic/Hebrew)
 /// fits comfortably inside safe shape bounds without accidental clipping,

@@ -1,4 +1,4 @@
-# Flutter Next-Generation Universal Dynamic Shape Engine: Architectural Report
+# Flutter Next-Generation Universal Material 4 Engine: Architectural Report
 
 > **Engine Status**: Production-Ready • 100% Backwards Compatible • 50 Unit & Widget Tests Passing (0 Warnings, 0 Errors)  
 > **Target Platforms**: Android (optimized for 500MB–1GB RAM low-end devices), iOS, Web, macOS, Windows, Linux  
@@ -8,14 +8,14 @@
 
 ## 1. Executive Summary & Architectural Overview
 
-The **Next-Generation Universal Dynamic Shape Engine** provides an ultra-modular, hardware-accelerated rendering and layout framework for Flutter. It eliminates the need for manual `CustomPainter` and `CustomClipper` authoring while offering a parameter-driven architecture for arbitrary vector shapes, organic contours, borders, physics animations, background effects, and collision-free layouts.
+The **Next-Generation Universal Material 4 Engine** provides an ultra-modular, hardware-accelerated rendering and layout framework for Flutter. It eliminates the need for manual `CustomPainter` and `CustomClipper` authoring while offering a parameter-driven architecture for arbitrary vector shapes, organic contours, borders, physics animations, background effects, and collision-free layouts.
 
 ### 1.1 Complete Modular File Architecture
 
 ```
 lib/core/shapes/
-├── dynamic_shape_config.dart        # Immutable models, 28 shape types, 20 borders, JSON serialization
-├── dynamic_shape_path_builder.dart  # Geometry engine, Bezier mathematical path construction, matrix transforms
+├── material_4_config.dart        # Immutable models, 28 shape types, 20 borders, JSON serialization
+├── material_4_path_builder.dart  # Geometry engine, Bezier mathematical path construction, matrix transforms
 ├── shape_path_cache.dart            # LRU Path Cache with bounded memory capacity & strict eviction limits
 ├── shape_border_painter.dart        # Next-Gen border renderer (neon, metallic, rainbow, embossed, hand-drawn)
 ├── shape_background_renderer.dart    # Next-Gen background renderer (mesh gradient, waves, aurora, particles)
@@ -25,8 +25,8 @@ lib/core/shapes/
 ├── shape_widgets.dart               # 13 high-level widgets (buttons, avatars, badges, app bars, dialogs, nav bars)
 ├── shape_dev_tools.dart             # Live studio playground, preset gallery, code generator (toJson/toDartCode)
 ├── school_shape_presets.dart        # 10 production-grade school management system presets
-├── dynamic_shape_container.dart     # Unified container widget, custom painter & clipper integration
-├── animated_dynamic_shape.dart      # Implicitly animated container widget
+├── material_4_container.dart     # Unified container widget, custom painter & clipper integration
+├── animated_material_4.dart      # Implicitly animated container widget
 └── shape_pattern.dart               # Procedural canvas pattern textures (dots, stripes, grid, waves)
 ```
 
@@ -38,7 +38,7 @@ All shapes automatically adapt to container dimensions and support independent c
 
 ### 2.1 Complete Geometry Matrix
 
-| Geometry (`DynamicShapeType`) | Contour Mathematics | Target Application |
+| Geometry (`Material4Type`) | Contour Mathematics | Target Application |
 | :--- | :--- | :--- |
 | **`folderTab`** | Raised elevation tab with continuous convex and concave fillet arcs. | Academic record tabs, subject notebooks, file organization. |
 | **`notchedBadge`** | Inward or outward cavity carved along top/bottom edges. | Countdown cards, timetable progress docking ("85% Done"). |
@@ -152,16 +152,16 @@ Implemented in `ShapeSmartLayout` and `ShapeSafeArea`:
 
 1. **`AnimatedShapeCard`**: Morphable card with leading, title, subtitle, and trailing accessory slots.
 2. **`ShapeButton`**: Touch-compliant button with tactile spring click, elevation, and loading indicator.
-3. **`ShapeAvatar`**: Profile picture clipped to any dynamic shape with online indicator ring.
+3. **`ShapeAvatar`**: Profile picture clipped to any Material 4 shape with online indicator ring.
 4. **`ShapeBadge`**: High-visibility pill badge for progress or notifications.
-5. **`ShapeProgress`**: Dynamic shape progress bar with fluid liquid fill.
+5. **`ShapeProgress`**: Material 4 shape progress bar with fluid liquid fill.
 6. **`ShapeDivider`**: Section divider featuring an ornamental center crest.
 7. **`ShapeAppBar`**: Top app bar with organic fluid wave bottom contour.
 8. **`ShapeNavigationBar`**: Bottom navigation bar with fluid wave docked active indicator.
 9. **`ShapeBottomSheet`**: Modal bottom sheet container styled with a fluid top handle contour.
 10. **`ShapeDialog`**: Alert dialog framed with expressive asymmetric geometry.
 11. **`ShapeTooltip`**: Speech bubble tooltip pointing directly to target widgets.
-12. **`ShapeImage`**: Image clipped to any dynamic shape with aspect ratio and border styling.
+12. **`ShapeImage`**: Image clipped to any Material 4 shape with aspect ratio and border styling.
 13. **`ShapeContainerGroup`**: Coordinated flex row/column container for interlocking shapes.
 
 ---
@@ -182,7 +182,7 @@ Implemented in `shape_dev_tools.dart`:
 - **`ShapePlayground`**: Interactive studio with live dropdowns for all 28 shapes, 20 borders, corner radius sliders, and light/dark theme toggles.
 - **`PresetGallery`**: Visual grid displaying all presets with live preview.
 - **`ShapeCodeGenerator`**: Generates clean, ready-to-paste Dart configuration code.
-- **JSON Serialization**: Full round-trip `toJson()` and `fromJson()` support on `DynamicShapeConfig`, `CornerRadii`, and `ShapeNotch`.
+- **JSON Serialization**: Full round-trip `toJson()` and `fromJson()` support on `Material4Config`, `CornerRadii`, and `ShapeNotch`.
 
 ---
 

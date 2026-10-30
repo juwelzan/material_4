@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/painting.dart';
 import 'package:vector_math/vector_math_64.dart' as vm;
 
-/// Immutable geometric transformation configuration for dynamic shapes.
+/// Immutable geometric transformation configuration for Material 4 shapes.
 ///
 /// ### Transformation Composition Order:
 /// 1. **Pivot Translation**: Moves shape coordinate space to the designated [origin]

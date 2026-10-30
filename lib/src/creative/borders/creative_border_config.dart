@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../dynamic_shape_config.dart';
+import '../../material_4_config.dart';
 
 /// Available creative border rendering styles.
 enum CreativeBorderStyle {

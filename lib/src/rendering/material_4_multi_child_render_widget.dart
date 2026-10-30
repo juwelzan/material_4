@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 
-import '../dynamic_shape_config.dart';
-import '../dynamic_shape_stack.dart';
 import '../layout/shape_collision_detector.dart';
 import '../layout/shape_content_protection.dart';
-import 'dynamic_shape_hit_test.dart';
-import 'dynamic_shape_interaction.dart';
-import 'dynamic_shape_multi_child_render_object.dart';
+import '../material_4_config.dart';
+import '../material_4_stack.dart';
+import 'material_4_hit_test.dart';
+import 'material_4_interaction.dart';
+import 'material_4_multi_child_render_object.dart';
 
-/// Multi-child RenderObjectWidget hosting the [RenderMultiChildDynamicShape] engine.
-class DynamicShapeMultiChildRenderWidget extends MultiChildRenderObjectWidget {
-  final DynamicShapeConfig config;
+/// Multi-child RenderObjectWidget hosting the [RenderMultiChildMaterial4] engine.
+class Material4MultiChildRenderWidget extends MultiChildRenderObjectWidget {
+  final Material4Config config;
   final Color? color;
   final Gradient? gradient;
   final Color borderColor;
@@ -19,7 +19,7 @@ class DynamicShapeMultiChildRenderWidget extends MultiChildRenderObjectWidget {
   final Clip clipBehavior;
   final ShapeContentProtection contentProtection;
   final ShapeHitTestBehavior hitTestBehavior;
-  final DynamicShapeInteraction? interaction;
+  final Material4Interaction? interaction;
   final ShapeClipConfig? clipConfig;
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
@@ -35,7 +35,7 @@ class DynamicShapeMultiChildRenderWidget extends MultiChildRenderObjectWidget {
   final String? semanticLabel;
   final String? semanticHint;
 
-  const DynamicShapeMultiChildRenderWidget({
+  const Material4MultiChildRenderWidget({
     super.key,
     required this.config,
     this.color,
@@ -65,8 +65,8 @@ class DynamicShapeMultiChildRenderWidget extends MultiChildRenderObjectWidget {
   });
 
   @override
-  RenderMultiChildDynamicShape createRenderObject(BuildContext context) {
-    return RenderMultiChildDynamicShape(
+  RenderMultiChildMaterial4 createRenderObject(BuildContext context) {
+    return RenderMultiChildMaterial4(
       config: config,
       color: color,
       gradient: gradient,
@@ -97,7 +97,7 @@ class DynamicShapeMultiChildRenderWidget extends MultiChildRenderObjectWidget {
 
   @override
   void updateRenderObject(
-      BuildContext context, RenderMultiChildDynamicShape renderObject) {
+      BuildContext context, RenderMultiChildMaterial4 renderObject) {
     renderObject
       ..config = config
       ..color = color

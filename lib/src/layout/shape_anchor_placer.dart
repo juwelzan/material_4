@@ -1,6 +1,6 @@
 import 'package:flutter/rendering.dart';
 
-import '../dynamic_shape_config.dart';
+import '../material_4_config.dart';
 
 /// Pixel coordinate resolver for semantic anchors on dynamic vector shapes.
 ///
@@ -13,7 +13,7 @@ class ShapeAnchorPlacer {
   static Offset resolveAnchorPoint({
     required Size size,
     required ShapeAnchor anchor,
-    DynamicShapeConfig config = const DynamicShapeConfig(),
+    Material4Config config = const Material4Config(),
     TextDirection textDirection = TextDirection.ltr,
   }) {
     if (size.width <= 0 || size.height <= 0) return Offset.zero;
@@ -87,7 +87,7 @@ class ShapeAnchorPlacer {
   /// Calculates the dock center for a shape tab (folder tab, side tab).
   static Offset resolveTabCenter({
     required Size size,
-    required DynamicShapeConfig config,
+    required Material4Config config,
     TextDirection textDirection = TextDirection.ltr,
   }) {
     final isRtl = textDirection == TextDirection.rtl;
@@ -125,7 +125,7 @@ class ShapeAnchorPlacer {
     required Size childSize,
     required ShapeAnchor anchor,
     EdgeInsets margin = EdgeInsets.zero,
-    DynamicShapeConfig config = const DynamicShapeConfig(),
+    Material4Config config = const Material4Config(),
     TextDirection textDirection = TextDirection.ltr,
   }) {
     final point = resolveAnchorPoint(

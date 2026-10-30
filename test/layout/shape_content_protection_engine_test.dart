@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:dynamic_shape/dynamic_shape.dart';
+import 'package:material_4/material_4.dart';
 
 void main() {
   group('Shape-Aware Content Protection Engine Tests', () {
@@ -8,17 +8,17 @@ void main() {
         '1. Long text and multi-line text remain visible without clipping or overflow',
         (tester) async {
       const longTitle =
-          'Universal Dynamic Shape Engine ensures that long titles and descriptive sentences wrap naturally without being cut off by custom organic borders, cutouts or notches.';
+          'Universal Material 4 Engine ensures that long titles and descriptive sentences wrap naturally without being cut off by custom organic borders, cutouts or notches.';
 
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
             body: Center(
-              child: DynamicShapeContainer(
+              child: Material4Container(
                 width: 320,
                 height: 180,
-                config: const DynamicShapeConfig(
-                  type: DynamicShapeType.speechBubble,
+                config: const Material4Config(
+                  type: Material4Type.speechBubble,
                   speechBubbleTailHeight: 20.0,
                   anchor: ShapeAnchor.bottomLeft,
                 ),
@@ -33,7 +33,7 @@ void main() {
         ),
       );
 
-      expect(find.byType(DynamicShapeRenderWidget), findsOneWidget);
+      expect(find.byType(Material4RenderWidget), findsOneWidget);
       expect(find.text(longTitle), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
@@ -44,11 +44,11 @@ void main() {
         MaterialApp(
           home: Scaffold(
             body: Center(
-              child: DynamicShapeContainer(
+              child: Material4Container(
                 width: 140,
                 height: 140,
-                config: const DynamicShapeConfig(
-                  type: DynamicShapeType.diamond,
+                config: const Material4Config(
+                  type: Material4Type.diamond,
                 ),
                 contentProtection: const ShapeContentProtection.strict(),
                 child: const Icon(
@@ -66,8 +66,7 @@ void main() {
       expect(iconFinder, findsOneWidget);
 
       final iconBox = tester.getRect(iconFinder);
-      final containerBox =
-          tester.getRect(find.byType(DynamicShapeRenderWidget));
+      final containerBox = tester.getRect(find.byType(Material4RenderWidget));
 
       // Icon must be centered within container boundaries
       expect(iconBox.left, greaterThan(containerBox.left));
@@ -83,11 +82,11 @@ void main() {
         MaterialApp(
           home: Scaffold(
             body: Center(
-              child: DynamicShapeContainer(
+              child: Material4Container(
                 width: 200,
                 height: 160,
-                config: const DynamicShapeConfig(
-                  type: DynamicShapeType.scallopedPetal,
+                config: const Material4Config(
+                  type: Material4Type.scallopedPetal,
                   petalCount: 12,
                 ),
                 child: Container(
@@ -106,8 +105,7 @@ void main() {
 
       final imageBox =
           tester.getRect(find.byKey(const ValueKey('inner_image_box')));
-      final containerBox =
-          tester.getRect(find.byType(DynamicShapeRenderWidget));
+      final containerBox = tester.getRect(find.byType(Material4RenderWidget));
 
       expect(imageBox.left, greaterThanOrEqualTo(containerBox.left));
       expect(imageBox.right, lessThanOrEqualTo(containerBox.right));
@@ -117,7 +115,7 @@ void main() {
     });
 
     test('4. Badges do not enter inward notches & children do not collide', () {
-      const config = DynamicShapeConfig(
+      const config = Material4Config(
         notches: [
           ShapeNotch(
             edge: ShapeEdge.top,
@@ -181,7 +179,7 @@ void main() {
       const size = Size(200, 200);
 
       // A. Organic Blob
-      const blobConfig = DynamicShapeConfig(type: DynamicShapeType.organicBlob);
+      const blobConfig = Material4Config(type: Material4Type.organicBlob);
       final blobBounds = ShapeSafeRegion.computeInscribedBounds(
         size: size,
         config: blobConfig,
@@ -190,12 +188,12 @@ void main() {
       expect(blobBounds.width, greaterThan(50));
       expect(blobBounds.height, greaterThan(50));
 
-      final blobPath = DynamicShapePathBuilder.buildPath(size, blobConfig);
+      final blobPath = Material4PathBuilder.buildPath(size, blobConfig);
       // Inscribed center must be strictly inside the blob path
       expect(blobPath.contains(blobBounds.center), isTrue);
 
       // B. Custom Bezier Lens
-      final bezierConfig = DynamicShapeConfig.customBezier(
+      final bezierConfig = Material4Config.customBezier(
         builder: (s) => Path()
           ..moveTo(0, s.height / 2)
           ..quadraticBezierTo(s.width / 2, 0, s.width, s.height / 2)
@@ -207,7 +205,7 @@ void main() {
         size: size,
         config: bezierConfig,
       );
-      final bezierPath = DynamicShapePathBuilder.buildPath(size, bezierConfig);
+      final bezierPath = Material4PathBuilder.buildPath(size, bezierConfig);
 
       expect(bezierPath.contains(bezierBounds.center), isTrue);
     });
@@ -227,11 +225,10 @@ void main() {
               child: Column(
                 children: [
                   // Bengali LTR
-                  DynamicShapeContainer(
+                  Material4Container(
                     width: 340,
                     height: 100,
-                    config: const DynamicShapeConfig(
-                        type: DynamicShapeType.waveEdge),
+                    config: const Material4Config(type: Material4Type.waveEdge),
                     child: const Text(
                       bengaliText,
                       style: TextStyle(fontSize: 14),
@@ -241,11 +238,11 @@ void main() {
                   // Arabic RTL
                   Directionality(
                     textDirection: TextDirection.rtl,
-                    child: DynamicShapeContainer(
+                    child: Material4Container(
                       width: 340,
                       height: 100,
-                      config: const DynamicShapeConfig(
-                          type: DynamicShapeType.asymmetricCard),
+                      config: const Material4Config(
+                          type: Material4Type.asymmetricCard),
                       child: const Text(
                         arabicText,
                         style: TextStyle(fontSize: 14),
@@ -265,8 +262,8 @@ void main() {
     });
 
     test('7. Dynamic resizing recalculates safe regions cleanly', () {
-      const config = DynamicShapeConfig(
-        type: DynamicShapeType.speechBubble,
+      const config = Material4Config(
+        type: Material4Type.speechBubble,
         speechBubbleTailHeight: 24.0,
         anchor: ShapeAnchor.bottomRight,
       );
@@ -303,7 +300,7 @@ void main() {
         MaterialApp(
           home: Scaffold(
             body: Center(
-              child: DynamicShapeContainer.withMode(
+              child: Material4Container.withMode(
                 mode: ShapeContentMode.visibleOverflow,
                 width: 150,
                 height: 80,
@@ -331,12 +328,12 @@ void main() {
         MaterialApp(
           home: Scaffold(
             body: Center(
-              child: DynamicShapeContainer.withMode(
+              child: Material4Container.withMode(
                 mode: ShapeContentMode.strict,
                 width: 200,
                 height: 100,
-                config: const DynamicShapeConfig(
-                  type: DynamicShapeType.capsule,
+                config: const Material4Config(
+                  type: Material4Type.capsule,
                 ),
                 child: const Text('Strictly Protected Content'),
               ),
@@ -345,8 +342,7 @@ void main() {
         ),
       );
 
-      final containerBox =
-          tester.getRect(find.byType(DynamicShapeRenderWidget));
+      final containerBox = tester.getRect(find.byType(Material4RenderWidget));
       final textBox = tester.getRect(find.text('Strictly Protected Content'));
 
       // Child is strictly within container
@@ -360,8 +356,8 @@ void main() {
     test('10. All 28 presets generate valid, non-negative, finite safe insets',
         () {
       const size = Size(240, 140);
-      for (final type in DynamicShapeType.values) {
-        final config = DynamicShapeConfig(type: type);
+      for (final type in Material4Type.values) {
+        final config = Material4Config(type: type);
         final insets = ShapeSafeRegion.computeSafeInsets(
           size: size,
           config: config,
@@ -393,8 +389,7 @@ void main() {
                 width: 300,
                 height: 100,
                 child: ShapeSmartContent(
-                  config: const DynamicShapeConfig(
-                      type: DynamicShapeType.folderTab),
+                  config: const Material4Config(type: Material4Type.folderTab),
                   leading: const Icon(Icons.star, key: ValueKey('smart_star')),
                   title: const Text('Smart Slot Title',
                       key: ValueKey('smart_title')),

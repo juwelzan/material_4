@@ -1,6 +1,6 @@
 import 'dart:ui';
 
-import 'package:dynamic_shape/dynamic_shape.dart';
+import 'package:material_4/material_4.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -22,8 +22,8 @@ void main() {
       final canvas = Canvas(recorder);
 
       for (final style in BorderStyleType.values) {
-        final config = DynamicShapeConfig(
-          type: DynamicShapeType.smoothRounded,
+        final config = Material4Config(
+          type: Material4Type.smoothRounded,
           borderStyle: style,
           borderProgress: 0.5,
           dashPhase: 3.0,
@@ -34,7 +34,7 @@ void main() {
           ],
         );
 
-        final path = DynamicShapePathBuilder.buildPath(testSize, config);
+        final path = Material4PathBuilder.buildPath(testSize, config);
 
         expect(
           () => ShapeBorderPainter.paintBorder(
@@ -61,7 +61,7 @@ void main() {
       final canvas = Canvas(recorder);
       const testSize = Size(100, 100);
       final path = Path()..addRect(Offset.zero & testSize);
-      const config = DynamicShapeConfig(borderStyle: BorderStyleType.solid);
+      const config = Material4Config(borderStyle: BorderStyleType.solid);
 
       // BorderWidth 0.0
       expect(
@@ -126,7 +126,7 @@ void main() {
       final path = Path()..addRect(Offset.zero & testSize);
 
       for (final metal in MetallicType.values) {
-        final config = DynamicShapeConfig(
+        final config = Material4Config(
           borderStyle: BorderStyleType.metallic,
           metallicType: metal,
         );
@@ -158,7 +158,7 @@ void main() {
       final path = Path()..addOval(Offset.zero & testSize);
 
       for (final align in ShapeStrokeAlign.values) {
-        final config = DynamicShapeConfig(
+        final config = Material4Config(
           borderStyle: BorderStyleType.neonPulse,
           strokeAlign: align,
         );
@@ -181,7 +181,7 @@ void main() {
     });
 
     testWidgets(
-      'DynamicShapeContainer convenience border factories render in widget tree',
+      'Material4Container convenience border factories render in widget tree',
       (tester) async {
         await tester.pumpWidget(
           MaterialApp(
@@ -189,23 +189,23 @@ void main() {
               body: SingleChildScrollView(
                 child: Column(
                   children: [
-                    DynamicShapeContainer.neon(
+                    Material4Container.neon(
                       width: 100,
                       height: 50,
                       child: const Text('Neon'),
                     ),
-                    DynamicShapeContainer.metallic(
+                    Material4Container.metallic(
                       width: 100,
                       height: 50,
                       metallicType: MetallicType.gold,
                       child: const Text('Metallic Gold'),
                     ),
-                    DynamicShapeContainer.rainbow(
+                    Material4Container.rainbow(
                       width: 100,
                       height: 50,
                       child: const Text('Rainbow'),
                     ),
-                    DynamicShapeContainer.multiLayer(
+                    Material4Container.multiLayer(
                       width: 100,
                       height: 50,
                       layers: const [
@@ -218,12 +218,12 @@ void main() {
                       ],
                       child: const Text('Multi-Layer'),
                     ),
-                    DynamicShapeContainer.cornerOnly(
+                    Material4Container.cornerOnly(
                       width: 100,
                       height: 50,
                       child: const Text('Corner Only'),
                     ),
-                    DynamicShapeContainer.handDrawn(
+                    Material4Container.handDrawn(
                       width: 100,
                       height: 50,
                       child: const Text('Hand Drawn'),

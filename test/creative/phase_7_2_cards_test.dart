@@ -1,4 +1,4 @@
-import 'package:dynamic_shape/dynamic_shape.dart';
+import 'package:material_4/material_4.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -167,7 +167,7 @@ void main() {
                   ),
                   const NotificationCard(
                     title: 'New Update Available',
-                    message: 'Universal Dynamic Shape v2.0 is ready to install',
+                    message: 'Universal Material 4 v2.0 is ready to install',
                   ),
                   const InformationCard(
                     title: 'Important Guidelines',
@@ -222,4 +222,3 @@ void main() {
     });
   });
 }
-

@@ -2,8 +2,8 @@ import 'dart:math' as math;
 import 'dart:ui';
 import 'package:flutter/material.dart';
 
-import '../dynamic_shape_config.dart';
-import '../dynamic_shape_path_builder.dart';
+import '../material_4_config.dart';
+import '../material_4_path_builder.dart';
 import 'shape_animation_cache.dart';
 import 'shape_animation_config.dart';
 import 'shape_geometry_interpolator.dart';
@@ -20,20 +20,19 @@ class ShapeMorphEngine {
   /// Default number of contour vertices sampled during normalized path morphing.
   static const int defaultSampleCount = 64;
 
-  /// Determines whether two [DynamicShapeType] variants are topologically compatible
+  /// Determines whether two [Material4Type] variants are topologically compatible
   /// for parameter-driven geometric morphing without vertex re-sampling.
-  static bool canMorphGeometrically(
-      DynamicShapeType from, DynamicShapeType to) {
+  static bool canMorphGeometrically(Material4Type from, Material4Type to) {
     if (from == to) return true;
 
     // Corner & Radius Family (Continuous Rectangular & Quad-Arc Geometries)
     const roundedFamily = {
-      DynamicShapeType.smoothRounded,
-      DynamicShapeType.squircle,
-      DynamicShapeType.capsule,
-      DynamicShapeType.asymmetricCard,
-      DynamicShapeType.convexRounded,
-      DynamicShapeType.concaveRounded,
+      Material4Type.smoothRounded,
+      Material4Type.squircle,
+      Material4Type.capsule,
+      Material4Type.asymmetricCard,
+      Material4Type.convexRounded,
+      Material4Type.concaveRounded,
     };
 
     if (roundedFamily.contains(from) && roundedFamily.contains(to)) {
@@ -42,14 +41,14 @@ class ShapeMorphEngine {
 
     // Notched & Tabbed Rectangles Family
     const notchedFamily = {
-      DynamicShapeType.folderTab,
-      DynamicShapeType.notchedBadge,
-      DynamicShapeType.sideTab,
-      DynamicShapeType.steppedCorner,
-      DynamicShapeType.ticketScallop,
-      DynamicShapeType.postageStamp,
-      DynamicShapeType.bookmark,
-      DynamicShapeType.smoothRounded,
+      Material4Type.folderTab,
+      Material4Type.notchedBadge,
+      Material4Type.sideTab,
+      Material4Type.steppedCorner,
+      Material4Type.ticketScallop,
+      Material4Type.postageStamp,
+      Material4Type.bookmark,
+      Material4Type.smoothRounded,
     };
 
     if (notchedFamily.contains(from) && notchedFamily.contains(to)) {
@@ -58,10 +57,10 @@ class ShapeMorphEngine {
 
     // Regular Polygons Family
     const polygonFamily = {
-      DynamicShapeType.diamond,
-      DynamicShapeType.octagon,
-      DynamicShapeType.shield,
-      DynamicShapeType.hexagonSoft,
+      Material4Type.diamond,
+      Material4Type.octagon,
+      Material4Type.shield,
+      Material4Type.hexagonSoft,
     };
 
     if (polygonFamily.contains(from) && polygonFamily.contains(to)) {
@@ -70,11 +69,11 @@ class ShapeMorphEngine {
 
     // Organic & Fluid Blobs Family
     const organicFamily = {
-      DynamicShapeType.organicBlob,
-      DynamicShapeType.cloud,
-      DynamicShapeType.waveEdge,
-      DynamicShapeType.waveCut,
-      DynamicShapeType.scallopedPetal,
+      Material4Type.organicBlob,
+      Material4Type.cloud,
+      Material4Type.waveEdge,
+      Material4Type.waveCut,
+      Material4Type.scallopedPetal,
     };
 
     if (organicFamily.contains(from) && organicFamily.contains(to)) {
@@ -86,36 +85,36 @@ class ShapeMorphEngine {
 
   /// Evaluates the morphed vector [Path] between [fromConfig] and [toConfig] at [progress] (0.0 to 1.0).
   static Path computeMorphedPath({
-    required DynamicShapeConfig fromConfig,
-    required DynamicShapeConfig toConfig,
+    required Material4Config fromConfig,
+    required Material4Config toConfig,
     required Size size,
     required double progress,
     ShapeMorphFallback fallback = ShapeMorphFallback.compatibleNormalized,
   }) {
     if (progress <= 0.0) {
-      return DynamicShapePathBuilder.buildPath(size, fromConfig);
+      return Material4PathBuilder.buildPath(size, fromConfig);
     }
     if (progress >= 1.0) {
-      return DynamicShapePathBuilder.buildPath(size, toConfig);
+      return Material4PathBuilder.buildPath(size, toConfig);
     }
 
     // 1. Direct parameter-driven morphing for compatible topologies
     if (canMorphGeometrically(fromConfig.type, toConfig.type)) {
       final interpolatedConfig =
           ShapeGeometryInterpolator.lerpConfig(fromConfig, toConfig, progress);
-      return DynamicShapePathBuilder.buildPath(size, interpolatedConfig);
+      return Material4PathBuilder.buildPath(size, interpolatedConfig);
     }
 
     // 2. Handle incompatible topologies according to fallback strategy
     switch (fallback) {
       case ShapeMorphFallback.switchAtMidpoint:
         final activeConfig = progress < 0.5 ? fromConfig : toConfig;
-        return DynamicShapePathBuilder.buildPath(size, activeConfig);
+        return Material4PathBuilder.buildPath(size, activeConfig);
 
       case ShapeMorphFallback.crossfade:
         // Returns dominant path based on progress; caller handles opacity crossfade
         final activeConfig = progress < 0.5 ? fromConfig : toConfig;
-        return DynamicShapePathBuilder.buildPath(size, activeConfig);
+        return Material4PathBuilder.buildPath(size, activeConfig);
 
       case ShapeMorphFallback.compatibleNormalized:
         return morphViaNormalizedSampling(
@@ -130,8 +129,8 @@ class ShapeMorphEngine {
   /// Morphs between arbitrary shapes by sampling equidistant contour points along
   /// both vector paths and synthesizing a smooth closed Bézier spline.
   static Path morphViaNormalizedSampling({
-    required DynamicShapeConfig fromConfig,
-    required DynamicShapeConfig toConfig,
+    required Material4Config fromConfig,
+    required Material4Config toConfig,
     required Size size,
     required double progress,
     int sampleCount = defaultSampleCount,
@@ -151,14 +150,14 @@ class ShapeMorphEngine {
 
     var pointsA = ShapeAnimationCache.instance.get(keyA);
     if (pointsA == null) {
-      final pathA = DynamicShapePathBuilder.buildPath(size, fromConfig);
+      final pathA = Material4PathBuilder.buildPath(size, fromConfig);
       pointsA = samplePathContour(pathA, sampleCount);
       ShapeAnimationCache.instance.put(keyA, pointsA);
     }
 
     var pointsB = ShapeAnimationCache.instance.get(keyB);
     if (pointsB == null) {
-      final pathB = DynamicShapePathBuilder.buildPath(size, toConfig);
+      final pathB = Material4PathBuilder.buildPath(size, toConfig);
       pointsB = samplePathContour(pathB, sampleCount);
       ShapeAnimationCache.instance.put(keyB, pointsB);
     }

@@ -1,8 +1,8 @@
 import 'package:flutter/foundation.dart';
 
-/// Independent, granular clipping configuration for dynamic shapes.
+/// Independent, granular clipping configuration for Material 4 shapes.
 ///
-/// Allows fine-grained control over which visual layers of the dynamic shape
+/// Allows fine-grained control over which visual layers of the Material 4 shape
 /// container are clipped to the shape path contour versus allowed to overflow naturally.
 @immutable
 class ShapeClipConfig {

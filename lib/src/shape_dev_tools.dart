@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'dynamic_shape_config.dart';
-import 'dynamic_shape_container.dart';
+import 'material_4_config.dart';
+import 'material_4_container.dart';
 import 'shape_smart_layout.dart';
 
-/// Developer tool that converts any [DynamicShapeConfig] into clean, ready-to-paste Dart code.
+/// Developer tool that converts any [Material4Config] into clean, ready-to-paste Dart code.
 class ShapeCodeGenerator {
   const ShapeCodeGenerator._();
 
   static String toDartCode(
-    DynamicShapeConfig config, {
+    Material4Config config, {
     String varName = 'shapeConfig',
   }) {
     final buffer = StringBuffer();
-    buffer.writeln('final $varName = DynamicShapeConfig(');
-    buffer.writeln('  type: DynamicShapeType.${config.type.name},');
+    buffer.writeln('final $varName = Material4Config(');
+    buffer.writeln('  type: Material4Type.${config.type.name},');
     if (config.borderStyle != BorderStyleType.solid) {
       buffer.writeln(
         '  borderStyle: BorderStyleType.${config.borderStyle.name},',
@@ -53,11 +53,11 @@ class ShapeCodeGenerator {
 /// Interactive Live Studio & Playground for experimenting with shapes, borders,
 /// and background effects in real time.
 class ShapePlayground extends StatefulWidget {
-  final DynamicShapeConfig initialConfig;
+  final Material4Config initialConfig;
 
   const ShapePlayground({
     super.key,
-    this.initialConfig = const DynamicShapeConfig(),
+    this.initialConfig = const Material4Config(),
   });
 
   @override
@@ -65,7 +65,7 @@ class ShapePlayground extends StatefulWidget {
 }
 
 class _ShapePlaygroundState extends State<ShapePlayground> {
-  late DynamicShapeType _type;
+  late Material4Type _type;
   late BorderStyleType _borderStyle;
   late BackgroundEffectType _bgEffect;
   late double _cornerRadius;
@@ -82,7 +82,7 @@ class _ShapePlaygroundState extends State<ShapePlayground> {
     _borderWidth = 2.0;
   }
 
-  DynamicShapeConfig get _activeConfig => DynamicShapeConfig(
+  Material4Config get _activeConfig => Material4Config(
         type: _type,
         borderStyle: _borderStyle,
         backgroundEffect: _bgEffect,
@@ -98,7 +98,7 @@ class _ShapePlaygroundState extends State<ShapePlayground> {
           // Preview Card Stage
           Expanded(
             child: Center(
-              child: DynamicShapeContainer(
+              child: Material4Container(
                 config: _activeConfig,
                 width: 260,
                 height: 160,
@@ -158,7 +158,7 @@ class _ShapePlaygroundState extends State<ShapePlayground> {
                 Row(
                   children: [
                     Expanded(
-                      child: DropdownButton<DynamicShapeType>(
+                      child: DropdownButton<Material4Type>(
                         value: _type,
                         isExpanded: true,
                         dropdownColor:
@@ -166,7 +166,7 @@ class _ShapePlaygroundState extends State<ShapePlayground> {
                         style: TextStyle(
                           color: _isDark ? Colors.white : Colors.black87,
                         ),
-                        items: DynamicShapeType.values
+                        items: Material4Type.values
                             .map(
                               (t) => DropdownMenuItem(
                                 value: t,
@@ -252,13 +252,13 @@ class _ShapePlaygroundState extends State<ShapePlayground> {
 
 /// Visual gallery displaying presets in an adaptive grid.
 class PresetGallery extends StatelessWidget {
-  final ValueChanged<DynamicShapeConfig>? onPresetSelected;
+  final ValueChanged<Material4Config>? onPresetSelected;
 
   const PresetGallery({super.key, this.onPresetSelected});
 
   @override
   Widget build(BuildContext context) {
-    final presets = DynamicShapeType.values;
+    final presets = Material4Type.values;
 
     return GridView.builder(
       padding: const EdgeInsets.all(16.0),
@@ -271,11 +271,11 @@ class PresetGallery extends StatelessWidget {
       itemCount: presets.length,
       itemBuilder: (context, i) {
         final shape = presets[i];
-        final config = DynamicShapeConfig(type: shape);
+        final config = Material4Config(type: shape);
 
         return GestureDetector(
           onTap: () => onPresetSelected?.call(config),
-          child: DynamicShapeContainer(
+          child: Material4Container(
             config: config,
             color: const Color(0xFFF1F5F9),
             borderColor: const Color(0xFFCBD5E1),

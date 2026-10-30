@@ -1,4 +1,4 @@
-import 'package:dynamic_shape/dynamic_shape.dart';
+import 'package:material_4/material_4.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -472,7 +472,7 @@ class _CreativeShowcaseScreenState extends State<CreativeShowcaseScreen>
         NotificationCard(
           title: 'Render Cache Optimized',
           message:
-              'All 28 dynamic shape paths successfully cached in GPU memory.',
+              'All 28 Material 4 shape paths successfully cached in GPU memory.',
           timestamp: 'Just now',
           icon: Icons.check_circle_outline,
           accentColor: const Color(0xFF10B981),
@@ -486,7 +486,7 @@ class _CreativeShowcaseScreenState extends State<CreativeShowcaseScreen>
             'Full support for Bengali & RTL text scripts',
             'Zero layout collisions between icon plates and titles',
           ],
-          footerNote: 'Flutter Universal Dynamic Shape Engine v2.0',
+          footerNote: 'Flutter Universal Material 4 Engine v2.0',
           icon: Icons.info_outline,
         ),
         const SizedBox(height: 16),

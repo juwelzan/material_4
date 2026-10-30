@@ -3,17 +3,17 @@ import 'dart:math' as math;
 import 'package:flutter/gestures.dart';
 import 'package:flutter/rendering.dart';
 
-import '../dynamic_shape_config.dart';
-import '../dynamic_shape_path_builder.dart';
 import '../layout/shape_content_protection.dart';
 import '../layout/shape_safe_region.dart';
-import 'dynamic_shape_clip_manager.dart';
-import 'dynamic_shape_hit_test.dart';
-import 'dynamic_shape_interaction.dart';
-import 'dynamic_shape_layout_manager.dart';
-import 'dynamic_shape_painter.dart';
-import 'dynamic_shape_parent_data.dart';
-import 'dynamic_shape_semantics.dart';
+import '../material_4_config.dart';
+import '../material_4_path_builder.dart';
+import 'material_4_clip_manager.dart';
+import 'material_4_hit_test.dart';
+import 'material_4_interaction.dart';
+import 'material_4_layout_manager.dart';
+import 'material_4_painter.dart';
+import 'material_4_parent_data.dart';
+import 'material_4_semantics.dart';
 
 /// Central hardware-accelerated [RenderBox] engine for dynamic vector shapes.
 ///
@@ -23,9 +23,9 @@ import 'dynamic_shape_semantics.dart';
 /// - Direct Canvas rendering (backgrounds, borders, patterns, shadows, shimmer)
 /// - Point-in-path hit testing with transformation coordinate mapping
 /// - Fine-grained clipping and accessibility semantics
-class RenderDynamicShape extends RenderBox
+class RenderMaterial4 extends RenderBox
     with RenderObjectWithChildMixin<RenderBox> {
-  DynamicShapeConfig _config;
+  Material4Config _config;
   Color? _color;
   Gradient? _gradient;
   Color _borderColor;
@@ -34,7 +34,7 @@ class RenderDynamicShape extends RenderBox
   Clip _clipBehavior;
   ShapeContentProtection _contentProtection;
   ShapeHitTestBehavior _hitTestBehavior;
-  DynamicShapeInteraction? _interaction;
+  Material4Interaction? _interaction;
   ShapeClipConfig? _clipConfig;
   VoidCallback? _onTap;
   VoidCallback? _onLongPress;
@@ -50,8 +50,8 @@ class RenderDynamicShape extends RenderBox
   /// Cached vector path for current [size].
   Path? _currentPath;
 
-  RenderDynamicShape({
-    required DynamicShapeConfig config,
+  RenderMaterial4({
+    required Material4Config config,
     Color? color,
     Gradient? gradient,
     Color borderColor = const Color(0x18000000),
@@ -60,7 +60,7 @@ class RenderDynamicShape extends RenderBox
     Clip clipBehavior = Clip.antiAlias,
     ShapeContentProtection contentProtection = const ShapeContentProtection(),
     ShapeHitTestBehavior hitTestBehavior = ShapeHitTestBehavior.shapeContour,
-    DynamicShapeInteraction? interaction,
+    Material4Interaction? interaction,
     ShapeClipConfig? clipConfig,
     VoidCallback? onTap,
     VoidCallback? onLongPress,
@@ -101,8 +101,8 @@ class RenderDynamicShape extends RenderBox
   // Property Getters & Setters with Invalidation Separation
   // =========================================================================
 
-  DynamicShapeConfig get config => _config;
-  set config(DynamicShapeConfig value) {
+  Material4Config get config => _config;
+  set config(Material4Config value) {
     if (_config == value) return;
     final needsLayoutRecompute = _config.cornerRadius != value.cornerRadius ||
         _config.corners != value.corners ||
@@ -180,8 +180,8 @@ class RenderDynamicShape extends RenderBox
     _hitTestBehavior = value;
   }
 
-  DynamicShapeInteraction? get interaction => _interaction;
-  set interaction(DynamicShapeInteraction? value) {
+  Material4Interaction? get interaction => _interaction;
+  set interaction(Material4Interaction? value) {
     if (_interaction == value) return;
     _interaction = value;
   }
@@ -321,8 +321,8 @@ class RenderDynamicShape extends RenderBox
 
   @override
   void setupParentData(RenderBox child) {
-    if (child.parentData is! DynamicShapeParentData) {
-      child.parentData = DynamicShapeParentData();
+    if (child.parentData is! Material4ParentData) {
+      child.parentData = Material4ParentData();
     }
   }
 
@@ -333,7 +333,7 @@ class RenderDynamicShape extends RenderBox
   /// Resolves the current vector [Path] for this RenderBox size.
   Path get currentPath {
     if (_currentPath != null) return _currentPath!;
-    _currentPath = DynamicShapePathBuilder.buildPath(size, _config);
+    _currentPath = Material4PathBuilder.buildPath(size, _config);
     return _currentPath!;
   }
 
@@ -457,7 +457,7 @@ class RenderDynamicShape extends RenderBox
 
       // Re-evaluate insets with finalized size
       final finalInsets = _computeEffectiveInsets(size);
-      final childParentData = child!.parentData! as DynamicShapeParentData;
+      final childParentData = child!.parentData! as Material4ParentData;
       final availableW = math.max(0.0, size.width - finalInsets.horizontal);
       final availableH = math.max(0.0, size.height - finalInsets.vertical);
 
@@ -601,7 +601,7 @@ class RenderDynamicShape extends RenderBox
 
   @override
   double computeMinIntrinsicWidth(double height) {
-    return DynamicShapeLayoutManager.computeMinIntrinsicWidth(
+    return Material4LayoutManager.computeMinIntrinsicWidth(
       height: height,
       child: child,
       config: _config,
@@ -614,7 +614,7 @@ class RenderDynamicShape extends RenderBox
 
   @override
   double computeMaxIntrinsicWidth(double height) {
-    return DynamicShapeLayoutManager.computeMaxIntrinsicWidth(
+    return Material4LayoutManager.computeMaxIntrinsicWidth(
       height: height,
       child: child,
       config: _config,
@@ -627,7 +627,7 @@ class RenderDynamicShape extends RenderBox
 
   @override
   double computeMinIntrinsicHeight(double width) {
-    return DynamicShapeLayoutManager.computeMinIntrinsicHeight(
+    return Material4LayoutManager.computeMinIntrinsicHeight(
       width: width,
       child: child,
       config: _config,
@@ -640,7 +640,7 @@ class RenderDynamicShape extends RenderBox
 
   @override
   double computeMaxIntrinsicHeight(double width) {
-    return DynamicShapeLayoutManager.computeMaxIntrinsicHeight(
+    return Material4LayoutManager.computeMaxIntrinsicHeight(
       width: width,
       child: child,
       config: _config,
@@ -746,7 +746,7 @@ class RenderDynamicShape extends RenderBox
     // 7. Child visible overflow
     if (child != null &&
         _contentProtection.mode == ContentProtectionMode.visibleOverflow) {
-      final childParentData = child!.parentData as DynamicShapeParentData?;
+      final childParentData = child!.parentData as Material4ParentData?;
       if (childParentData != null) {
         final childBounds = child!.paintBounds.shift(childParentData.offset);
         bounds = bounds.expandToInclude(childBounds);
@@ -758,7 +758,7 @@ class RenderDynamicShape extends RenderBox
     bounds = bounds.expandToInclude(pathBounds);
 
     // 9. If overflow clipping is explicitly enabled, clamp to container rectangular bounds
-    if (DynamicShapeClipManager.shouldClipOverflow(
+    if (Material4ClipManager.shouldClipOverflow(
       config: _config,
       clipConfig: _clipConfig,
     )) {
@@ -772,11 +772,11 @@ class RenderDynamicShape extends RenderBox
   void paint(PaintingContext context, Offset offset) {
     if (size.width <= 0 || size.height <= 0) return;
 
-    if (DynamicShapeClipManager.shouldClipOverflow(
+    if (Material4ClipManager.shouldClipOverflow(
       config: _config,
       clipConfig: _clipConfig,
     )) {
-      DynamicShapeClipManager.paintWithRectClip(
+      Material4ClipManager.paintWithRectClip(
         context: context,
         offset: offset,
         clipRect: Offset.zero & size,
@@ -797,7 +797,7 @@ class RenderDynamicShape extends RenderBox
     canvas.translate(offset.dx, offset.dy);
 
     // Stage 2: Outer shadows (Neo-3D hard block, soft drop shadows, glow halo)
-    DynamicShapePainter.paintOuterShadows(
+    Material4Painter.paintOuterShadows(
       canvas: canvas,
       size: size,
       path: path,
@@ -808,7 +808,7 @@ class RenderDynamicShape extends RenderBox
     );
 
     // Stage 3: Shape background & procedural background effects
-    DynamicShapePainter.paintBackground(
+    Material4Painter.paintBackground(
       canvas: canvas,
       size: size,
       path: path,
@@ -818,7 +818,7 @@ class RenderDynamicShape extends RenderBox
     );
 
     // Stage 4: Background patterns (stripes, dots, grid, waves)
-    DynamicShapePainter.paintPatterns(
+    Material4Painter.paintPatterns(
       canvas: canvas,
       size: size,
       path: path,
@@ -827,7 +827,7 @@ class RenderDynamicShape extends RenderBox
     );
 
     // Stage 5: Background effects & inner shadows (tactile inset shadows)
-    DynamicShapePainter.paintInnerShadows(
+    Material4Painter.paintInnerShadows(
       canvas: canvas,
       size: size,
       path: path,
@@ -835,7 +835,7 @@ class RenderDynamicShape extends RenderBox
     );
 
     // Stage 6: Distinctive borders (all 20 border styles with stroke alignment & reveal)
-    DynamicShapePainter.paintBorders(
+    Material4Painter.paintBorders(
       canvas: canvas,
       size: size,
       path: path,
@@ -845,7 +845,7 @@ class RenderDynamicShape extends RenderBox
     );
 
     // Stage 7: Foreground decorations (holographic shimmer light sweep)
-    DynamicShapePainter.paintForegroundDecorations(
+    Material4Painter.paintForegroundDecorations(
       canvas: canvas,
       size: size,
       path: path,
@@ -856,16 +856,16 @@ class RenderDynamicShape extends RenderBox
 
     // Stage 8: Child painting with selective clipping
     if (child != null) {
-      final childParentData = child!.parentData! as DynamicShapeParentData;
+      final childParentData = child!.parentData! as Material4ParentData;
       final childOffset = offset + childParentData.offset;
 
-      if (DynamicShapeClipManager.shouldClipChild(
+      if (Material4ClipManager.shouldClipChild(
         protection: _contentProtection,
         config: _config,
         clipBehavior: _clipBehavior,
         clipConfig: _clipConfig,
       )) {
-        DynamicShapeClipManager.paintWithClip(
+        Material4ClipManager.paintWithClip(
           context: context,
           offset: offset,
           bounds: Offset.zero & size,
@@ -891,12 +891,12 @@ class RenderDynamicShape extends RenderBox
 
     final effectiveInteraction = _interaction ??
         _config.interaction ??
-        DynamicShapeInteraction(hitTestBehavior: _hitTestBehavior);
+        Material4Interaction(hitTestBehavior: _hitTestBehavior);
 
     final behavior = effectiveInteraction.hitTestBehavior;
 
-    // 1. Point-in-shape evaluation via DynamicShapeHitTester
-    final bool isInsideShapeOrBox = DynamicShapeHitTester.containsPoint(
+    // 1. Point-in-shape evaluation via Material4HitTester
+    final bool isInsideShapeOrBox = Material4HitTester.containsPoint(
       path: currentPath,
       size: size,
       position: position,
@@ -964,7 +964,7 @@ class RenderDynamicShape extends RenderBox
   @override
   bool hitTestChildren(BoxHitTestResult result, {required Offset position}) {
     if (child == null) return false;
-    final childParentData = child!.parentData! as DynamicShapeParentData;
+    final childParentData = child!.parentData! as Material4ParentData;
     return result.addWithPaintOffset(
       offset: childParentData.offset,
       position: position,
@@ -977,7 +977,7 @@ class RenderDynamicShape extends RenderBox
 
   @override
   void applyPaintTransform(RenderBox child, Matrix4 transform) {
-    final childParentData = child.parentData! as DynamicShapeParentData;
+    final childParentData = child.parentData! as Material4ParentData;
     transform.translateByDouble(
       childParentData.offset.dx,
       childParentData.offset.dy,
@@ -989,7 +989,7 @@ class RenderDynamicShape extends RenderBox
   @override
   void describeSemanticsConfiguration(SemanticsConfiguration config) {
     super.describeSemanticsConfiguration(config);
-    DynamicShapeSemantics.applySemantics(
+    Material4Semantics.applySemantics(
       config: config,
       onTap: _onTap,
       onLongPress: _onLongPress,

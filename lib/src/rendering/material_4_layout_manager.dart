@@ -1,13 +1,13 @@
 import 'dart:math' as math;
 import 'package:flutter/rendering.dart';
 
-import '../dynamic_shape_config.dart';
 import '../layout/shape_content_protection.dart';
 import '../layout/shape_safe_region.dart';
+import '../material_4_config.dart';
 
-/// Layout and constraint coordination engine for [RenderDynamicShape].
-class DynamicShapeLayoutManager {
-  const DynamicShapeLayoutManager._();
+/// Layout and constraint coordination engine for [RenderMaterial4].
+class Material4LayoutManager {
+  const Material4LayoutManager._();
 
   /// Computes container dimensions given incoming [constraints], explicit dimensions,
   /// and optional child measurements.
@@ -16,7 +16,7 @@ class DynamicShapeLayoutManager {
     double? explicitWidth,
     double? explicitHeight,
     RenderBox? child,
-    required DynamicShapeConfig config,
+    required Material4Config config,
     required ShapeContentProtection protection,
     EdgeInsetsGeometry? padding,
     double borderWidth = 1.0,
@@ -79,7 +79,7 @@ class DynamicShapeLayoutManager {
   static double computeMinIntrinsicWidth({
     required double height,
     RenderBox? child,
-    required DynamicShapeConfig config,
+    required Material4Config config,
     EdgeInsetsGeometry? padding,
     double? explicitWidth,
     double borderWidth = 1.0,
@@ -108,7 +108,7 @@ class DynamicShapeLayoutManager {
   static double computeMaxIntrinsicWidth({
     required double height,
     RenderBox? child,
-    required DynamicShapeConfig config,
+    required Material4Config config,
     EdgeInsetsGeometry? padding,
     double? explicitWidth,
     double borderWidth = 1.0,
@@ -137,7 +137,7 @@ class DynamicShapeLayoutManager {
   static double computeMinIntrinsicHeight({
     required double width,
     RenderBox? child,
-    required DynamicShapeConfig config,
+    required Material4Config config,
     EdgeInsetsGeometry? padding,
     double? explicitHeight,
     double borderWidth = 1.0,
@@ -166,7 +166,7 @@ class DynamicShapeLayoutManager {
   static double computeMaxIntrinsicHeight({
     required double width,
     RenderBox? child,
-    required DynamicShapeConfig config,
+    required Material4Config config,
     EdgeInsetsGeometry? padding,
     double? explicitHeight,
     double borderWidth = 1.0,

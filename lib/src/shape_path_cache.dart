@@ -2,12 +2,12 @@ import 'dart:collection';
 
 import 'package:flutter/material.dart';
 
-import 'dynamic_shape_config.dart';
+import 'material_4_config.dart';
 
 /// Immutable composite cache key uniquely identifying a geometric path layout.
 @immutable
 class ShapeCacheKey {
-  final DynamicShapeType type;
+  final Material4Type type;
   final double width;
   final double height;
   final double cornerRadius;
@@ -33,7 +33,7 @@ class ShapeCacheKey {
   final CustomBezierConfig? bezierConfig;
   final int notchesHash;
 
-  ShapeCacheKey({required Size size, required DynamicShapeConfig config})
+  ShapeCacheKey({required Size size, required Material4Config config})
       : type = config.type,
         width = size.width,
         height = size.height,
@@ -163,11 +163,11 @@ class ShapePathCache {
   /// Retrieve a cached path or compute, store, and return a new one.
   Path getOrCreate({
     required Size size,
-    required DynamicShapeConfig config,
+    required Material4Config config,
     required Path Function() computePath,
   }) {
     // Custom Bezier paths with callback closures are not cached to prevent caching stale closures
-    if (config.type == DynamicShapeType.customBezier &&
+    if (config.type == Material4Type.customBezier &&
         config.customBezierBuilder != null) {
       return computePath();
     }

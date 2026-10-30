@@ -1,4 +1,4 @@
-import 'package:dynamic_shape/dynamic_shape.dart';
+import 'package:material_4/material_4.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -6,17 +6,17 @@ void main() {
   group('Phase 1: Shape Geometry Engine Tests', () {
     const testSize = Size(200.0, 120.0);
 
-    test('All 28 DynamicShapeType presets build valid, closed paths', () {
-      for (final shapeType in DynamicShapeType.values) {
-        final config = DynamicShapeConfig(
+    test('All 28 Material4Type presets build valid, closed paths', () {
+      for (final shapeType in Material4Type.values) {
+        final config = Material4Config(
           type: shapeType,
           cornerRadius: 16.0,
-          customBezierBuilder: shapeType == DynamicShapeType.customBezier
+          customBezierBuilder: shapeType == Material4Type.customBezier
               ? (size) => (Path()..addOval(Offset.zero & size))
               : null,
         );
 
-        final path = DynamicShapePathBuilder.buildPath(testSize, config);
+        final path = Material4PathBuilder.buildPath(testSize, config);
         expect(path, isNotNull, reason: 'Failed for shape: ${shapeType.name}');
 
         final bounds = path.getBounds();
@@ -52,25 +52,25 @@ void main() {
     });
 
     test('Handles zero, negative, NaN, and extreme dimensions safely', () {
-      const config = DynamicShapeConfig(type: DynamicShapeType.shield);
+      const config = Material4Config(type: Material4Type.shield);
 
       // Zero dimensions
       expect(
-        DynamicShapePathBuilder.buildPath(
+        Material4PathBuilder.buildPath(
           Size.zero,
           config,
         ).getBounds().isEmpty,
         isTrue,
       );
       expect(
-        DynamicShapePathBuilder.buildPath(
+        Material4PathBuilder.buildPath(
           const Size(0, 100),
           config,
         ).getBounds().isEmpty,
         isTrue,
       );
       expect(
-        DynamicShapePathBuilder.buildPath(
+        Material4PathBuilder.buildPath(
           const Size(100, 0),
           config,
         ).getBounds().isEmpty,
@@ -79,14 +79,14 @@ void main() {
 
       // Negative dimensions
       expect(
-        DynamicShapePathBuilder.buildPath(
+        Material4PathBuilder.buildPath(
           const Size(-50, 100),
           config,
         ).getBounds().isEmpty,
         isTrue,
       );
       expect(
-        DynamicShapePathBuilder.buildPath(
+        Material4PathBuilder.buildPath(
           const Size(100, -50),
           config,
         ).getBounds().isEmpty,
@@ -95,7 +95,7 @@ void main() {
 
       // Extreme large dimensions
       const largeSize = Size(8000.0, 4000.0);
-      final largePath = DynamicShapePathBuilder.buildPath(largeSize, config);
+      final largePath = Material4PathBuilder.buildPath(largeSize, config);
       expect(largePath.getBounds().isEmpty, isFalse);
       expect(largePath.getBounds().width, closeTo(8000.0, 50.0));
       expect(largePath.getBounds().height, closeTo(4000.0, 50.0));
@@ -109,8 +109,8 @@ void main() {
         bottomLeft: 5.0,
       );
 
-      final config = DynamicShapeConfig.asymmetricCard(cornerRadii: radii);
-      final path = DynamicShapePathBuilder.buildPath(testSize, config);
+      final config = Material4Config.asymmetricCard(cornerRadii: radii);
+      final path = Material4PathBuilder.buildPath(testSize, config);
       final bounds = path.getBounds();
 
       expect(bounds.width, closeTo(testSize.width, 1.0));
@@ -120,22 +120,22 @@ void main() {
     test(
       'Rotation, scale, and stretch transforms apply cleanly around center',
       () {
-        const config = DynamicShapeConfig(
-          type: DynamicShapeType.shield,
+        const config = Material4Config(
+          type: Material4Type.shield,
           rotation: 0.5,
           scaleX: 1.2,
           scaleY: 0.8,
           stretchOffset: Offset(10, 5),
         );
 
-        final path = DynamicShapePathBuilder.buildPath(testSize, config);
+        final path = Material4PathBuilder.buildPath(testSize, config);
         expect(path.getBounds().isEmpty, isFalse);
       },
     );
 
     test('Multi-notch carving modifies geometry correctly', () {
-      const config = DynamicShapeConfig(
-        type: DynamicShapeType.smoothRounded,
+      const config = Material4Config(
+        type: Material4Type.smoothRounded,
         notches: [
           ShapeNotch(
             position: ShapeAnchor.topRight,
@@ -152,12 +152,12 @@ void main() {
         ],
       );
 
-      final path = DynamicShapePathBuilder.buildPath(testSize, config);
+      final path = Material4PathBuilder.buildPath(testSize, config);
       expect(path.getBounds().isEmpty, isFalse);
     });
 
     test('CustomBezier builder callback produces exact custom path', () {
-      final config = DynamicShapeConfig.customBezier(
+      final config = Material4Config.customBezier(
         builder: (size) => Path()
           ..moveTo(0, 0)
           ..lineTo(size.width, size.height)
@@ -165,7 +165,7 @@ void main() {
           ..close(),
       );
 
-      final path = DynamicShapePathBuilder.buildPath(testSize, config);
+      final path = Material4PathBuilder.buildPath(testSize, config);
       expect(path.getBounds().width, equals(testSize.width));
       expect(path.getBounds().height, equals(testSize.height));
     });
@@ -173,7 +173,7 @@ void main() {
     testWidgets(
       'AdaptiveShapeCard renders all 28 shapes without clipping text',
       (tester) async {
-        for (final shape in DynamicShapeType.values) {
+        for (final shape in Material4Type.values) {
           await tester.pumpWidget(
             MaterialApp(
               home: Scaffold(
@@ -198,34 +198,34 @@ void main() {
     );
 
     testWidgets(
-      'DynamicShapeContainer convenience factories render correctly',
+      'Material4Container convenience factories render correctly',
       (tester) async {
         await tester.pumpWidget(
           MaterialApp(
             home: Scaffold(
               body: Column(
                 children: [
-                  DynamicShapeContainer.capsule(
+                  Material4Container.capsule(
                     width: 100,
                     height: 40,
                     child: const Text('Capsule'),
                   ),
-                  DynamicShapeContainer.shield(
+                  Material4Container.shield(
                     width: 100,
                     height: 80,
                     child: const Text('Shield'),
                   ),
-                  DynamicShapeContainer.ribbon(
+                  Material4Container.ribbon(
                     width: 120,
                     height: 40,
                     child: const Text('Ribbon'),
                   ),
-                  DynamicShapeContainer.bookmark(
+                  Material4Container.bookmark(
                     width: 60,
                     height: 100,
                     child: const Text('Bookmark'),
                   ),
-                  DynamicShapeContainer.speechBubble(
+                  Material4Container.speechBubble(
                     width: 120,
                     height: 70,
                     child: const Text('Speech'),

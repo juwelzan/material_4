@@ -1,14 +1,14 @@
-import 'package:dynamic_shape/dynamic_shape.dart';
+import 'package:material_4/material_4.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('Phase 8 & 9: Developer Tools & School Presets Tests', () {
     test(
-      'DynamicShapeConfig JSON serialization round-trip retains properties',
+      'Material4Config JSON serialization round-trip retains properties',
       () {
-        final original = DynamicShapeConfig(
-          type: DynamicShapeType.waveEdge,
+        final original = Material4Config(
+          type: Material4Type.waveEdge,
           borderStyle: BorderStyleType.neonPulse,
           cornerRadius: 32.0,
           cornerRadii: const CornerRadii(
@@ -31,7 +31,7 @@ void main() {
         );
 
         final json = original.toJson();
-        final restored = DynamicShapeConfig.fromJson(json);
+        final restored = Material4Config.fromJson(json);
 
         expect(restored.type, original.type);
         expect(restored.borderStyle, original.borderStyle);
@@ -49,14 +49,14 @@ void main() {
     );
 
     test('ShapeCodeGenerator outputs valid Dart string', () {
-      const config = DynamicShapeConfig(
-        type: DynamicShapeType.speechBubble,
+      const config = Material4Config(
+        type: Material4Type.speechBubble,
         cornerRadius: 18.0,
       );
 
       final code = ShapeCodeGenerator.toDartCode(config, varName: 'testConfig');
-      expect(code, contains('final testConfig = DynamicShapeConfig('));
-      expect(code, contains('type: DynamicShapeType.speechBubble,'));
+      expect(code, contains('final testConfig = Material4Config('));
+      expect(code, contains('type: Material4Type.speechBubble,'));
       expect(code, contains('cornerRadius: 18.0,'));
     });
 

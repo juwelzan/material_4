@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:dynamic_shape/dynamic_shape.dart';
+import 'package:material_4/material_4.dart';
 
 void main() {
   group('ShapeSafeRegionSet Multi-Region Partitioning Engine', () {
     test('Simple smoothRounded container computes single primary safe region',
         () {
-      const config = DynamicShapeConfig(
-        type: DynamicShapeType.smoothRounded,
+      const config = Material4Config(
+        type: Material4Type.smoothRounded,
         cornerRadius: 12.0,
       );
       const size = Size(200, 100);
@@ -25,8 +25,8 @@ void main() {
     });
 
     test('Shape with top inward notch partitions into flanking pockets', () {
-      const config = DynamicShapeConfig(
-        type: DynamicShapeType.smoothRounded,
+      const config = Material4Config(
+        type: Material4Type.smoothRounded,
         notches: [
           ShapeNotch(
             edge: ShapeEdge.top,
@@ -56,8 +56,8 @@ void main() {
     });
 
     test('Ticket scallop partitions into upper and lower compartments', () {
-      const config = DynamicShapeConfig(
-        type: DynamicShapeType.ticketScallop,
+      const config = Material4Config(
+        type: Material4Type.ticketScallop,
         scallopRadius: 16.0,
       );
       const size = Size(200, 200);
@@ -75,8 +75,8 @@ void main() {
     });
 
     test('Folder tab partitions into header tab and card body', () {
-      const config = DynamicShapeConfig(
-        type: DynamicShapeType.folderTab,
+      const config = Material4Config(
+        type: Material4Type.folderTab,
         tabWidth: 60.0,
         tabHeight: 25.0,
       );
@@ -92,8 +92,8 @@ void main() {
     });
 
     test('Stepped corner cutouts partition safe shelf and core body', () {
-      const config = DynamicShapeConfig(
-        type: DynamicShapeType.steppedCorner,
+      const config = Material4Config(
+        type: Material4Type.steppedCorner,
         tabWidth: 30.0,
         tabHeight: 30.0,
         anchor: ShapeAnchor.topRight,
@@ -162,15 +162,15 @@ void main() {
     });
   });
 
-  group('DynamicShapeStack Multi-Child Layout Strategies', () {
+  group('Material4Stack Multi-Child Layout Strategies', () {
     testWidgets('Stack strategy aligns children to specified alignments',
         (tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: DynamicShapeStack(
-              config: const DynamicShapeConfig(
-                type: DynamicShapeType.smoothRounded,
+            body: Material4Stack(
+              config: const Material4Config(
+                type: Material4Type.smoothRounded,
               ),
               width: 300,
               height: 200,
@@ -228,9 +228,9 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: DynamicShapeStack(
-              config: const DynamicShapeConfig(
-                type: DynamicShapeType.smoothRounded,
+            body: Material4Stack(
+              config: const Material4Config(
+                type: Material4Type.smoothRounded,
               ),
               width: 200,
               height: 300,
@@ -273,9 +273,9 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: DynamicShapeStack(
-              config: const DynamicShapeConfig(
-                type: DynamicShapeType.smoothRounded,
+            body: Material4Stack(
+              config: const Material4Config(
+                type: Material4Type.smoothRounded,
               ),
               width: 300,
               height: 100,
@@ -317,9 +317,9 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: DynamicShapeStack(
-              config: const DynamicShapeConfig(
-                type: DynamicShapeType.smoothRounded,
+            body: Material4Stack(
+              config: const Material4Config(
+                type: Material4Type.smoothRounded,
               ),
               width: 200,
               height: 200,
@@ -371,9 +371,9 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: DynamicShapeStack(
-              config: const DynamicShapeConfig(
-                type: DynamicShapeType.ticketScallop,
+            body: Material4Stack(
+              config: const Material4Config(
+                type: Material4Type.ticketScallop,
                 scallopRadius: 16.0,
               ),
               width: 200,
@@ -414,9 +414,9 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: DynamicShapeStack(
-              config: const DynamicShapeConfig(
-                type: DynamicShapeType.smoothRounded,
+            body: Material4Stack(
+              config: const Material4Config(
+                type: Material4Type.smoothRounded,
               ),
               width: 100,
               height: 100,
@@ -443,8 +443,8 @@ void main() {
       // In strict mode, the widget must still be rendered and visible in tree
       expect(find.byKey(const ValueKey('large_child')), findsOneWidget);
 
-      final renderObject = tester.renderObject<RenderMultiChildDynamicShape>(
-        find.byType(DynamicShapeMultiChildRenderWidget),
+      final renderObject = tester.renderObject<RenderMultiChildMaterial4>(
+        find.byType(Material4MultiChildRenderWidget),
       );
       expect(renderObject.diagnostics, isNotEmpty);
       expect(
@@ -461,9 +461,9 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: DynamicShapeStack(
-              config: const DynamicShapeConfig(
-                type: DynamicShapeType.smoothRounded,
+            body: Material4Stack(
+              config: const Material4Config(
+                type: Material4Type.smoothRounded,
               ),
               width: 100,
               height: 100,
@@ -495,8 +495,8 @@ void main() {
 
       expect(find.byKey(const ValueKey('overflow_button')), findsOneWidget);
 
-      final renderObject = tester.renderObject<RenderMultiChildDynamicShape>(
-        find.byType(DynamicShapeMultiChildRenderWidget),
+      final renderObject = tester.renderObject<RenderMultiChildMaterial4>(
+        find.byType(Material4MultiChildRenderWidget),
       );
       // paintBounds must be larger than size (100x100) due to overflowing child (160x160)
       expect(renderObject.paintBounds.width, greaterThan(100));
@@ -509,18 +509,18 @@ void main() {
     });
   });
 
-  group('DynamicShapeContainer Multi-Child Integration', () {
+  group('Material4Container Multi-Child Integration', () {
     testWidgets(
-        'DynamicShapeContainer with children renders RenderMultiChildDynamicShape',
+        'Material4Container with children renders RenderMultiChildMaterial4',
         (tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: DynamicShapeContainer(
+            body: Material4Container(
               width: 250,
               height: 150,
-              config: const DynamicShapeConfig(
-                type: DynamicShapeType.smoothRounded,
+              config: const Material4Config(
+                type: Material4Type.smoothRounded,
                 cornerRadius: 16.0,
               ),
               layoutStrategy: ShapeLayoutStrategy.flowVertical,
@@ -535,20 +535,20 @@ void main() {
 
       expect(find.byKey(const ValueKey('line1')), findsOneWidget);
       expect(find.byKey(const ValueKey('line2')), findsOneWidget);
-      expect(find.byType(DynamicShapeMultiChildRenderWidget), findsOneWidget);
+      expect(find.byType(Material4MultiChildRenderWidget), findsOneWidget);
     });
 
     testWidgets(
-        'DynamicShapeContainer with dockedBadge renders badge cleanly in multi-child mode',
+        'Material4Container with dockedBadge renders badge cleanly in multi-child mode',
         (tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: DynamicShapeContainer(
+            body: Material4Container(
               width: 250,
               height: 150,
-              config: const DynamicShapeConfig(
-                type: DynamicShapeType.smoothRounded,
+              config: const Material4Config(
+                type: Material4Type.smoothRounded,
                 cornerRadius: 16.0,
               ),
               dockedBadge: const Icon(Icons.star, key: ValueKey('docked_star')),

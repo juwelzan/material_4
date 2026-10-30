@@ -1,6 +1,6 @@
 import 'dart:ui';
-import 'package:dynamic_shape/src/config/bezier_config.dart';
-import 'package:dynamic_shape/src/config/shape_edge_config.dart';
+import 'package:material_4/src/config/bezier_config.dart';
+import 'package:material_4/src/config/shape_edge_config.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

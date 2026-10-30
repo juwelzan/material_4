@@ -1,4 +1,4 @@
-import 'package:dynamic_shape/dynamic_shape.dart';
+import 'package:material_4/material_4.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -167,7 +167,7 @@ void main() {
                 subtitle:
                     'Secondary explanatory subtitle that contains lots of detailed technical guidance for users.',
                 description:
-                    'Full descriptive body detailing the exact requirements of the modern dynamic shape RenderBox.',
+                    'Full descriptive body detailing the exact requirements of the modern Material 4 shape RenderBox.',
               ),
             ),
           ),

@@ -2,7 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-import '../../dynamic_shape_config.dart';
+import '../../material_4_config.dart';
 import 'creative_border_config.dart';
 import 'torn_paper_border.dart';
 

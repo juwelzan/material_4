@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
 
-import 'dynamic_shape_config.dart';
-import 'dynamic_shape_container.dart';
+import 'material_4_config.dart';
+import 'material_4_container.dart';
 
-/// Implicitly animated wrapper around [DynamicShapeContainer].
+/// Implicitly animated wrapper around [Material4Container].
 /// Automatically interpolates corner radii, tab dimensions, colors, and shadows
 /// with smooth fluid transitions when state changes.
-class AnimatedDynamicShapeContainer extends ImplicitlyAnimatedWidget {
+
+/// Type alias for [AnimatedMaterial4Container].
+typedef AnimatedMaterial4 = AnimatedMaterial4Container;
+
+class AnimatedMaterial4Container extends ImplicitlyAnimatedWidget {
   final Widget? child;
-  final DynamicShapeConfig config;
+  final Material4Config config;
   final double? width;
   final double? height;
   final EdgeInsetsGeometry? padding;
@@ -21,7 +25,7 @@ class AnimatedDynamicShapeContainer extends ImplicitlyAnimatedWidget {
   final VoidCallback? onTap;
   final Widget? dockedBadge;
 
-  const AnimatedDynamicShapeContainer({
+  const AnimatedMaterial4Container({
     super.key,
     super.curve = Curves.easeOutCubic,
     super.duration = const Duration(milliseconds: 300),
@@ -41,13 +45,13 @@ class AnimatedDynamicShapeContainer extends ImplicitlyAnimatedWidget {
   });
 
   @override
-  AnimatedWidgetBaseState<AnimatedDynamicShapeContainer> createState() =>
-      _AnimatedDynamicShapeContainerState();
+  AnimatedWidgetBaseState<AnimatedMaterial4Container> createState() =>
+      _AnimatedMaterial4ContainerState();
 }
 
-class _AnimatedDynamicShapeContainerState
-    extends AnimatedWidgetBaseState<AnimatedDynamicShapeContainer> {
-  DynamicShapeConfigTween? _configTween;
+class _AnimatedMaterial4ContainerState
+    extends AnimatedWidgetBaseState<AnimatedMaterial4Container> {
+  Material4ConfigTween? _configTween;
   Tween<double>? _widthTween;
   Tween<double>? _heightTween;
   EdgeInsetsGeometryTween? _paddingTween;
@@ -61,9 +65,8 @@ class _AnimatedDynamicShapeContainerState
     _configTween = visitor(
       _configTween,
       widget.config,
-      (dynamic value) =>
-          DynamicShapeConfigTween(begin: value as DynamicShapeConfig),
-    ) as DynamicShapeConfigTween?;
+      (dynamic value) => Material4ConfigTween(begin: value as Material4Config),
+    ) as Material4ConfigTween?;
 
     _widthTween = visitor(
       _widthTween,
@@ -119,7 +122,7 @@ class _AnimatedDynamicShapeContainerState
         ? widget.config
         : (_configTween?.evaluate(animation) ?? widget.config);
 
-    return DynamicShapeContainer(
+    return Material4Container(
       config: animatedConfig,
       width: _widthTween?.evaluate(animation) ?? widget.width,
       height: _heightTween?.evaluate(animation) ?? widget.height,
@@ -137,15 +140,15 @@ class _AnimatedDynamicShapeContainerState
   }
 }
 
-/// Specialized [Tween] for interpolating [DynamicShapeConfig] instances.
-class DynamicShapeConfigTween extends Tween<DynamicShapeConfig> {
-  DynamicShapeConfigTween({super.begin, super.end});
+/// Specialized [Tween] for interpolating [Material4Config] instances.
+class Material4ConfigTween extends Tween<Material4Config> {
+  Material4ConfigTween({super.begin, super.end});
 
   @override
-  DynamicShapeConfig lerp(double t) {
-    if (begin == null && end == null) return const DynamicShapeConfig();
+  Material4Config lerp(double t) {
+    if (begin == null && end == null) return const Material4Config();
     if (begin == null) return end!;
     if (end == null) return begin!;
-    return DynamicShapeConfig.lerp(begin!, end!, t);
+    return Material4Config.lerp(begin!, end!, t);
   }
 }

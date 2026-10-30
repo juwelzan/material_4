@@ -2,7 +2,7 @@ import 'dart:math' as math;
 import 'dart:ui';
 import 'package:flutter/foundation.dart';
 
-/// Immutable specification for the four corner radii of a dynamic shape contour.
+/// Immutable specification for the four corner radii of a Material 4 shape contour.
 ///
 /// Supports independent circular and elliptical radii for all four corners,
 /// along with standard CSS-style proportional radius down-scaling to prevent

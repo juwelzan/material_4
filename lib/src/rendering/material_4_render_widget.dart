@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 
-import '../dynamic_shape_config.dart';
 import '../layout/shape_content_protection.dart';
-import 'dynamic_shape_hit_test.dart';
-import 'dynamic_shape_interaction.dart';
-import 'dynamic_shape_render_object.dart';
+import '../material_4_config.dart';
+import 'material_4_hit_test.dart';
+import 'material_4_interaction.dart';
+import 'material_4_render_object.dart';
 
-/// Single-child RenderObjectWidget that hosts the [RenderDynamicShape] engine.
-class DynamicShapeRenderWidget extends SingleChildRenderObjectWidget {
-  final DynamicShapeConfig config;
+/// Single-child RenderObjectWidget that hosts the [RenderMaterial4] engine.
+class Material4RenderWidget extends SingleChildRenderObjectWidget {
+  final Material4Config config;
   final Color? color;
   final Gradient? gradient;
   final Color borderColor;
@@ -17,7 +17,7 @@ class DynamicShapeRenderWidget extends SingleChildRenderObjectWidget {
   final Clip clipBehavior;
   final ShapeContentProtection contentProtection;
   final ShapeHitTestBehavior hitTestBehavior;
-  final DynamicShapeInteraction? interaction;
+  final Material4Interaction? interaction;
   final ShapeClipConfig? clipConfig;
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
@@ -30,7 +30,7 @@ class DynamicShapeRenderWidget extends SingleChildRenderObjectWidget {
   final String? semanticLabel;
   final String? semanticHint;
 
-  const DynamicShapeRenderWidget({
+  const Material4RenderWidget({
     super.key,
     required this.config,
     this.color,
@@ -57,8 +57,8 @@ class DynamicShapeRenderWidget extends SingleChildRenderObjectWidget {
   });
 
   @override
-  RenderDynamicShape createRenderObject(BuildContext context) {
-    return RenderDynamicShape(
+  RenderMaterial4 createRenderObject(BuildContext context) {
+    return RenderMaterial4(
       config: config,
       color: color,
       gradient: gradient,
@@ -85,8 +85,7 @@ class DynamicShapeRenderWidget extends SingleChildRenderObjectWidget {
   }
 
   @override
-  void updateRenderObject(
-      BuildContext context, RenderDynamicShape renderObject) {
+  void updateRenderObject(BuildContext context, RenderMaterial4 renderObject) {
     renderObject
       ..config = config
       ..color = color

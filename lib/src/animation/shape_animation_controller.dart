@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/physics.dart';
 
-import '../dynamic_shape_config.dart';
+import '../material_4_config.dart';
 import 'shape_animation_config.dart';
 import 'shape_animation_sequence.dart';
 import 'shape_geometry_interpolator.dart';
 import 'shape_physics_simulation.dart';
 
-/// Centralized animation controller for dynamic shapes.
+/// Centralized animation controller for Material 4 shapes.
 ///
 /// Coordinates shape morphing, corner radius transitions, notch animations,
 /// affine transformations, physics springs, continuous pulsing, tactile press
@@ -24,9 +24,9 @@ class ShapeAnimationController extends ChangeNotifier {
   late final AnimationController _strokeDrawController;
   late final AnimationController _pressController;
 
-  DynamicShapeConfig _currentConfig;
-  DynamicShapeConfig? _targetConfig;
-  DynamicShapeConfig? _previousConfig;
+  Material4Config _currentConfig;
+  Material4Config? _targetConfig;
+  Material4Config? _previousConfig;
   Curve _morphCurve = Curves.easeInOutCubic;
   ShapeMorphFallback _morphFallback = ShapeMorphFallback.compatibleNormalized;
 
@@ -37,10 +37,10 @@ class ShapeAnimationController extends ChangeNotifier {
   ShapeMorphFallback get morphFallback => _morphFallback;
 
   /// Current shape configuration including interpolated animated parameters.
-  DynamicShapeConfig get currentConfig => _computeCurrentConfig();
+  Material4Config get currentConfig => _computeCurrentConfig();
 
   /// Target shape configuration currently being animated toward.
-  DynamicShapeConfig? get targetConfig => _targetConfig;
+  Material4Config? get targetConfig => _targetConfig;
 
   /// Whether this controller has been disposed.
   bool get isDisposed => _isDisposed;
@@ -62,7 +62,7 @@ class ShapeAnimationController extends ChangeNotifier {
 
   ShapeAnimationController({
     required this.vsync,
-    DynamicShapeConfig initialConfig = const DynamicShapeConfig(),
+    Material4Config initialConfig = const Material4Config(),
     this.respectReducedMotion = true,
   }) : _currentConfig = initialConfig {
     _morphController = AnimationController(
@@ -105,7 +105,7 @@ class ShapeAnimationController extends ChangeNotifier {
 
   /// Morph smoothly from current configuration to [target].
   TickerFuture morphTo(
-    DynamicShapeConfig target, {
+    Material4Config target, {
     Duration duration = const Duration(milliseconds: 450),
     Curve curve = Curves.easeInOutCubic,
     bool reducedMotion = false,
@@ -118,9 +118,9 @@ class ShapeAnimationController extends ChangeNotifier {
     );
   }
 
-  /// Transition smoothly to a specific [DynamicShapeType] preset.
+  /// Transition smoothly to a specific [Material4Type] preset.
   TickerFuture animateTo(
-    DynamicShapeType type, {
+    Material4Type type, {
     Duration duration = const Duration(milliseconds: 450),
     Curve curve = Curves.easeInOutCubic,
     ShapeMorphFallback fallback = ShapeMorphFallback.compatibleNormalized,
@@ -138,7 +138,7 @@ class ShapeAnimationController extends ChangeNotifier {
 
   /// Core transition method animating to [target] with full parameter interpolation.
   TickerFuture animateConfig(
-    DynamicShapeConfig target, {
+    Material4Config target, {
     Duration duration = const Duration(milliseconds: 400),
     Curve curve = Curves.easeInOutCubic,
     ShapePhysicsSimulation? physics,
@@ -209,7 +209,7 @@ class ShapeAnimationController extends ChangeNotifier {
 
   /// Animate using physics spring simulation.
   TickerFuture animateWithPhysics(
-    DynamicShapeConfig target, {
+    Material4Config target, {
     ShapePhysicsSimulation? physics,
   }) {
     return animateConfig(
@@ -362,7 +362,7 @@ class ShapeAnimationController extends ChangeNotifier {
   }
 
   /// Evaluate interpolated configuration during morphing or pressing.
-  DynamicShapeConfig _computeCurrentConfig() {
+  Material4Config _computeCurrentConfig() {
     var base = _currentConfig;
 
     if (_targetConfig != null && _previousConfig != null) {

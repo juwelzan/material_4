@@ -1,4 +1,4 @@
-import 'package:dynamic_shape/dynamic_shape.dart';
+import 'package:material_4/material_4.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -14,7 +14,7 @@ void main() {
       final vsync = tester;
       final controller = ShapeAnimationController(
         vsync: vsync,
-        initialConfig: DynamicShapeConfig.folderTab(),
+        initialConfig: Material4Config.folderTab(),
       );
 
       expect(controller.isDisposed, isFalse);
@@ -50,7 +50,7 @@ void main() {
       expect(() => controller.release(), returnsNormally);
       expect(() => controller.stopPulse(), returnsNormally);
       expect(
-        () => controller.morphTo(DynamicShapeConfig.shield()),
+        () => controller.morphTo(Material4Config.shield()),
         returnsNormally,
       );
     });
@@ -64,14 +64,14 @@ void main() {
 
       final controller = ShapeAnimationController(
         vsync: tester,
-        initialConfig: const DynamicShapeConfig(
+        initialConfig: const Material4Config(
           cornerRadius: 10.0,
           tabWidth: 40.0,
         ),
       );
 
       controller.morphTo(
-        const DynamicShapeConfig(cornerRadius: 30.0, tabWidth: 80.0),
+        const Material4Config(cornerRadius: 30.0, tabWidth: 80.0),
         duration: const Duration(milliseconds: 400),
       );
 
@@ -98,12 +98,12 @@ void main() {
 
       final controller = ShapeAnimationController(
         vsync: tester,
-        initialConfig: const DynamicShapeConfig(cornerRadius: 12.0),
+        initialConfig: const Material4Config(cornerRadius: 12.0),
         respectReducedMotion: true,
       );
 
       controller.morphTo(
-        const DynamicShapeConfig(cornerRadius: 36.0),
+        const Material4Config(cornerRadius: 36.0),
         reducedMotion: true,
       );
 

@@ -1,26 +1,26 @@
 import 'package:flutter/material.dart';
 
-import '../dynamic_shape_config.dart';
-import '../dynamic_shape_container.dart';
+import '../material_4_config.dart';
+import '../material_4_container.dart';
 import 'shape_animation_config.dart';
 import 'shape_geometry_interpolator.dart';
 
-/// Animated transition widget that morphs between two dynamic shapes.
+/// Animated transition widget that morphs between two Material 4 shapes.
 ///
 /// Can operate implicitly with specified `from` and `to` presets, or explicitly
 /// driven by an external [Animation<double>].
 class ShapeMorphTransition extends StatefulWidget {
   /// Starting shape preset (when [fromConfig] is omitted).
-  final DynamicShapeType? from;
+  final Material4Type? from;
 
   /// Ending target shape preset (when [toConfig] is omitted).
-  final DynamicShapeType? to;
+  final Material4Type? to;
 
   /// Full starting shape configuration.
-  final DynamicShapeConfig? fromConfig;
+  final Material4Config? fromConfig;
 
   /// Full target shape configuration.
-  final DynamicShapeConfig? toConfig;
+  final Material4Config? toConfig;
 
   /// Optional explicit progress animation (0.0 = start shape, 1.0 = target shape).
   final Animation<double>? animation;
@@ -96,11 +96,11 @@ class _ShapeMorphTransitionState extends State<ShapeMorphTransition>
   Animation<double> get _activeAnimation =>
       widget.animation ?? _internalController!;
 
-  DynamicShapeConfig get _startConfig =>
-      widget.fromConfig ?? DynamicShapeConfig(type: widget.from!);
+  Material4Config get _startConfig =>
+      widget.fromConfig ?? Material4Config(type: widget.from!);
 
-  DynamicShapeConfig get _endConfig =>
-      widget.toConfig ?? DynamicShapeConfig(type: widget.to!);
+  Material4Config get _endConfig =>
+      widget.toConfig ?? Material4Config(type: widget.to!);
 
   @override
   void initState() {
@@ -145,7 +145,7 @@ class _ShapeMorphTransitionState extends State<ShapeMorphTransition>
           t,
         );
 
-        return DynamicShapeContainer(
+        return Material4Container(
           config: morphedConfig,
           width: widget.width,
           height: widget.height,

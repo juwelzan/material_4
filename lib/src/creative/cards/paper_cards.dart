@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../dynamic_shape_config.dart';
-import '../../dynamic_shape_container.dart';
+import '../../material_4_config.dart';
+import '../../material_4_container.dart';
 import '../borders/creative_border_config.dart';
 import '../paper/paper_background_config.dart';
 
@@ -77,15 +77,15 @@ class LayeredPaperCard extends StatelessWidget {
               ),
             ),
           ),
-        DynamicShapeContainer(
+        Material4Container(
           width: width,
           height: height,
           padding: padding,
           color: backgroundColor,
           borderColor: const Color(0x14000000),
           borderWidth: 1.0,
-          config: const DynamicShapeConfig(
-            type: DynamicShapeType.smoothRounded,
+          config: const Material4Config(
+            type: Material4Type.smoothRounded,
             cornerRadius: 6.0,
             paperBackground: PaperBackgroundConfig(
               style: PaperBackgroundStyle.plainWhite,
@@ -138,14 +138,14 @@ class TornPaperCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final card = DynamicShapeContainer(
+    final card = Material4Container(
       width: width,
       height: height,
       padding: padding,
       margin: margin,
       color: backgroundColor,
-      config: DynamicShapeConfig(
-        type: DynamicShapeType.smoothRounded,
+      config: Material4Config(
+        type: Material4Type.smoothRounded,
         cornerRadius: 4.0,
         creativeBorder: CreativeBorderConfig.tornPaper(
           edges: edges,
@@ -197,14 +197,14 @@ class FoldedPaperCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget card = DynamicShapeContainer(
+    Widget card = Material4Container(
       width: width,
       height: height,
       padding: padding,
       margin: margin,
       color: backgroundColor,
-      config: DynamicShapeConfig(
-        type: DynamicShapeType.chamferDiagonal,
+      config: Material4Config(
+        type: Material4Type.chamferDiagonal,
         tabWidth: foldSize,
         tabHeight: foldSize,
         paperBackground: const PaperBackgroundConfig(
@@ -259,7 +259,7 @@ class StickyNoteCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget note = DynamicShapeContainer(
+    Widget note = Material4Container(
       width: width,
       height: height,
       padding: padding,
@@ -276,8 +276,8 @@ class StickyNoteCard extends StatelessWidget {
           blurRadius: 3,
         ),
       ],
-      config: DynamicShapeConfig(
-        type: DynamicShapeType.smoothRounded,
+      config: Material4Config(
+        type: Material4Type.smoothRounded,
         cornerRadius: 4.0,
         paperBackground: PaperBackgroundConfig.stickyNote(baseColor: color),
       ),
@@ -351,14 +351,14 @@ class VintagePaperCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final card = DynamicShapeContainer(
+    final card = Material4Container(
       width: width,
       height: height,
       padding: padding,
       margin: margin,
       color: backgroundColor,
-      config: DynamicShapeConfig(
-        type: DynamicShapeType.smoothRounded,
+      config: Material4Config(
+        type: Material4Type.smoothRounded,
         cornerRadius: 8.0,
         creativeBorder: burnEdges ? CreativeBorderConfig.burntEdge() : null,
         paperBackground: PaperBackgroundConfig.vintage(),
@@ -400,7 +400,7 @@ class NotebookCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final card = DynamicShapeContainer(
+    final card = Material4Container(
       width: width,
       height: height,
       padding: padding,
@@ -408,8 +408,8 @@ class NotebookCard extends StatelessWidget {
       color: backgroundColor,
       borderColor: const Color(0x18000000),
       borderWidth: 1.0,
-      config: DynamicShapeConfig(
-        type: DynamicShapeType.smoothRounded,
+      config: Material4Config(
+        type: Material4Type.smoothRounded,
         cornerRadius: 12.0,
         paperBackground: const PaperBackgroundConfig(
           style: PaperBackgroundStyle.notebook,
@@ -453,7 +453,7 @@ class KraftPaperCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final card = DynamicShapeContainer(
+    final card = Material4Container(
       width: width,
       height: height,
       padding: padding,
@@ -468,8 +468,8 @@ class KraftPaperCard extends StatelessWidget {
           blurRadius: 8,
         ),
       ],
-      config: const DynamicShapeConfig(
-        type: DynamicShapeType.smoothRounded,
+      config: const Material4Config(
+        type: Material4Type.smoothRounded,
         cornerRadius: 8.0,
         paperBackground: PaperBackgroundConfig(
           style: PaperBackgroundStyle.kraft,
@@ -514,7 +514,7 @@ class RecycledPaperCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final card = DynamicShapeContainer(
+    final card = Material4Container(
       width: width,
       height: height,
       padding: padding,
@@ -529,8 +529,8 @@ class RecycledPaperCard extends StatelessWidget {
           blurRadius: 6,
         ),
       ],
-      config: const DynamicShapeConfig(
-        type: DynamicShapeType.smoothRounded,
+      config: const Material4Config(
+        type: Material4Type.smoothRounded,
         cornerRadius: 6.0,
         paperBackground: PaperBackgroundConfig(
           style: PaperBackgroundStyle.recycled,
@@ -575,7 +575,7 @@ class ParchmentCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final card = DynamicShapeContainer(
+    final card = Material4Container(
       width: width,
       height: height,
       padding: padding,
@@ -588,8 +588,8 @@ class ParchmentCard extends StatelessWidget {
           blurRadius: 10,
         ),
       ],
-      config: DynamicShapeConfig(
-        type: DynamicShapeType.smoothRounded,
+      config: Material4Config(
+        type: Material4Type.smoothRounded,
         cornerRadius: 4.0,
         creativeBorder: CreativeBorderConfig.deckledEdge(
           color: const Color(0xFFD7CCC8),
@@ -664,7 +664,7 @@ class PaperStackCard extends StatelessWidget {
               ),
             ),
           ),
-        DynamicShapeContainer(
+        Material4Container(
           width: width,
           height: height,
           padding: padding,
@@ -678,8 +678,8 @@ class PaperStackCard extends StatelessWidget {
               blurRadius: 8,
             ),
           ],
-          config: const DynamicShapeConfig(
-            type: DynamicShapeType.smoothRounded,
+          config: const Material4Config(
+            type: Material4Type.smoothRounded,
             cornerRadius: 6.0,
             paperBackground: PaperBackgroundConfig(
               style: PaperBackgroundStyle.plainWhite,
@@ -759,7 +759,7 @@ class PaperCutoutCard extends StatelessWidget {
       ],
     );
 
-    final card = DynamicShapeContainer(
+    final card = Material4Container(
       width: width,
       height: height,
       padding: padding,
@@ -774,8 +774,8 @@ class PaperCutoutCard extends StatelessWidget {
           blurRadius: 10,
         ),
       ],
-      config: const DynamicShapeConfig(
-        type: DynamicShapeType.smoothRounded,
+      config: const Material4Config(
+        type: Material4Type.smoothRounded,
         cornerRadius: 10.0,
         paperBackground: PaperBackgroundConfig(
           style: PaperBackgroundStyle.handmade,
@@ -823,7 +823,7 @@ class PaperTicketCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget card = DynamicShapeContainer(
+    Widget card = Material4Container(
       width: width,
       height: height,
       padding: padding,
@@ -836,8 +836,8 @@ class PaperTicketCard extends StatelessWidget {
           blurRadius: 8,
         ),
       ],
-      config: DynamicShapeConfig(
-        type: DynamicShapeType.ticketScallop,
+      config: Material4Config(
+        type: Material4Type.ticketScallop,
         cornerRadius: 8.0,
         scallopRadius: cutoutRadius,
         creativeBorder: CreativeBorderConfig.perforated(
@@ -897,14 +897,14 @@ class CouponCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget card = DynamicShapeContainer(
+    Widget card = Material4Container(
       width: width,
       height: height,
       padding: padding,
       margin: margin,
       color: Colors.white,
-      config: const DynamicShapeConfig(
-        type: DynamicShapeType.ticketScallop,
+      config: const Material4Config(
+        type: Material4Type.ticketScallop,
         scallopRadius: 14.0,
         creativeBorder: CreativeBorderConfig(
           style: CreativeBorderStyle.couponEdge,

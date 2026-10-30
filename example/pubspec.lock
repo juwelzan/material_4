@@ -73,13 +73,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.9"
-  dynamic_shape:
-    dependency: "direct main"
-    description:
-      path: ".."
-      relative: true
-    source: path
-    version: "1.0.0"
   fake_async:
     dependency: transitive
     description:
@@ -218,6 +211,13 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.12.20"
+  material_4:
+    dependency: "direct main"
+    description:
+      path: ".."
+      relative: true
+    source: path
+    version: "1.0.0"
   material_color_utilities:
     dependency: transitive
     description:

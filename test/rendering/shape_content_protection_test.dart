@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:dynamic_shape/dynamic_shape.dart';
+import 'package:material_4/material_4.dart';
 
 void main() {
   group('ShapeContentProtection Modes', () {
@@ -28,8 +28,8 @@ void main() {
 
   group('ShapeSafeRegion & Content Protection Geometry', () {
     test('Calculates insets for inward notches avoiding content collision', () {
-      const config = DynamicShapeConfig(
-        type: DynamicShapeType.smoothRounded,
+      const config = Material4Config(
+        type: Material4Type.smoothRounded,
         notches: [
           ShapeNotch(
             edge: ShapeEdge.top,
@@ -61,7 +61,7 @@ void main() {
     });
 
     test('Outward tabs do not intrude on interior safe insets', () {
-      const inwardConfig = DynamicShapeConfig(
+      const inwardConfig = Material4Config(
         notches: [
           ShapeNotch(
             edge: ShapeEdge.top,
@@ -72,7 +72,7 @@ void main() {
           ),
         ],
       );
-      const outwardConfig = DynamicShapeConfig(
+      const outwardConfig = Material4Config(
         notches: [
           ShapeNotch(
             edge: ShapeEdge.top,
@@ -97,8 +97,8 @@ void main() {
     });
 
     test('RTL mirrors horizontal safe insets correctly', () {
-      const config = DynamicShapeConfig(
-        type: DynamicShapeType.asymmetricCard,
+      const config = Material4Config(
+        type: Material4Type.asymmetricCard,
         corners: ShapeCorners(
           topLeft: Radius.circular(50),
           topRight: Radius.circular(10),
@@ -127,7 +127,7 @@ void main() {
 
   group('ShapeCollisionDetector Tests', () {
     test('Detects safe child position inside safe bounds', () {
-      const config = DynamicShapeConfig(
+      const config = Material4Config(
         notches: [
           ShapeNotch(
             edge: ShapeEdge.top,
@@ -151,7 +151,7 @@ void main() {
     });
 
     test('Flags collision when child overlaps inward notch pocket', () {
-      const config = DynamicShapeConfig(
+      const config = Material4Config(
         notches: [
           ShapeNotch(
             edge: ShapeEdge.top,
@@ -206,7 +206,7 @@ void main() {
     });
 
     test('Computes optimal font size for bounded inscribed region', () {
-      const sampleText = 'Universal Dynamic Shape Content Protection';
+      const sampleText = 'Universal Material 4 Content Protection';
       final optimalSize = ShapeTextFitter.computeOptimalFontSize(
         text: sampleText,
         targetSize: const Size(120, 40),
@@ -285,17 +285,17 @@ void main() {
 
   group('Widget Content Protection Integration Tests', () {
     testWidgets(
-        'Renders Bengali multiline text in DynamicShapeContainer without error',
+        'Renders Bengali multiline text in Material4Container without error',
         (tester) async {
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
           child: Center(
-            child: DynamicShapeContainer(
+            child: Material4Container(
               width: 260,
               height: 120,
-              config: const DynamicShapeConfig(
-                type: DynamicShapeType.waveEdge,
+              config: const Material4Config(
+                type: Material4Type.waveEdge,
               ),
               contentProtection: const ShapeContentProtection.strict(),
               child: const Text(
@@ -307,7 +307,7 @@ void main() {
         ),
       );
 
-      expect(find.byType(DynamicShapeRenderWidget), findsOneWidget);
+      expect(find.byType(Material4RenderWidget), findsOneWidget);
       expect(find.textContaining('বাংলা টেক্সট কন্টেন্ট সুরক্ষা টেস্ট'),
           findsOneWidget);
       expect(tester.takeException(), isNull);
@@ -320,7 +320,7 @@ void main() {
         Directionality(
           textDirection: TextDirection.ltr,
           child: Center(
-            child: DynamicShapeContainer(
+            child: Material4Container(
               width: 150,
               height: 80,
               contentProtection: const ShapeContentProtection.visibleOverflow(),

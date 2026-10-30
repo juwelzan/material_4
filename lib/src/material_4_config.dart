@@ -6,13 +6,13 @@ import 'package:flutter/material.dart' show BoxShadow, Gradient;
 import 'config/config.dart';
 import 'creative/borders/creative_border_config.dart';
 import 'creative/paper/paper_background_config.dart';
-import 'rendering/dynamic_shape_interaction.dart';
+import 'rendering/material_4_interaction.dart';
 import 'shape_pattern.dart';
 
 export 'config/config.dart';
 
-/// Available dynamic shape presets that can be generated on the fly.
-enum DynamicShapeType {
+/// Available Material 4 shape presets that can be generated on the fly.
+enum Material4Type {
   // --- Original 13 Presets (Preserved for 100% Backward Compatibility) ---
   /// File-folder tab shape (elevated or recessed tab on an edge).
   folderTab,
@@ -232,7 +232,7 @@ enum BorderStyleType {
   handDrawn,
 }
 
-/// Visual background effect styles for dynamic shape interiors.
+/// Visual background effect styles for Material 4 shape interiors.
 enum BackgroundEffectType {
   /// Standard solid color or linear gradient fill.
   none,
@@ -272,9 +272,13 @@ enum BackgroundEffectType {
 }
 
 /// Configuration model containing all geometric, border, pattern, and depth parameters
-/// needed to generate arbitrary organic, minimal, and unique shapes dynamically.
-class DynamicShapeConfig {
-  final DynamicShapeType type;
+/// needed to generate arbitrary organic, minimal, and unique shapes in Material 4.
+
+/// Type alias for [Material4Config].
+typedef Material4ShapeConfig = Material4Config;
+
+class Material4Config {
+  final Material4Type type;
   final BorderStyleType borderStyle;
 
   /// Base uniform corner radius of the container.
@@ -442,7 +446,7 @@ class DynamicShapeConfig {
   final ShapeClipConfig? clipConfig;
 
   /// Shape-aware interaction, hit-testing, and pointer routing configuration.
-  final DynamicShapeInteraction? interaction;
+  final Material4Interaction? interaction;
 
   /// Creative border configuration (torn paper, deckled edge, stamps, stitch, neon, etc.).
   final CreativeBorderConfig? creativeBorder;
@@ -453,8 +457,8 @@ class DynamicShapeConfig {
   /// Creative stationery or repeating pattern configuration.
   final CreativePatternConfig? creativePattern;
 
-  const DynamicShapeConfig({
-    this.type = DynamicShapeType.smoothRounded,
+  const Material4Config({
+    this.type = Material4Type.smoothRounded,
     this.borderStyle = BorderStyleType.solid,
     this.cornerRadius = 24.0,
     CornerRadii? cornerRadii,
@@ -573,7 +577,7 @@ class DynamicShapeConfig {
 
   // --- Factory Presets (Existing preserved 100%) ---
 
-  factory DynamicShapeConfig.folderTab({
+  factory Material4Config.folderTab({
     ShapeAnchor anchor = ShapeAnchor.topRight,
     BorderStyleType borderStyle = BorderStyleType.solid,
     double cornerRadius = 22.0,
@@ -582,8 +586,8 @@ class DynamicShapeConfig {
     double filletRadius = 10.0,
     ShapePattern pattern = ShapePattern.none,
   }) {
-    return DynamicShapeConfig(
-      type: DynamicShapeType.folderTab,
+    return Material4Config(
+      type: Material4Type.folderTab,
       borderStyle: borderStyle,
       anchor: anchor,
       cornerRadius: cornerRadius,
@@ -594,7 +598,7 @@ class DynamicShapeConfig {
     );
   }
 
-  factory DynamicShapeConfig.notchedBadge({
+  factory Material4Config.notchedBadge({
     ShapeAnchor anchor = ShapeAnchor.topRight,
     BorderStyleType borderStyle = BorderStyleType.solid,
     double cornerRadius = 24.0,
@@ -602,8 +606,8 @@ class DynamicShapeConfig {
     double notchHeight = 26.0,
     double filletRadius = 12.0,
   }) {
-    return DynamicShapeConfig(
-      type: DynamicShapeType.notchedBadge,
+    return Material4Config(
+      type: Material4Type.notchedBadge,
       borderStyle: borderStyle,
       anchor: anchor,
       cornerRadius: cornerRadius,
@@ -613,7 +617,7 @@ class DynamicShapeConfig {
     );
   }
 
-  factory DynamicShapeConfig.sideTab({
+  factory Material4Config.sideTab({
     ShapeAnchor anchor = ShapeAnchor.rightCenter,
     BorderStyleType borderStyle = BorderStyleType.solid,
     double cornerRadius = 24.0,
@@ -621,8 +625,8 @@ class DynamicShapeConfig {
     double tabHeight = 50.0,
     double filletRadius = 12.0,
   }) {
-    return DynamicShapeConfig(
-      type: DynamicShapeType.sideTab,
+    return Material4Config(
+      type: Material4Type.sideTab,
       borderStyle: borderStyle,
       anchor: anchor,
       cornerRadius: cornerRadius,
@@ -632,7 +636,7 @@ class DynamicShapeConfig {
     );
   }
 
-  factory DynamicShapeConfig.steppedCorner({
+  factory Material4Config.steppedCorner({
     ShapeAnchor anchor = ShapeAnchor.bottomRight,
     BorderStyleType borderStyle = BorderStyleType.solid,
     double cornerRadius = 22.0,
@@ -640,8 +644,8 @@ class DynamicShapeConfig {
     double stepHeight = 44.0,
     double filletRadius = 14.0,
   }) {
-    return DynamicShapeConfig(
-      type: DynamicShapeType.steppedCorner,
+    return Material4Config(
+      type: Material4Type.steppedCorner,
       borderStyle: borderStyle,
       anchor: anchor,
       cornerRadius: cornerRadius,
@@ -651,14 +655,14 @@ class DynamicShapeConfig {
     );
   }
 
-  factory DynamicShapeConfig.ticketScallop({
+  factory Material4Config.ticketScallop({
     BorderStyleType borderStyle = BorderStyleType.solid,
     double cornerRadius = 24.0,
     double scallopRadius = 12.0,
     ShapePattern pattern = ShapePattern.none,
   }) {
-    return DynamicShapeConfig(
-      type: DynamicShapeType.ticketScallop,
+    return Material4Config(
+      type: Material4Type.ticketScallop,
       borderStyle: borderStyle,
       cornerRadius: cornerRadius,
       scallopRadius: scallopRadius,
@@ -666,27 +670,27 @@ class DynamicShapeConfig {
     );
   }
 
-  factory DynamicShapeConfig.postageStamp({
+  factory Material4Config.postageStamp({
     BorderStyleType borderStyle = BorderStyleType.solid,
     double cornerRadius = 18.0,
     double scallopRadius = 6.0,
   }) {
-    return DynamicShapeConfig(
-      type: DynamicShapeType.postageStamp,
+    return Material4Config(
+      type: Material4Type.postageStamp,
       borderStyle: borderStyle,
       cornerRadius: cornerRadius,
       scallopRadius: scallopRadius,
     );
   }
 
-  factory DynamicShapeConfig.zigzagCut({
+  factory Material4Config.zigzagCut({
     BorderStyleType borderStyle = BorderStyleType.dashed,
     double cornerRadius = 20.0,
     double toothWidth = 14.0,
     double toothHeight = 8.0,
   }) {
-    return DynamicShapeConfig(
-      type: DynamicShapeType.zigzagCut,
+    return Material4Config(
+      type: Material4Type.zigzagCut,
       borderStyle: borderStyle,
       cornerRadius: cornerRadius,
       toothWidth: toothWidth,
@@ -694,36 +698,36 @@ class DynamicShapeConfig {
     );
   }
 
-  factory DynamicShapeConfig.arch({
+  factory Material4Config.arch({
     BorderStyleType borderStyle = BorderStyleType.solid,
     double cornerRadius = 24.0,
   }) {
-    return DynamicShapeConfig(
-      type: DynamicShapeType.arch,
+    return Material4Config(
+      type: Material4Type.arch,
       borderStyle: borderStyle,
       cornerRadius: cornerRadius,
     );
   }
 
-  factory DynamicShapeConfig.hexagonSoft({
+  factory Material4Config.hexagonSoft({
     BorderStyleType borderStyle = BorderStyleType.solid,
     double cornerRadius = 16.0,
   }) {
-    return DynamicShapeConfig(
-      type: DynamicShapeType.hexagonSoft,
+    return Material4Config(
+      type: Material4Type.hexagonSoft,
       borderStyle: borderStyle,
       cornerRadius: cornerRadius,
     );
   }
 
-  factory DynamicShapeConfig.chamferDiagonal({
+  factory Material4Config.chamferDiagonal({
     ShapeAnchor anchor = ShapeAnchor.topRight,
     BorderStyleType borderStyle = BorderStyleType.solid,
     double cornerRadius = 20.0,
     double chamferSize = 36.0,
   }) {
-    return DynamicShapeConfig(
-      type: DynamicShapeType.chamferDiagonal,
+    return Material4Config(
+      type: Material4Type.chamferDiagonal,
       anchor: anchor,
       borderStyle: borderStyle,
       cornerRadius: cornerRadius,
@@ -731,24 +735,24 @@ class DynamicShapeConfig {
     );
   }
 
-  factory DynamicShapeConfig.organicBlob({
+  factory Material4Config.organicBlob({
     BorderStyleType borderStyle = BorderStyleType.solid,
     double cornerRadius = 28.0,
   }) {
-    return DynamicShapeConfig(
-      type: DynamicShapeType.organicBlob,
+    return Material4Config(
+      type: Material4Type.organicBlob,
       borderStyle: borderStyle,
       cornerRadius: cornerRadius,
     );
   }
 
-  factory DynamicShapeConfig.scallopedPetal({
+  factory Material4Config.scallopedPetal({
     int petalCount = 10,
     BorderStyleType borderStyle = BorderStyleType.solid,
     double cornerRadius = 24.0,
   }) {
-    return DynamicShapeConfig(
-      type: DynamicShapeType.scallopedPetal,
+    return Material4Config(
+      type: Material4Type.scallopedPetal,
       borderStyle: borderStyle,
       petalCount: petalCount,
       cornerRadius: cornerRadius,
@@ -758,13 +762,13 @@ class DynamicShapeConfig {
   // --- Next-Gen Shape Preset Factories ---
 
   /// Preset for an Asymmetric Card with 4 independent corner radii.
-  factory DynamicShapeConfig.asymmetricCard({
+  factory Material4Config.asymmetricCard({
     CornerRadii cornerRadii = const CornerRadii.asymmetric(),
     ShapeCorners? corners,
     BorderStyleType borderStyle = BorderStyleType.solid,
   }) {
-    return DynamicShapeConfig(
-      type: DynamicShapeType.asymmetricCard,
+    return Material4Config(
+      type: Material4Type.asymmetricCard,
       borderStyle: borderStyle,
       cornerRadii: cornerRadii,
       corners: corners,
@@ -772,25 +776,25 @@ class DynamicShapeConfig {
   }
 
   /// Preset for a smooth Capsule / Pill shape.
-  factory DynamicShapeConfig.capsule({
+  factory Material4Config.capsule({
     BorderStyleType borderStyle = BorderStyleType.solid,
   }) {
-    return DynamicShapeConfig(
-      type: DynamicShapeType.capsule,
+    return Material4Config(
+      type: Material4Type.capsule,
       borderStyle: borderStyle,
     );
   }
 
   /// Preset for a Wave Edge container.
-  factory DynamicShapeConfig.waveEdge({
+  factory Material4Config.waveEdge({
     ShapeAnchor anchor = ShapeAnchor.bottomCenter,
     double waveCount = 3.0,
     double waveAmplitude = 10.0,
     double cornerRadius = 20.0,
     BorderStyleType borderStyle = BorderStyleType.solid,
   }) {
-    return DynamicShapeConfig(
-      type: DynamicShapeType.waveEdge,
+    return Material4Config(
+      type: Material4Type.waveEdge,
       anchor: anchor,
       waveCount: waveCount,
       waveAmplitude: waveAmplitude,
@@ -800,25 +804,25 @@ class DynamicShapeConfig {
   }
 
   /// Preset for an organic multi-lobed Cloud shape.
-  factory DynamicShapeConfig.cloud({
+  factory Material4Config.cloud({
     BorderStyleType borderStyle = BorderStyleType.solid,
   }) {
-    return DynamicShapeConfig(
-      type: DynamicShapeType.cloud,
+    return Material4Config(
+      type: Material4Type.cloud,
       borderStyle: borderStyle,
     );
   }
 
   /// Preset for a Speech Bubble container with an integrated pointer tail.
-  factory DynamicShapeConfig.speechBubble({
+  factory Material4Config.speechBubble({
     ShapeAnchor anchor = ShapeAnchor.bottomLeft,
     double tailWidth = 18.0,
     double tailHeight = 14.0,
     double cornerRadius = 22.0,
     BorderStyleType borderStyle = BorderStyleType.solid,
   }) {
-    return DynamicShapeConfig(
-      type: DynamicShapeType.speechBubble,
+    return Material4Config(
+      type: Material4Type.speechBubble,
       anchor: anchor,
       speechBubbleTailWidth: tailWidth,
       speechBubbleTailHeight: tailHeight,
@@ -828,50 +832,50 @@ class DynamicShapeConfig {
   }
 
   /// Preset for a classic Shield / Academic Crest emblem.
-  factory DynamicShapeConfig.shield({
+  factory Material4Config.shield({
     double cornerRadius = 20.0,
     BorderStyleType borderStyle = BorderStyleType.solid,
   }) {
-    return DynamicShapeConfig(
-      type: DynamicShapeType.shield,
+    return Material4Config(
+      type: Material4Type.shield,
       cornerRadius: cornerRadius,
       borderStyle: borderStyle,
     );
   }
 
   /// Preset for a Diamond / Rhombus badge.
-  factory DynamicShapeConfig.diamond({
+  factory Material4Config.diamond({
     double cornerRadius = 14.0,
     BorderStyleType borderStyle = BorderStyleType.solid,
   }) {
-    return DynamicShapeConfig(
-      type: DynamicShapeType.diamond,
+    return Material4Config(
+      type: Material4Type.diamond,
       cornerRadius: cornerRadius,
       borderStyle: borderStyle,
     );
   }
 
   /// Preset for an 8-sided Octagon shape.
-  factory DynamicShapeConfig.octagon({
+  factory Material4Config.octagon({
     double cornerRadius = 16.0,
     BorderStyleType borderStyle = BorderStyleType.solid,
   }) {
-    return DynamicShapeConfig(
-      type: DynamicShapeType.octagon,
+    return Material4Config(
+      type: Material4Type.octagon,
       cornerRadius: cornerRadius,
       borderStyle: borderStyle,
     );
   }
 
   /// Preset for a Wave Cut sliced container.
-  factory DynamicShapeConfig.waveCut({
+  factory Material4Config.waveCut({
     ShapeAnchor anchor = ShapeAnchor.bottomRight,
     double waveAmplitude = 16.0,
     double cornerRadius = 22.0,
     BorderStyleType borderStyle = BorderStyleType.solid,
   }) {
-    return DynamicShapeConfig(
-      type: DynamicShapeType.waveCut,
+    return Material4Config(
+      type: Material4Type.waveCut,
       anchor: anchor,
       waveAmplitude: waveAmplitude,
       cornerRadius: cornerRadius,
@@ -880,49 +884,49 @@ class DynamicShapeConfig {
   }
 
   /// Preset for Concave Rounded corners (vintage decorative frame).
-  factory DynamicShapeConfig.concaveRounded({
+  factory Material4Config.concaveRounded({
     double cornerRadius = 20.0,
     BorderStyleType borderStyle = BorderStyleType.solid,
   }) {
-    return DynamicShapeConfig(
-      type: DynamicShapeType.concaveRounded,
+    return Material4Config(
+      type: Material4Type.concaveRounded,
       cornerRadius: cornerRadius,
       borderStyle: borderStyle,
     );
   }
 
   /// Preset for Convex Rounded (barrel curved sides).
-  factory DynamicShapeConfig.convexRounded({
+  factory Material4Config.convexRounded({
     double curvature = 16.0,
     BorderStyleType borderStyle = BorderStyleType.solid,
   }) {
-    return DynamicShapeConfig(
-      type: DynamicShapeType.convexRounded,
+    return Material4Config(
+      type: Material4Type.convexRounded,
       waveAmplitude: curvature,
       borderStyle: borderStyle,
     );
   }
 
   /// Preset for true mathematical Squircle (iOS super-ellipse).
-  factory DynamicShapeConfig.squircle({
+  factory Material4Config.squircle({
     double cornerRadius = 32.0,
     BorderStyleType borderStyle = BorderStyleType.solid,
   }) {
-    return DynamicShapeConfig(
-      type: DynamicShapeType.squircle,
+    return Material4Config(
+      type: Material4Type.squircle,
       cornerRadius: cornerRadius,
       borderStyle: borderStyle,
     );
   }
 
   /// Preset for a slanted Parallelogram badge.
-  factory DynamicShapeConfig.parallelogram({
+  factory Material4Config.parallelogram({
     double skewAngle = 14.0,
     double cornerRadius = 16.0,
     BorderStyleType borderStyle = BorderStyleType.solid,
   }) {
-    return DynamicShapeConfig(
-      type: DynamicShapeType.parallelogram,
+    return Material4Config(
+      type: Material4Type.parallelogram,
       skewAngle: skewAngle,
       cornerRadius: cornerRadius,
       borderStyle: borderStyle,
@@ -930,13 +934,13 @@ class DynamicShapeConfig {
   }
 
   /// Preset for a Banner Ribbon with swallowtail notches.
-  factory DynamicShapeConfig.ribbon({
+  factory Material4Config.ribbon({
     double foldDepth = 20.0,
     double cornerRadius = 6.0,
     BorderStyleType borderStyle = BorderStyleType.solid,
   }) {
-    return DynamicShapeConfig(
-      type: DynamicShapeType.ribbon,
+    return Material4Config(
+      type: Material4Type.ribbon,
       ribbonFoldDepth: foldDepth,
       cornerRadius: cornerRadius,
       borderStyle: borderStyle,
@@ -944,13 +948,13 @@ class DynamicShapeConfig {
   }
 
   /// Preset for a Bookmark with an inverted bottom V-tail.
-  factory DynamicShapeConfig.bookmark({
+  factory Material4Config.bookmark({
     double notchDepth = 22.0,
     double cornerRadius = 16.0,
     BorderStyleType borderStyle = BorderStyleType.solid,
   }) {
-    return DynamicShapeConfig(
-      type: DynamicShapeType.bookmark,
+    return Material4Config(
+      type: Material4Type.bookmark,
       ribbonFoldDepth: notchDepth,
       cornerRadius: cornerRadius,
       borderStyle: borderStyle,
@@ -958,13 +962,13 @@ class DynamicShapeConfig {
   }
 
   /// Preset for fully custom Bézier path geometry.
-  factory DynamicShapeConfig.customBezier({
+  factory Material4Config.customBezier({
     Path Function(Size size)? builder,
     CustomBezierConfig? config,
     BorderStyleType borderStyle = BorderStyleType.solid,
   }) {
-    return DynamicShapeConfig(
-      type: DynamicShapeType.customBezier,
+    return Material4Config(
+      type: Material4Type.customBezier,
       customBezierBuilder: builder,
       bezierConfig: config,
       borderStyle: borderStyle,
@@ -974,13 +978,13 @@ class DynamicShapeConfig {
   // --- Next-Gen Border Presets (Phase 2 Expansion) ---
 
   /// Preset for a high-intensity pulsing neon glow border.
-  factory DynamicShapeConfig.neon({
-    DynamicShapeType type = DynamicShapeType.smoothRounded,
+  factory Material4Config.neon({
+    Material4Type type = Material4Type.smoothRounded,
     double cornerRadius = 24.0,
     double neonPulseIntensity = 1.0,
     Color? neonGlowColor,
   }) {
-    return DynamicShapeConfig(
+    return Material4Config(
       type: type,
       cornerRadius: cornerRadius,
       borderStyle: BorderStyleType.neonPulse,
@@ -990,12 +994,12 @@ class DynamicShapeConfig {
   }
 
   /// Preset for a specular reflective metallic border (gold, chrome, bronze, etc.).
-  factory DynamicShapeConfig.metallic({
-    DynamicShapeType type = DynamicShapeType.smoothRounded,
+  factory Material4Config.metallic({
+    Material4Type type = Material4Type.smoothRounded,
     double cornerRadius = 24.0,
     MetallicType metallicType = MetallicType.gold,
   }) {
-    return DynamicShapeConfig(
+    return Material4Config(
       type: type,
       cornerRadius: cornerRadius,
       borderStyle: BorderStyleType.metallic,
@@ -1004,11 +1008,11 @@ class DynamicShapeConfig {
   }
 
   /// Preset for a full chromatic spectrum rainbow dispersion border.
-  factory DynamicShapeConfig.rainbow({
-    DynamicShapeType type = DynamicShapeType.smoothRounded,
+  factory Material4Config.rainbow({
+    Material4Type type = Material4Type.smoothRounded,
     double cornerRadius = 24.0,
   }) {
-    return DynamicShapeConfig(
+    return Material4Config(
       type: type,
       cornerRadius: cornerRadius,
       borderStyle: BorderStyleType.rainbow,
@@ -1016,12 +1020,12 @@ class DynamicShapeConfig {
   }
 
   /// Preset for a multi-layered concentric border stack.
-  factory DynamicShapeConfig.multiLayer({
-    DynamicShapeType type = DynamicShapeType.smoothRounded,
+  factory Material4Config.multiLayer({
+    Material4Type type = Material4Type.smoothRounded,
     double cornerRadius = 24.0,
     required List<BorderLayer> layers,
   }) {
-    return DynamicShapeConfig(
+    return Material4Config(
       type: type,
       cornerRadius: cornerRadius,
       borderStyle: BorderStyleType.multiLayer,
@@ -1030,12 +1034,12 @@ class DynamicShapeConfig {
   }
 
   /// Preset for technical framing bracket corners (corners rendered, edges open).
-  factory DynamicShapeConfig.cornerOnly({
-    DynamicShapeType type = DynamicShapeType.smoothRounded,
+  factory Material4Config.cornerOnly({
+    Material4Type type = Material4Type.smoothRounded,
     double cornerRadius = 24.0,
     double cornerLength = 24.0,
   }) {
-    return DynamicShapeConfig(
+    return Material4Config(
       type: type,
       cornerRadius: cornerRadius,
       borderStyle: BorderStyleType.cornerOnly,
@@ -1044,15 +1048,15 @@ class DynamicShapeConfig {
   }
 
   /// Preset for an animated dashed marquee border.
-  factory DynamicShapeConfig.animatedDashed({
-    DynamicShapeType type = DynamicShapeType.smoothRounded,
+  factory Material4Config.animatedDashed({
+    Material4Type type = Material4Type.smoothRounded,
     double cornerRadius = 24.0,
     double dashLength = 8.0,
     double dashGap = 5.0,
     double dashPhase = 0.0,
     double progress = 0.0,
   }) {
-    return DynamicShapeConfig(
+    return Material4Config(
       type: type,
       cornerRadius: cornerRadius,
       borderStyle: BorderStyleType.animatedDashed,
@@ -1064,13 +1068,13 @@ class DynamicShapeConfig {
   }
 
   /// Preset for a smoothly rotating animated gradient contour.
-  factory DynamicShapeConfig.animatedGradient({
-    DynamicShapeType type = DynamicShapeType.smoothRounded,
+  factory Material4Config.animatedGradient({
+    Material4Type type = Material4Type.smoothRounded,
     double cornerRadius = 24.0,
     double progress = 0.0,
     Gradient? gradient,
   }) {
-    return DynamicShapeConfig(
+    return Material4Config(
       type: type,
       cornerRadius: cornerRadius,
       borderStyle: BorderStyleType.animatedGradient,
@@ -1080,12 +1084,12 @@ class DynamicShapeConfig {
   }
 
   /// Preset for an artisanal organic hand-drawn sketchy border.
-  factory DynamicShapeConfig.handDrawn({
-    DynamicShapeType type = DynamicShapeType.smoothRounded,
+  factory Material4Config.handDrawn({
+    Material4Type type = Material4Type.smoothRounded,
     double cornerRadius = 24.0,
     double roughness = 1.6,
   }) {
-    return DynamicShapeConfig(
+    return Material4Config(
       type: type,
       cornerRadius: cornerRadius,
       borderStyle: BorderStyleType.handDrawn,
@@ -1094,12 +1098,12 @@ class DynamicShapeConfig {
   }
 
   /// Preset for a chiseled 3D embossed border with directional lighting.
-  factory DynamicShapeConfig.embossed({
-    DynamicShapeType type = DynamicShapeType.smoothRounded,
+  factory Material4Config.embossed({
+    Material4Type type = Material4Type.smoothRounded,
     double cornerRadius = 24.0,
     double lightAngle = 0.7853981633974483,
   }) {
-    return DynamicShapeConfig(
+    return Material4Config(
       type: type,
       cornerRadius: cornerRadius,
       borderStyle: BorderStyleType.embossed,
@@ -1108,19 +1112,19 @@ class DynamicShapeConfig {
   }
 
   /// Preset for a tactile stippled noise textured border.
-  factory DynamicShapeConfig.noiseTextured({
-    DynamicShapeType type = DynamicShapeType.smoothRounded,
+  factory Material4Config.noiseTextured({
+    Material4Type type = Material4Type.smoothRounded,
     double cornerRadius = 24.0,
   }) {
-    return DynamicShapeConfig(
+    return Material4Config(
       type: type,
       cornerRadius: cornerRadius,
       borderStyle: BorderStyleType.noiseTextured,
     );
   }
 
-  DynamicShapeConfig copyWith({
-    DynamicShapeType? type,
+  Material4Config copyWith({
+    Material4Type? type,
     BorderStyleType? borderStyle,
     double? cornerRadius,
     CornerRadii? cornerRadii,
@@ -1188,12 +1192,12 @@ class DynamicShapeConfig {
     double? waveLevel,
     int? particleCount,
     ShapeClipConfig? clipConfig,
-    DynamicShapeInteraction? interaction,
+    Material4Interaction? interaction,
     CreativeBorderConfig? creativeBorder,
     PaperBackgroundConfig? paperBackground,
     CreativePatternConfig? creativePattern,
   }) {
-    return DynamicShapeConfig(
+    return Material4Config(
       type: type ?? this.type,
       borderStyle: borderStyle ?? this.borderStyle,
       cornerRadius: cornerRadius ?? this.cornerRadius,
@@ -1317,14 +1321,14 @@ class DynamicShapeConfig {
         'notches': notches?.map((n) => n.toJson()).toList(),
       };
 
-  /// Constructs a [DynamicShapeConfig] from serialized JSON data.
-  factory DynamicShapeConfig.fromJson(
+  /// Constructs a [Material4Config] from serialized JSON data.
+  factory Material4Config.fromJson(
     Map<String, dynamic> json,
   ) =>
-      DynamicShapeConfig(
-        type: DynamicShapeType.values.firstWhere(
+      Material4Config(
+        type: Material4Type.values.firstWhere(
           (e) => e.name == json['type'],
-          orElse: () => DynamicShapeType.smoothRounded,
+          orElse: () => Material4Type.smoothRounded,
         ),
         borderStyle: BorderStyleType.values.firstWhere(
           (e) => e.name == json['borderStyle'],
@@ -1407,7 +1411,7 @@ class DynamicShapeConfig {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is DynamicShapeConfig &&
+      other is Material4Config &&
           runtimeType == other.runtimeType &&
           type == other.type &&
           borderStyle == other.borderStyle &&
@@ -1554,10 +1558,10 @@ class DynamicShapeConfig {
         creativePattern,
       ]);
 
-  /// Linearly interpolates between two [DynamicShapeConfig] instances.
-  static DynamicShapeConfig lerp(
-    DynamicShapeConfig a,
-    DynamicShapeConfig b,
+  /// Linearly interpolates between two [Material4Config] instances.
+  static Material4Config lerp(
+    Material4Config a,
+    Material4Config b,
     double t,
   ) {
     if (identical(a, b)) return a;

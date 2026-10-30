@@ -2,52 +2,52 @@ import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
 
-import 'animated_dynamic_shape.dart';
+import 'animated_material_4.dart';
 import 'animation/shape_animation_config.dart';
 import 'animation/shape_animation_controller.dart';
-import 'dynamic_shape_config.dart';
-import 'dynamic_shape_path_builder.dart';
-import 'dynamic_shape_stack.dart';
+import 'material_4_config.dart';
+import 'material_4_path_builder.dart';
+import 'material_4_stack.dart';
 import 'layout/shape_collision_detector.dart';
 import 'layout/shape_content_protection.dart';
-import 'rendering/dynamic_shape_hit_test.dart';
-import 'rendering/dynamic_shape_interaction.dart';
-import 'rendering/dynamic_shape_multi_child_render_widget.dart';
-import 'rendering/dynamic_shape_painter.dart';
-import 'rendering/dynamic_shape_render_widget.dart';
+import 'rendering/material_4_hit_test.dart';
+import 'rendering/material_4_interaction.dart';
+import 'rendering/material_4_multi_child_render_widget.dart';
+import 'rendering/material_4_painter.dart';
+import 'rendering/material_4_render_widget.dart';
 import 'shape_pattern.dart';
 
 /// CustomClipper that clips any child widget to the exact contour
-/// of the configured dynamic shape.
-class DynamicShapeClipper extends CustomClipper<Path> {
-  final DynamicShapeConfig config;
+/// of the configured Material 4 shape.
+class Material4Clipper extends CustomClipper<Path> {
+  final Material4Config config;
 
-  const DynamicShapeClipper({required this.config});
+  const Material4Clipper({required this.config});
 
   @override
   Path getClip(Size size) {
-    return DynamicShapePathBuilder.buildPath(size, config);
+    return Material4PathBuilder.buildPath(size, config);
   }
 
   @override
-  bool shouldReclip(covariant DynamicShapeClipper oldClipper) {
+  bool shouldReclip(covariant Material4Clipper oldClipper) {
     return oldClipper.config != config;
   }
 }
 
 /// Legacy adapter if a [CustomPainter] is directly needed.
 ///
-/// Under normal usage, [DynamicShapeContainer] and [DynamicShapeRenderWidget]
-/// draw directly using [RenderDynamicShape] and [DynamicShapePainter.paintShape].
-class DynamicShapeCustomPainter extends CustomPainter {
-  final DynamicShapeConfig config;
+/// Under normal usage, [Material4Container] and [Material4RenderWidget]
+/// draw directly using [RenderMaterial4] and [Material4Painter.paintShape].
+class Material4CustomPainter extends CustomPainter {
+  final Material4Config config;
   final Color? color;
   final Gradient? gradient;
   final Color borderColor;
   final double borderWidth;
   final List<BoxShadow>? shadows;
 
-  const DynamicShapeCustomPainter({
+  const Material4CustomPainter({
     required this.config,
     this.color,
     this.gradient,
@@ -58,8 +58,8 @@ class DynamicShapeCustomPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final path = DynamicShapePathBuilder.buildPath(size, config);
-    DynamicShapePainter.paintShape(
+    final path = Material4PathBuilder.buildPath(size, config);
+    Material4Painter.paintShape(
       canvas: canvas,
       size: size,
       path: path,
@@ -73,7 +73,7 @@ class DynamicShapeCustomPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant DynamicShapeCustomPainter oldDelegate) {
+  bool shouldRepaint(covariant Material4CustomPainter oldDelegate) {
     return oldDelegate.config != config ||
         oldDelegate.color != color ||
         oldDelegate.gradient != gradient ||
@@ -85,14 +85,18 @@ class DynamicShapeCustomPainter extends CustomPainter {
 
 /// A universal, modular shape container widget that dynamically transforms
 /// its geometry, patterns, frosted glassmorphism, inner shadows, and border styling.
-class DynamicShapeContainer extends StatelessWidget {
+
+/// Type alias for [Material4Container].
+typedef Material4ShapeContainer = Material4Container;
+
+class Material4Container extends StatelessWidget {
   final Widget? child;
 
-  /// Optional multiple children. When provided and non-empty, [RenderMultiChildDynamicShape]
+  /// Optional multiple children. When provided and non-empty, [RenderMultiChildMaterial4]
   /// is used for intelligent geometry-aware multi-child layout.
   final List<Widget>? children;
 
-  final DynamicShapeConfig config;
+  final Material4Config config;
   final double? width;
   final double? height;
   final EdgeInsetsGeometry? padding;
@@ -114,7 +118,7 @@ class DynamicShapeContainer extends StatelessWidget {
   final ShapeHitTestBehavior hitTestBehavior;
 
   /// Shape-aware interaction, hit-testing, and pointer routing configuration.
-  final DynamicShapeInteraction? interaction;
+  final Material4Interaction? interaction;
 
   /// Granular layer-specific clipping configuration.
   final ShapeClipConfig? clipConfig;
@@ -142,8 +146,8 @@ class DynamicShapeContainer extends StatelessWidget {
   /// Accessibility semantic hint.
   final String? semanticHint;
 
-  /// Optional dynamic shape type preset overriding [config.type].
-  final DynamicShapeType? shape;
+  /// Optional Material 4 shape type preset overriding [config.type].
+  final Material4Type? shape;
 
   /// Optional animation configuration for automatic shape morphing.
   final ShapeAnimationConfig? animation;
@@ -151,9 +155,9 @@ class DynamicShapeContainer extends StatelessWidget {
   /// Optional shape animation controller for programmatic motion orchestration.
   final ShapeAnimationController? controller;
 
-  const DynamicShapeContainer({
+  const Material4Container({
     super.key,
-    this.config = const DynamicShapeConfig(),
+    this.config = const Material4Config(),
     this.shape,
     this.animation,
     this.controller,
@@ -190,9 +194,9 @@ class DynamicShapeContainer extends StatelessWidget {
   });
 
   /// Factory constructor for direct [ShapeContentMode] selection.
-  DynamicShapeContainer.withMode({
+  Material4Container.withMode({
     super.key,
-    this.config = const DynamicShapeConfig(),
+    this.config = const Material4Config(),
     this.shape,
     this.animation,
     this.controller,
@@ -232,10 +236,10 @@ class DynamicShapeContainer extends StatelessWidget {
   ShapeContentMode get contentMode => contentProtection.mode;
 
   /// Factory for Frosted Glassmorphism Container with dynamic path clipping
-  factory DynamicShapeContainer.glass({
+  factory Material4Container.glass({
     Key? key,
     Widget? child,
-    DynamicShapeConfig config = const DynamicShapeConfig(),
+    Material4Config config = const Material4Config(),
     double? width,
     double? height,
     EdgeInsetsGeometry? padding,
@@ -247,7 +251,7 @@ class DynamicShapeContainer extends StatelessWidget {
     VoidCallback? onTap,
     Widget? dockedBadge,
   }) {
-    return DynamicShapeContainer(
+    return Material4Container(
       key: key,
       config: config.copyWith(
         isGlassmorphic: true,
@@ -268,10 +272,10 @@ class DynamicShapeContainer extends StatelessWidget {
   }
 
   /// Factory for Patterned Container (stripes, dots, grid, waves)
-  factory DynamicShapeContainer.patterned({
+  factory Material4Container.patterned({
     Key? key,
     Widget? child,
-    DynamicShapeConfig config = const DynamicShapeConfig(),
+    Material4Config config = const Material4Config(),
     ShapePattern pattern = ShapePattern.dotsMatrix,
     Color? patternColor,
     double patternSpacing = 16.0,
@@ -284,7 +288,7 @@ class DynamicShapeContainer extends StatelessWidget {
     double borderWidth = 1.0,
     VoidCallback? onTap,
   }) {
-    return DynamicShapeContainer(
+    return Material4Container(
       key: key,
       config: config.copyWith(
         pattern: pattern,
@@ -304,10 +308,10 @@ class DynamicShapeContainer extends StatelessWidget {
   }
 
   /// Factory for Sculpted Claymorphic Container with Inset Inner Shadow
-  factory DynamicShapeContainer.innerShadow({
+  factory Material4Container.innerShadow({
     Key? key,
     Widget? child,
-    DynamicShapeConfig config = const DynamicShapeConfig(),
+    Material4Config config = const Material4Config(),
     List<BoxShadow> innerShadows = const [
       BoxShadow(color: Color(0x18000000), blurRadius: 8, offset: Offset(2, 3)),
       BoxShadow(
@@ -325,7 +329,7 @@ class DynamicShapeContainer extends StatelessWidget {
     double borderWidth = 1.0,
     VoidCallback? onTap,
   }) {
-    return DynamicShapeContainer(
+    return Material4Container(
       key: key,
       config: config.copyWith(innerShadows: innerShadows),
       width: width,
@@ -341,10 +345,10 @@ class DynamicShapeContainer extends StatelessWidget {
   }
 
   /// Factory for Luminous Pulsing Neon Bloom Border
-  factory DynamicShapeContainer.neon({
+  factory Material4Container.neon({
     Key? key,
     Widget? child,
-    DynamicShapeConfig config = const DynamicShapeConfig(),
+    Material4Config config = const Material4Config(),
     double? width,
     double? height,
     EdgeInsetsGeometry? padding,
@@ -355,7 +359,7 @@ class DynamicShapeContainer extends StatelessWidget {
     double pulseIntensity = 1.0,
     VoidCallback? onTap,
   }) {
-    return DynamicShapeContainer(
+    return Material4Container(
       key: key,
       config: config.copyWith(
         borderStyle: BorderStyleType.neonPulse,
@@ -375,10 +379,10 @@ class DynamicShapeContainer extends StatelessWidget {
   }
 
   /// Factory for Specular Reflective Metallic Border
-  factory DynamicShapeContainer.metallic({
+  factory Material4Container.metallic({
     Key? key,
     Widget? child,
-    DynamicShapeConfig config = const DynamicShapeConfig(),
+    Material4Config config = const Material4Config(),
     double? width,
     double? height,
     EdgeInsetsGeometry? padding,
@@ -388,7 +392,7 @@ class DynamicShapeContainer extends StatelessWidget {
     double borderWidth = 2.0,
     VoidCallback? onTap,
   }) {
-    return DynamicShapeContainer(
+    return Material4Container(
       key: key,
       config: config.copyWith(
         borderStyle: BorderStyleType.metallic,
@@ -407,10 +411,10 @@ class DynamicShapeContainer extends StatelessWidget {
   }
 
   /// Factory for Chromatic Dispersion Rainbow Border
-  factory DynamicShapeContainer.rainbow({
+  factory Material4Container.rainbow({
     Key? key,
     Widget? child,
-    DynamicShapeConfig config = const DynamicShapeConfig(),
+    Material4Config config = const Material4Config(),
     double? width,
     double? height,
     EdgeInsetsGeometry? padding,
@@ -420,7 +424,7 @@ class DynamicShapeContainer extends StatelessWidget {
     double progress = 0.0,
     VoidCallback? onTap,
   }) {
-    return DynamicShapeContainer(
+    return Material4Container(
       key: key,
       config: config.copyWith(
         borderStyle: BorderStyleType.rainbow,
@@ -439,10 +443,10 @@ class DynamicShapeContainer extends StatelessWidget {
   }
 
   /// Factory for Multi-Layered Concentric Border Stack
-  factory DynamicShapeContainer.multiLayer({
+  factory Material4Container.multiLayer({
     Key? key,
     Widget? child,
-    DynamicShapeConfig config = const DynamicShapeConfig(),
+    Material4Config config = const Material4Config(),
     double? width,
     double? height,
     EdgeInsetsGeometry? padding,
@@ -451,7 +455,7 @@ class DynamicShapeContainer extends StatelessWidget {
     required List<BorderLayer> layers,
     VoidCallback? onTap,
   }) {
-    return DynamicShapeContainer(
+    return Material4Container(
       key: key,
       config: config.copyWith(
         borderStyle: BorderStyleType.multiLayer,
@@ -471,10 +475,10 @@ class DynamicShapeContainer extends StatelessWidget {
   }
 
   /// Factory for Technical Corner Framing Brackets
-  factory DynamicShapeContainer.cornerOnly({
+  factory Material4Container.cornerOnly({
     Key? key,
     Widget? child,
-    DynamicShapeConfig config = const DynamicShapeConfig(),
+    Material4Config config = const Material4Config(),
     double? width,
     double? height,
     EdgeInsetsGeometry? padding,
@@ -485,7 +489,7 @@ class DynamicShapeContainer extends StatelessWidget {
     double cornerLength = 24.0,
     VoidCallback? onTap,
   }) {
-    return DynamicShapeContainer(
+    return Material4Container(
       key: key,
       config: config.copyWith(
         borderStyle: BorderStyleType.cornerOnly,
@@ -504,10 +508,10 @@ class DynamicShapeContainer extends StatelessWidget {
   }
 
   /// Factory for Artisanal Hand-Drawn Sketchy Border
-  factory DynamicShapeContainer.handDrawn({
+  factory Material4Container.handDrawn({
     Key? key,
     Widget? child,
-    DynamicShapeConfig config = const DynamicShapeConfig(),
+    Material4Config config = const Material4Config(),
     double? width,
     double? height,
     EdgeInsetsGeometry? padding,
@@ -518,7 +522,7 @@ class DynamicShapeContainer extends StatelessWidget {
     double roughness = 1.6,
     VoidCallback? onTap,
   }) {
-    return DynamicShapeContainer(
+    return Material4Container(
       key: key,
       config: config.copyWith(
         borderStyle: BorderStyleType.handDrawn,
@@ -537,7 +541,7 @@ class DynamicShapeContainer extends StatelessWidget {
   }
 
   /// Factory for Folder Tab Container (e.g. Marks Entry)
-  factory DynamicShapeContainer.folderTab({
+  factory Material4Container.folderTab({
     Key? key,
     Widget? child,
     double? width,
@@ -557,9 +561,9 @@ class DynamicShapeContainer extends StatelessWidget {
     double tabWidth = 72.0,
     double tabHeight = 16.0,
   }) {
-    return DynamicShapeContainer(
+    return Material4Container(
       key: key,
-      config: DynamicShapeConfig.folderTab(
+      config: Material4Config.folderTab(
         anchor: anchor,
         borderStyle: borderStyle,
         cornerRadius: cornerRadius,
@@ -582,7 +586,7 @@ class DynamicShapeContainer extends StatelessWidget {
   }
 
   /// Factory for Inward Notched Container (e.g. Today's Timetable with docked badge)
-  factory DynamicShapeContainer.notchedBadge({
+  factory Material4Container.notchedBadge({
     Key? key,
     Widget? child,
     Widget? dockedBadge,
@@ -602,9 +606,9 @@ class DynamicShapeContainer extends StatelessWidget {
     double notchWidth = 92.0,
     double notchHeight = 26.0,
   }) {
-    return DynamicShapeContainer(
+    return Material4Container(
       key: key,
-      config: DynamicShapeConfig.notchedBadge(
+      config: Material4Config.notchedBadge(
         anchor: anchor,
         borderStyle: borderStyle,
         cornerRadius: cornerRadius,
@@ -632,7 +636,7 @@ class DynamicShapeContainer extends StatelessWidget {
   }
 
   /// Factory for Side Tab / Protruding Bubble Container (e.g. Notice Board)
-  factory DynamicShapeContainer.sideTab({
+  factory Material4Container.sideTab({
     Key? key,
     Widget? child,
     double? width,
@@ -650,9 +654,9 @@ class DynamicShapeContainer extends StatelessWidget {
     double tabHeight = 44.0,
     double cornerRadius = 22.0,
   }) {
-    return DynamicShapeContainer(
+    return Material4Container(
       key: key,
-      config: DynamicShapeConfig.sideTab(
+      config: Material4Config.sideTab(
         borderStyle: borderStyle,
         cornerRadius: cornerRadius,
         tabWidth: protrusionDepth,
@@ -673,7 +677,7 @@ class DynamicShapeContainer extends StatelessWidget {
   }
 
   /// Factory for Stepped Corner Container (e.g. Take Attendance or Daily Register)
-  factory DynamicShapeContainer.steppedCorner({
+  factory Material4Container.steppedCorner({
     Key? key,
     Widget? child,
     double? width,
@@ -692,9 +696,9 @@ class DynamicShapeContainer extends StatelessWidget {
     double stepHeight = 42.0,
     double cornerRadius = 22.0,
   }) {
-    return DynamicShapeContainer(
+    return Material4Container(
       key: key,
-      config: DynamicShapeConfig.steppedCorner(
+      config: Material4Config.steppedCorner(
         anchor: anchor,
         borderStyle: borderStyle,
         stepWidth: stepWidth,
@@ -716,7 +720,7 @@ class DynamicShapeContainer extends StatelessWidget {
   }
 
   /// Factory for Ticket Scallop Container (e.g. Pending Marks)
-  factory DynamicShapeContainer.ticket({
+  factory Material4Container.ticket({
     Key? key,
     Widget? child,
     double? width,
@@ -734,9 +738,9 @@ class DynamicShapeContainer extends StatelessWidget {
     double cornerRadius = 22.0,
     double scallopRadius = 10.0,
   }) {
-    return DynamicShapeContainer(
+    return Material4Container(
       key: key,
-      config: DynamicShapeConfig.ticketScallop(
+      config: Material4Config.ticketScallop(
         borderStyle: borderStyle,
         cornerRadius: cornerRadius,
         scallopRadius: scallopRadius,
@@ -757,7 +761,7 @@ class DynamicShapeContainer extends StatelessWidget {
   }
 
   /// Factory for Postage Stamp with serrated perforated border
-  factory DynamicShapeContainer.postageStamp({
+  factory Material4Container.postageStamp({
     Key? key,
     Widget? child,
     double? width,
@@ -774,9 +778,9 @@ class DynamicShapeContainer extends StatelessWidget {
     double cornerRadius = 18.0,
     double scallopRadius = 6.0,
   }) {
-    return DynamicShapeContainer(
+    return Material4Container(
       key: key,
-      config: DynamicShapeConfig.postageStamp(
+      config: Material4Config.postageStamp(
         borderStyle: borderStyle,
         cornerRadius: cornerRadius,
         scallopRadius: scallopRadius,
@@ -796,7 +800,7 @@ class DynamicShapeContainer extends StatelessWidget {
   }
 
   /// Factory for Zigzag Receipt cut container (great for vouchers, payment tokens)
-  factory DynamicShapeContainer.zigzagReceipt({
+  factory Material4Container.zigzagReceipt({
     Key? key,
     Widget? child,
     double? width,
@@ -813,9 +817,9 @@ class DynamicShapeContainer extends StatelessWidget {
     double toothWidth = 14.0,
     double toothHeight = 8.0,
   }) {
-    return DynamicShapeContainer(
+    return Material4Container(
       key: key,
-      config: DynamicShapeConfig.zigzagCut(
+      config: Material4Config.zigzagCut(
         borderStyle: borderStyle,
         toothWidth: toothWidth,
         toothHeight: toothHeight,
@@ -835,7 +839,7 @@ class DynamicShapeContainer extends StatelessWidget {
   }
 
   /// Factory for Cathedral Arch / Dome Top Container
-  factory DynamicShapeContainer.arch({
+  factory Material4Container.arch({
     Key? key,
     Widget? child,
     double? width,
@@ -851,9 +855,9 @@ class DynamicShapeContainer extends StatelessWidget {
     VoidCallback? onTap,
     double cornerRadius = 24.0,
   }) {
-    return DynamicShapeContainer(
+    return Material4Container(
       key: key,
-      config: DynamicShapeConfig.arch(
+      config: Material4Config.arch(
         borderStyle: borderStyle,
         cornerRadius: cornerRadius,
       ),
@@ -872,7 +876,7 @@ class DynamicShapeContainer extends StatelessWidget {
   }
 
   /// Factory for Soft Hexagon Badge Container
-  factory DynamicShapeContainer.hexagon({
+  factory Material4Container.hexagon({
     Key? key,
     Widget? child,
     double? width,
@@ -888,9 +892,9 @@ class DynamicShapeContainer extends StatelessWidget {
     VoidCallback? onTap,
     double cornerRadius = 14.0,
   }) {
-    return DynamicShapeContainer(
+    return Material4Container(
       key: key,
-      config: DynamicShapeConfig.hexagonSoft(
+      config: Material4Config.hexagonSoft(
         borderStyle: borderStyle,
         cornerRadius: cornerRadius,
       ),
@@ -909,7 +913,7 @@ class DynamicShapeContainer extends StatelessWidget {
   }
 
   /// Factory for Diagonal Chamfer Ribbon Corner Container
-  factory DynamicShapeContainer.chamferDiagonal({
+  factory Material4Container.chamferDiagonal({
     Key? key,
     Widget? child,
     double? width,
@@ -927,9 +931,9 @@ class DynamicShapeContainer extends StatelessWidget {
     double chamferSize = 36.0,
     double cornerRadius = 20.0,
   }) {
-    return DynamicShapeContainer(
+    return Material4Container(
       key: key,
-      config: DynamicShapeConfig.chamferDiagonal(
+      config: Material4Config.chamferDiagonal(
         anchor: anchor,
         borderStyle: borderStyle,
         chamferSize: chamferSize,
@@ -950,7 +954,7 @@ class DynamicShapeContainer extends StatelessWidget {
   }
 
   /// Factory for Organic Asymmetric Fluid Blob Container
-  factory DynamicShapeContainer.organicBlob({
+  factory Material4Container.organicBlob({
     Key? key,
     Widget? child,
     double? width,
@@ -965,9 +969,9 @@ class DynamicShapeContainer extends StatelessWidget {
     List<BoxShadow>? shadows,
     VoidCallback? onTap,
   }) {
-    return DynamicShapeContainer(
+    return Material4Container(
       key: key,
-      config: DynamicShapeConfig.organicBlob(borderStyle: borderStyle),
+      config: Material4Config.organicBlob(borderStyle: borderStyle),
       width: width,
       height: height,
       padding: padding,
@@ -983,7 +987,7 @@ class DynamicShapeContainer extends StatelessWidget {
   }
 
   /// Factory for Scalloped Petal / Flower (e.g. Profile Avatar)
-  factory DynamicShapeContainer.scallopedPetal({
+  factory Material4Container.scallopedPetal({
     Key? key,
     Widget? child,
     double? width,
@@ -999,9 +1003,9 @@ class DynamicShapeContainer extends StatelessWidget {
     VoidCallback? onTap,
     int petalCount = 10,
   }) {
-    return DynamicShapeContainer(
+    return Material4Container(
       key: key,
-      config: DynamicShapeConfig.scallopedPetal(
+      config: Material4Config.scallopedPetal(
         borderStyle: borderStyle,
         petalCount: petalCount,
       ),
@@ -1020,10 +1024,10 @@ class DynamicShapeContainer extends StatelessWidget {
   }
 
   /// Factory for Neo-Brutalist 3D Hard Offset Shadow Container
-  factory DynamicShapeContainer.neo3d({
+  factory Material4Container.neo3d({
     Key? key,
     Widget? child,
-    DynamicShapeConfig config = const DynamicShapeConfig(),
+    Material4Config config = const Material4Config(),
     double? width,
     double? height,
     EdgeInsetsGeometry? padding,
@@ -1036,7 +1040,7 @@ class DynamicShapeContainer extends StatelessWidget {
     Color neoColor = const Color(0xFF1E1E24),
     VoidCallback? onTap,
   }) {
-    return DynamicShapeContainer(
+    return Material4Container(
       key: key,
       config: config.copyWith(
         borderStyle: BorderStyleType.neo3d,
@@ -1057,7 +1061,7 @@ class DynamicShapeContainer extends StatelessWidget {
   }
 
   /// Factory for Asymmetric Card Container
-  factory DynamicShapeContainer.asymmetricCard({
+  factory Material4Container.asymmetricCard({
     Key? key,
     Widget? child,
     CornerRadii cornerRadii = const CornerRadii.asymmetric(),
@@ -1073,9 +1077,9 @@ class DynamicShapeContainer extends StatelessWidget {
     List<BoxShadow>? shadows,
     VoidCallback? onTap,
   }) {
-    return DynamicShapeContainer(
+    return Material4Container(
       key: key,
-      config: DynamicShapeConfig.asymmetricCard(
+      config: Material4Config.asymmetricCard(
         cornerRadii: cornerRadii,
         borderStyle: borderStyle,
       ),
@@ -1094,7 +1098,7 @@ class DynamicShapeContainer extends StatelessWidget {
   }
 
   /// Factory for Capsule / Pill Container
-  factory DynamicShapeContainer.capsule({
+  factory Material4Container.capsule({
     Key? key,
     Widget? child,
     double? width,
@@ -1109,9 +1113,9 @@ class DynamicShapeContainer extends StatelessWidget {
     List<BoxShadow>? shadows,
     VoidCallback? onTap,
   }) {
-    return DynamicShapeContainer(
+    return Material4Container(
       key: key,
-      config: DynamicShapeConfig.capsule(borderStyle: borderStyle),
+      config: Material4Config.capsule(borderStyle: borderStyle),
       width: width,
       height: height,
       padding: padding,
@@ -1127,7 +1131,7 @@ class DynamicShapeContainer extends StatelessWidget {
   }
 
   /// Factory for Wave Edge Container
-  factory DynamicShapeContainer.waveEdge({
+  factory Material4Container.waveEdge({
     Key? key,
     Widget? child,
     ShapeAnchor anchor = ShapeAnchor.bottomCenter,
@@ -1146,9 +1150,9 @@ class DynamicShapeContainer extends StatelessWidget {
     List<BoxShadow>? shadows,
     VoidCallback? onTap,
   }) {
-    return DynamicShapeContainer(
+    return Material4Container(
       key: key,
-      config: DynamicShapeConfig.waveEdge(
+      config: Material4Config.waveEdge(
         anchor: anchor,
         waveCount: waveCount,
         waveAmplitude: waveAmplitude,
@@ -1170,7 +1174,7 @@ class DynamicShapeContainer extends StatelessWidget {
   }
 
   /// Factory for Cloud Shape Container
-  factory DynamicShapeContainer.cloud({
+  factory Material4Container.cloud({
     Key? key,
     Widget? child,
     double? width,
@@ -1185,9 +1189,9 @@ class DynamicShapeContainer extends StatelessWidget {
     List<BoxShadow>? shadows,
     VoidCallback? onTap,
   }) {
-    return DynamicShapeContainer(
+    return Material4Container(
       key: key,
-      config: DynamicShapeConfig.cloud(borderStyle: borderStyle),
+      config: Material4Config.cloud(borderStyle: borderStyle),
       width: width,
       height: height,
       padding: padding,
@@ -1203,7 +1207,7 @@ class DynamicShapeContainer extends StatelessWidget {
   }
 
   /// Factory for Speech Bubble Container
-  factory DynamicShapeContainer.speechBubble({
+  factory Material4Container.speechBubble({
     Key? key,
     Widget? child,
     ShapeAnchor anchor = ShapeAnchor.bottomLeft,
@@ -1222,9 +1226,9 @@ class DynamicShapeContainer extends StatelessWidget {
     List<BoxShadow>? shadows,
     VoidCallback? onTap,
   }) {
-    return DynamicShapeContainer(
+    return Material4Container(
       key: key,
-      config: DynamicShapeConfig.speechBubble(
+      config: Material4Config.speechBubble(
         anchor: anchor,
         tailWidth: tailWidth,
         tailHeight: tailHeight,
@@ -1246,7 +1250,7 @@ class DynamicShapeContainer extends StatelessWidget {
   }
 
   /// Factory for Shield / Academic Crest Container
-  factory DynamicShapeContainer.shield({
+  factory Material4Container.shield({
     Key? key,
     Widget? child,
     double cornerRadius = 20.0,
@@ -1262,9 +1266,9 @@ class DynamicShapeContainer extends StatelessWidget {
     List<BoxShadow>? shadows,
     VoidCallback? onTap,
   }) {
-    return DynamicShapeContainer(
+    return Material4Container(
       key: key,
-      config: DynamicShapeConfig.shield(
+      config: Material4Config.shield(
         cornerRadius: cornerRadius,
         borderStyle: borderStyle,
       ),
@@ -1283,7 +1287,7 @@ class DynamicShapeContainer extends StatelessWidget {
   }
 
   /// Factory for Diamond Badge Container
-  factory DynamicShapeContainer.diamond({
+  factory Material4Container.diamond({
     Key? key,
     Widget? child,
     double cornerRadius = 14.0,
@@ -1299,9 +1303,9 @@ class DynamicShapeContainer extends StatelessWidget {
     List<BoxShadow>? shadows,
     VoidCallback? onTap,
   }) {
-    return DynamicShapeContainer(
+    return Material4Container(
       key: key,
-      config: DynamicShapeConfig.diamond(
+      config: Material4Config.diamond(
         cornerRadius: cornerRadius,
         borderStyle: borderStyle,
       ),
@@ -1320,7 +1324,7 @@ class DynamicShapeContainer extends StatelessWidget {
   }
 
   /// Factory for Regular 8-sided Octagon Container
-  factory DynamicShapeContainer.octagon({
+  factory Material4Container.octagon({
     Key? key,
     Widget? child,
     double cornerRadius = 16.0,
@@ -1336,9 +1340,9 @@ class DynamicShapeContainer extends StatelessWidget {
     List<BoxShadow>? shadows,
     VoidCallback? onTap,
   }) {
-    return DynamicShapeContainer(
+    return Material4Container(
       key: key,
-      config: DynamicShapeConfig.octagon(
+      config: Material4Config.octagon(
         cornerRadius: cornerRadius,
         borderStyle: borderStyle,
       ),
@@ -1357,7 +1361,7 @@ class DynamicShapeContainer extends StatelessWidget {
   }
 
   /// Factory for Wave Cut Sliced Container
-  factory DynamicShapeContainer.waveCut({
+  factory Material4Container.waveCut({
     Key? key,
     Widget? child,
     ShapeAnchor anchor = ShapeAnchor.bottomRight,
@@ -1375,9 +1379,9 @@ class DynamicShapeContainer extends StatelessWidget {
     List<BoxShadow>? shadows,
     VoidCallback? onTap,
   }) {
-    return DynamicShapeContainer(
+    return Material4Container(
       key: key,
-      config: DynamicShapeConfig.waveCut(
+      config: Material4Config.waveCut(
         anchor: anchor,
         waveAmplitude: waveAmplitude,
         cornerRadius: cornerRadius,
@@ -1398,7 +1402,7 @@ class DynamicShapeContainer extends StatelessWidget {
   }
 
   /// Factory for Concave Rounded Frame Container
-  factory DynamicShapeContainer.concaveRounded({
+  factory Material4Container.concaveRounded({
     Key? key,
     Widget? child,
     double cornerRadius = 20.0,
@@ -1414,9 +1418,9 @@ class DynamicShapeContainer extends StatelessWidget {
     List<BoxShadow>? shadows,
     VoidCallback? onTap,
   }) {
-    return DynamicShapeContainer(
+    return Material4Container(
       key: key,
-      config: DynamicShapeConfig.concaveRounded(
+      config: Material4Config.concaveRounded(
         cornerRadius: cornerRadius,
         borderStyle: borderStyle,
       ),
@@ -1435,7 +1439,7 @@ class DynamicShapeContainer extends StatelessWidget {
   }
 
   /// Factory for Convex Rounded Barrel Container
-  factory DynamicShapeContainer.convexRounded({
+  factory Material4Container.convexRounded({
     Key? key,
     Widget? child,
     double curvature = 16.0,
@@ -1451,9 +1455,9 @@ class DynamicShapeContainer extends StatelessWidget {
     List<BoxShadow>? shadows,
     VoidCallback? onTap,
   }) {
-    return DynamicShapeContainer(
+    return Material4Container(
       key: key,
-      config: DynamicShapeConfig.convexRounded(
+      config: Material4Config.convexRounded(
         curvature: curvature,
         borderStyle: borderStyle,
       ),
@@ -1472,7 +1476,7 @@ class DynamicShapeContainer extends StatelessWidget {
   }
 
   /// Factory for Squircle (iOS super-ellipse) Container
-  factory DynamicShapeContainer.squircle({
+  factory Material4Container.squircle({
     Key? key,
     Widget? child,
     double cornerRadius = 32.0,
@@ -1488,9 +1492,9 @@ class DynamicShapeContainer extends StatelessWidget {
     List<BoxShadow>? shadows,
     VoidCallback? onTap,
   }) {
-    return DynamicShapeContainer(
+    return Material4Container(
       key: key,
-      config: DynamicShapeConfig.squircle(
+      config: Material4Config.squircle(
         cornerRadius: cornerRadius,
         borderStyle: borderStyle,
       ),
@@ -1509,7 +1513,7 @@ class DynamicShapeContainer extends StatelessWidget {
   }
 
   /// Factory for Slanted Parallelogram Container
-  factory DynamicShapeContainer.parallelogram({
+  factory Material4Container.parallelogram({
     Key? key,
     Widget? child,
     double skewAngle = 14.0,
@@ -1526,9 +1530,9 @@ class DynamicShapeContainer extends StatelessWidget {
     List<BoxShadow>? shadows,
     VoidCallback? onTap,
   }) {
-    return DynamicShapeContainer(
+    return Material4Container(
       key: key,
-      config: DynamicShapeConfig.parallelogram(
+      config: Material4Config.parallelogram(
         skewAngle: skewAngle,
         cornerRadius: cornerRadius,
         borderStyle: borderStyle,
@@ -1548,7 +1552,7 @@ class DynamicShapeContainer extends StatelessWidget {
   }
 
   /// Factory for Banner Ribbon Container
-  factory DynamicShapeContainer.ribbon({
+  factory Material4Container.ribbon({
     Key? key,
     Widget? child,
     double foldDepth = 20.0,
@@ -1565,9 +1569,9 @@ class DynamicShapeContainer extends StatelessWidget {
     List<BoxShadow>? shadows,
     VoidCallback? onTap,
   }) {
-    return DynamicShapeContainer(
+    return Material4Container(
       key: key,
-      config: DynamicShapeConfig.ribbon(
+      config: Material4Config.ribbon(
         foldDepth: foldDepth,
         cornerRadius: cornerRadius,
         borderStyle: borderStyle,
@@ -1587,7 +1591,7 @@ class DynamicShapeContainer extends StatelessWidget {
   }
 
   /// Factory for Hanging Bookmark Container
-  factory DynamicShapeContainer.bookmark({
+  factory Material4Container.bookmark({
     Key? key,
     Widget? child,
     double notchDepth = 22.0,
@@ -1604,9 +1608,9 @@ class DynamicShapeContainer extends StatelessWidget {
     List<BoxShadow>? shadows,
     VoidCallback? onTap,
   }) {
-    return DynamicShapeContainer(
+    return Material4Container(
       key: key,
-      config: DynamicShapeConfig.bookmark(
+      config: Material4Config.bookmark(
         notchDepth: notchDepth,
         cornerRadius: cornerRadius,
         borderStyle: borderStyle,
@@ -1626,7 +1630,7 @@ class DynamicShapeContainer extends StatelessWidget {
   }
 
   /// Factory for Custom Bézier Geometry Container
-  factory DynamicShapeContainer.customBezier({
+  factory Material4Container.customBezier({
     Key? key,
     Widget? child,
     required Path Function(Size size) builder,
@@ -1642,9 +1646,9 @@ class DynamicShapeContainer extends StatelessWidget {
     List<BoxShadow>? shadows,
     VoidCallback? onTap,
   }) {
-    return DynamicShapeContainer(
+    return Material4Container(
       key: key,
-      config: DynamicShapeConfig.customBezier(
+      config: Material4Config.customBezier(
         builder: builder,
         borderStyle: borderStyle,
       ),
@@ -1668,7 +1672,7 @@ class DynamicShapeContainer extends StatelessWidget {
         shape != null ? config.copyWith(type: shape) : config;
 
     if (animation != null) {
-      return AnimatedDynamicShapeContainer(
+      return AnimatedMaterial4Container(
         key: key,
         duration: animation!.duration,
         curve: animation!.curve,
@@ -1702,7 +1706,7 @@ class DynamicShapeContainer extends StatelessWidget {
 
   Widget _buildRenderTree(
     BuildContext context,
-    DynamicShapeConfig activeConfig,
+    Material4Config activeConfig,
   ) {
     final hasMultiChild = children != null && children!.isNotEmpty;
     Widget rendered;
@@ -1718,7 +1722,7 @@ class DynamicShapeContainer extends StatelessWidget {
           ),
         );
       }
-      rendered = DynamicShapeMultiChildRenderWidget(
+      rendered = Material4MultiChildRenderWidget(
         config: activeConfig,
         color: color,
         gradient: gradient,
@@ -1762,7 +1766,7 @@ class DynamicShapeContainer extends StatelessWidget {
         );
       }
 
-      rendered = DynamicShapeRenderWidget(
+      rendered = Material4RenderWidget(
         config: activeConfig,
         color: color,
         gradient: gradient,
@@ -1789,7 +1793,7 @@ class DynamicShapeContainer extends StatelessWidget {
 
     if (activeConfig.isGlassmorphic) {
       rendered = ClipPath(
-        clipper: DynamicShapeClipper(config: activeConfig),
+        clipper: Material4Clipper(config: activeConfig),
         clipBehavior: clipBehavior,
         child: BackdropFilter(
           filter: ImageFilter.blur(

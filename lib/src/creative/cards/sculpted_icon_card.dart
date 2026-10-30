@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../dynamic_shape_config.dart';
-import '../../dynamic_shape_container.dart';
+import '../../material_4_config.dart';
+import '../../material_4_container.dart';
 import 'sculpted_card_config.dart';
 import 'sculpted_surface_painter.dart';
 
@@ -32,8 +32,8 @@ class SculptedIconCard extends StatefulWidget {
   /// Sculpted surface finish and plate geometry configuration.
   final SculptedPlateConfig plateConfig;
 
-  /// Base container dynamic shape configuration.
-  final DynamicShapeConfig shapeConfig;
+  /// Base container Material 4 shape configuration.
+  final Material4Config shapeConfig;
 
   /// Tap callback.
   final VoidCallback? onTap;
@@ -108,8 +108,8 @@ class SculptedIconCard extends StatefulWidget {
     this.iconPosition = SculptedIconPosition.topLeft,
     this.customIconAlignment,
     this.plateConfig = const SculptedPlateConfig(),
-    this.shapeConfig = const DynamicShapeConfig(
-      type: DynamicShapeType.smoothRounded,
+    this.shapeConfig = const Material4Config(
+      type: Material4Type.smoothRounded,
       cornerRadius: 18.0,
     ),
     this.onTap,
@@ -274,8 +274,8 @@ class _SculptedIconCardState extends State<SculptedIconCard>
       direction: effectiveDirection,
     );
 
-    // DynamicShape container as the base card
-    final cardWidget = DynamicShapeContainer(
+    // Material4 container as the base card
+    final cardWidget = Material4Container(
       width: widget.width,
       height: widget.height,
       padding: widget.padding,

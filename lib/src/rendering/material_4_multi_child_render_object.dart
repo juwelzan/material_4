@@ -3,19 +3,19 @@ import 'dart:math' as math;
 import 'package:flutter/gestures.dart';
 import 'package:flutter/rendering.dart';
 
-import '../dynamic_shape_config.dart';
-import '../dynamic_shape_path_builder.dart';
-import '../dynamic_shape_stack.dart';
 import '../layout/shape_anchor_placer.dart';
 import '../layout/shape_collision_detector.dart';
 import '../layout/shape_content_protection.dart';
 import '../layout/shape_safe_region.dart';
-import 'dynamic_shape_clip_manager.dart';
-import 'dynamic_shape_hit_test.dart';
-import 'dynamic_shape_interaction.dart';
-import 'dynamic_shape_multi_child_parent_data.dart';
-import 'dynamic_shape_painter.dart';
-import 'dynamic_shape_semantics.dart';
+import '../material_4_config.dart';
+import '../material_4_path_builder.dart';
+import '../material_4_stack.dart';
+import 'material_4_clip_manager.dart';
+import 'material_4_hit_test.dart';
+import 'material_4_interaction.dart';
+import 'material_4_multi_child_parent_data.dart';
+import 'material_4_painter.dart';
+import 'material_4_semantics.dart';
 
 /// Central hardware-accelerated Multi-Child [RenderBox] engine for dynamic vector shapes.
 ///
@@ -25,12 +25,12 @@ import 'dynamic_shape_semantics.dart';
 /// - Collision detection and automatic resolution across sibling children
 /// - Direct Canvas rendering (backgrounds, borders, patterns, shadows, shimmer)
 /// - Fine-grained clipping and accessible semantics
-class RenderMultiChildDynamicShape extends RenderBox
+class RenderMultiChildMaterial4 extends RenderBox
     with
-        ContainerRenderObjectMixin<RenderBox, DynamicShapeMultiChildParentData>,
+        ContainerRenderObjectMixin<RenderBox, Material4MultiChildParentData>,
         RenderBoxContainerDefaultsMixin<RenderBox,
-            DynamicShapeMultiChildParentData> {
-  DynamicShapeConfig _config;
+            Material4MultiChildParentData> {
+  Material4Config _config;
   Color? _color;
   Gradient? _gradient;
   Color _borderColor;
@@ -39,7 +39,7 @@ class RenderMultiChildDynamicShape extends RenderBox
   Clip _clipBehavior;
   ShapeContentProtection _contentProtection;
   ShapeHitTestBehavior _hitTestBehavior;
-  DynamicShapeInteraction? _interaction;
+  Material4Interaction? _interaction;
   ShapeClipConfig? _clipConfig;
   VoidCallback? _onTap;
   VoidCallback? _onLongPress;
@@ -61,8 +61,8 @@ class RenderMultiChildDynamicShape extends RenderBox
   /// Diagnostic reports recorded during layout.
   final List<ShapeLayoutDiagnostic> _layoutDiagnostics = [];
 
-  RenderMultiChildDynamicShape({
-    required DynamicShapeConfig config,
+  RenderMultiChildMaterial4({
+    required Material4Config config,
     Color? color,
     Gradient? gradient,
     Color borderColor = const Color(0x18000000),
@@ -71,7 +71,7 @@ class RenderMultiChildDynamicShape extends RenderBox
     Clip clipBehavior = Clip.antiAlias,
     ShapeContentProtection contentProtection = const ShapeContentProtection(),
     ShapeHitTestBehavior hitTestBehavior = ShapeHitTestBehavior.shapeContour,
-    DynamicShapeInteraction? interaction,
+    Material4Interaction? interaction,
     ShapeClipConfig? clipConfig,
     VoidCallback? onTap,
     VoidCallback? onLongPress,
@@ -118,8 +118,8 @@ class RenderMultiChildDynamicShape extends RenderBox
   // Property Getters & Setters with Invalidation Separation
   // =========================================================================
 
-  DynamicShapeConfig get config => _config;
-  set config(DynamicShapeConfig value) {
+  Material4Config get config => _config;
+  set config(Material4Config value) {
     if (_config == value) return;
     final needsLayoutRecompute = _config.cornerRadius != value.cornerRadius ||
         _config.corners != value.corners ||
@@ -197,8 +197,8 @@ class RenderMultiChildDynamicShape extends RenderBox
     _hitTestBehavior = value;
   }
 
-  DynamicShapeInteraction? get interaction => _interaction;
-  set interaction(DynamicShapeInteraction? value) {
+  Material4Interaction? get interaction => _interaction;
+  set interaction(Material4Interaction? value) {
     if (_interaction == value) return;
     _interaction = value;
   }
@@ -367,8 +367,8 @@ class RenderMultiChildDynamicShape extends RenderBox
 
   @override
   void setupParentData(RenderBox child) {
-    if (child.parentData is! DynamicShapeMultiChildParentData) {
-      child.parentData = DynamicShapeMultiChildParentData();
+    if (child.parentData is! Material4MultiChildParentData) {
+      child.parentData = Material4MultiChildParentData();
     }
   }
 
@@ -379,7 +379,7 @@ class RenderMultiChildDynamicShape extends RenderBox
   /// Resolves the current vector [Path] for this RenderBox size.
   Path get currentPath {
     if (_currentPath != null) return _currentPath!;
-    _currentPath = DynamicShapePathBuilder.buildPath(size, _config);
+    _currentPath = Material4PathBuilder.buildPath(size, _config);
     return _currentPath!;
   }
 
@@ -510,7 +510,7 @@ class RenderMultiChildDynamicShape extends RenderBox
       RenderBox? child = firstChild;
       while (child != null) {
         final childParentData =
-            child.parentData! as DynamicShapeMultiChildParentData;
+            child.parentData! as Material4MultiChildParentData;
         final childRect = childParentData.offset & child.size;
         if (!effectiveSafeBounds.contains(childRect.topLeft) ||
             !effectiveSafeBounds.contains(childRect.bottomRight)) {
@@ -539,7 +539,7 @@ class RenderMultiChildDynamicShape extends RenderBox
     RenderBox? child = firstChild;
     while (child != null) {
       final childParentData =
-          child.parentData! as DynamicShapeMultiChildParentData;
+          child.parentData! as Material4MultiChildParentData;
       final childConstraints = _createChildConstraints(
         childParentData: childParentData,
         safeBounds: safeBounds,
@@ -626,7 +626,7 @@ class RenderMultiChildDynamicShape extends RenderBox
 
     while (child != null) {
       final childParentData =
-          child.parentData! as DynamicShapeMultiChildParentData;
+          child.parentData! as Material4MultiChildParentData;
       final childConstraints = _createChildConstraints(
         childParentData: childParentData,
         safeBounds: safeBounds,
@@ -667,7 +667,7 @@ class RenderMultiChildDynamicShape extends RenderBox
 
     while (child != null) {
       final childParentData =
-          child.parentData! as DynamicShapeMultiChildParentData;
+          child.parentData! as Material4MultiChildParentData;
       final childConstraints = _createChildConstraints(
         childParentData: childParentData,
         safeBounds: safeBounds,
@@ -711,7 +711,7 @@ class RenderMultiChildDynamicShape extends RenderBox
 
     while (child != null) {
       final childParentData =
-          child.parentData! as DynamicShapeMultiChildParentData;
+          child.parentData! as Material4MultiChildParentData;
       final anchor = childParentData.anchor ?? ShapeAnchor.center;
 
       final childConstraints = BoxConstraints(
@@ -759,7 +759,7 @@ class RenderMultiChildDynamicShape extends RenderBox
     int idx = 0;
     RenderBox? c = firstChild;
     while (c != null) {
-      final pd = c.parentData! as DynamicShapeMultiChildParentData;
+      final pd = c.parentData! as Material4MultiChildParentData;
       entries.add((child: c, priority: pd.priority, originalIndex: idx));
       idx++;
       c = pd.nextSibling;
@@ -770,7 +770,7 @@ class RenderMultiChildDynamicShape extends RenderBox
     for (final entry in entries) {
       final child = entry.child;
       final childParentData =
-          child.parentData! as DynamicShapeMultiChildParentData;
+          child.parentData! as Material4MultiChildParentData;
 
       // Estimate dry size to find best safe region
       final estimateConstraints = BoxConstraints(
@@ -821,7 +821,7 @@ class RenderMultiChildDynamicShape extends RenderBox
   }
 
   BoxConstraints _createChildConstraints({
-    required DynamicShapeMultiChildParentData childParentData,
+    required Material4MultiChildParentData childParentData,
     required Rect safeBounds,
     Axis? direction,
   }) {
@@ -889,7 +889,7 @@ class RenderMultiChildDynamicShape extends RenderBox
     RenderBox? child = firstChild;
     while (child != null) {
       final childParentData =
-          child.parentData! as DynamicShapeMultiChildParentData;
+          child.parentData! as Material4MultiChildParentData;
       final childW = child.getMinIntrinsicWidth(height) +
           childParentData.margin.horizontal;
       if (_layoutStrategy == ShapeLayoutStrategy.flowHorizontal) {
@@ -910,7 +910,7 @@ class RenderMultiChildDynamicShape extends RenderBox
     RenderBox? child = firstChild;
     while (child != null) {
       final childParentData =
-          child.parentData! as DynamicShapeMultiChildParentData;
+          child.parentData! as Material4MultiChildParentData;
       final childW = child.getMaxIntrinsicWidth(height) +
           childParentData.margin.horizontal;
       if (_layoutStrategy == ShapeLayoutStrategy.flowHorizontal) {
@@ -931,7 +931,7 @@ class RenderMultiChildDynamicShape extends RenderBox
     RenderBox? child = firstChild;
     while (child != null) {
       final childParentData =
-          child.parentData! as DynamicShapeMultiChildParentData;
+          child.parentData! as Material4MultiChildParentData;
       final childH =
           child.getMinIntrinsicHeight(width) + childParentData.margin.vertical;
       if (_layoutStrategy == ShapeLayoutStrategy.flowVertical) {
@@ -952,7 +952,7 @@ class RenderMultiChildDynamicShape extends RenderBox
     RenderBox? child = firstChild;
     while (child != null) {
       final childParentData =
-          child.parentData! as DynamicShapeMultiChildParentData;
+          child.parentData! as Material4MultiChildParentData;
       final childH =
           child.getMaxIntrinsicHeight(width) + childParentData.margin.vertical;
       if (_layoutStrategy == ShapeLayoutStrategy.flowVertical) {
@@ -1064,7 +1064,7 @@ class RenderMultiChildDynamicShape extends RenderBox
       RenderBox? child = firstChild;
       while (child != null) {
         final childParentData =
-            child.parentData as DynamicShapeMultiChildParentData?;
+            child.parentData as Material4MultiChildParentData?;
         if (childParentData != null) {
           final childBounds = child.paintBounds.shift(childParentData.offset);
           bounds = bounds.expandToInclude(childBounds);
@@ -1078,7 +1078,7 @@ class RenderMultiChildDynamicShape extends RenderBox
     bounds = bounds.expandToInclude(pathBounds);
 
     // 9. If overflow clipping is explicitly enabled, clamp to container rectangular bounds
-    if (DynamicShapeClipManager.shouldClipOverflow(
+    if (Material4ClipManager.shouldClipOverflow(
       config: _config,
       clipConfig: _clipConfig,
     )) {
@@ -1092,11 +1092,11 @@ class RenderMultiChildDynamicShape extends RenderBox
   void paint(PaintingContext context, Offset offset) {
     if (size.width <= 0 || size.height <= 0) return;
 
-    if (DynamicShapeClipManager.shouldClipOverflow(
+    if (Material4ClipManager.shouldClipOverflow(
       config: _config,
       clipConfig: _clipConfig,
     )) {
-      DynamicShapeClipManager.paintWithRectClip(
+      Material4ClipManager.paintWithRectClip(
         context: context,
         offset: offset,
         clipRect: Offset.zero & size,
@@ -1117,7 +1117,7 @@ class RenderMultiChildDynamicShape extends RenderBox
     canvas.translate(offset.dx, offset.dy);
 
     // Stage 2: Outer Shadows
-    DynamicShapePainter.paintOuterShadows(
+    Material4Painter.paintOuterShadows(
       canvas: canvas,
       size: size,
       path: path,
@@ -1128,7 +1128,7 @@ class RenderMultiChildDynamicShape extends RenderBox
     );
 
     // Stage 3: Shape Background & Procedural Effects
-    DynamicShapePainter.paintBackground(
+    Material4Painter.paintBackground(
       canvas: canvas,
       size: size,
       path: path,
@@ -1138,7 +1138,7 @@ class RenderMultiChildDynamicShape extends RenderBox
     );
 
     // Stage 4: Background Patterns
-    DynamicShapePainter.paintPatterns(
+    Material4Painter.paintPatterns(
       canvas: canvas,
       size: size,
       path: path,
@@ -1147,7 +1147,7 @@ class RenderMultiChildDynamicShape extends RenderBox
     );
 
     // Stage 5: Inner Shadows
-    DynamicShapePainter.paintInnerShadows(
+    Material4Painter.paintInnerShadows(
       canvas: canvas,
       size: size,
       path: path,
@@ -1155,7 +1155,7 @@ class RenderMultiChildDynamicShape extends RenderBox
     );
 
     // Stage 6: Distinctive Borders
-    DynamicShapePainter.paintBorders(
+    Material4Painter.paintBorders(
       canvas: canvas,
       size: size,
       path: path,
@@ -1165,7 +1165,7 @@ class RenderMultiChildDynamicShape extends RenderBox
     );
 
     // Stage 7: Foreground Decorations
-    DynamicShapePainter.paintForegroundDecorations(
+    Material4Painter.paintForegroundDecorations(
       canvas: canvas,
       size: size,
       path: path,
@@ -1176,7 +1176,7 @@ class RenderMultiChildDynamicShape extends RenderBox
 
     // Stage 8: Multi-Child Painting with Selective Clipping
     if (firstChild != null) {
-      final shouldClip = DynamicShapeClipManager.shouldClipChild(
+      final shouldClip = Material4ClipManager.shouldClipChild(
         protection: _contentProtection,
         config: _config,
         clipBehavior: _clipBehavior,
@@ -1184,7 +1184,7 @@ class RenderMultiChildDynamicShape extends RenderBox
       );
 
       if (shouldClip) {
-        DynamicShapeClipManager.paintWithClip(
+        Material4ClipManager.paintWithClip(
           context: context,
           offset: offset,
           bounds: Offset.zero & size,
@@ -1207,23 +1207,23 @@ class RenderMultiChildDynamicShape extends RenderBox
     while (child != null) {
       children.add(child);
       final childParentData =
-          child.parentData! as DynamicShapeMultiChildParentData;
+          child.parentData! as Material4MultiChildParentData;
       child = childParentData.nextSibling;
     }
 
     bool hasCustomZ = children.any(
-        (c) => (c.parentData! as DynamicShapeMultiChildParentData).zIndex != 0);
+        (c) => (c.parentData! as Material4MultiChildParentData).zIndex != 0);
 
     if (hasCustomZ) {
       children.sort((a, b) {
-        final zA = (a.parentData! as DynamicShapeMultiChildParentData).zIndex;
-        final zB = (b.parentData! as DynamicShapeMultiChildParentData).zIndex;
+        final zA = (a.parentData! as Material4MultiChildParentData).zIndex;
+        final zB = (b.parentData! as Material4MultiChildParentData).zIndex;
         return zA.compareTo(zB);
       });
     }
 
     for (final c in children) {
-      final childParentData = c.parentData! as DynamicShapeMultiChildParentData;
+      final childParentData = c.parentData! as Material4MultiChildParentData;
       context.paintChild(c, offset + childParentData.offset);
     }
   }
@@ -1238,12 +1238,12 @@ class RenderMultiChildDynamicShape extends RenderBox
 
     final effectiveInteraction = _interaction ??
         _config.interaction ??
-        DynamicShapeInteraction(hitTestBehavior: _hitTestBehavior);
+        Material4Interaction(hitTestBehavior: _hitTestBehavior);
 
     final behavior = effectiveInteraction.hitTestBehavior;
 
-    // 1. Point-in-shape evaluation via DynamicShapeHitTester
-    final bool isInsideShapeOrBox = DynamicShapeHitTester.containsPoint(
+    // 1. Point-in-shape evaluation via Material4HitTester
+    final bool isInsideShapeOrBox = Material4HitTester.containsPoint(
       path: currentPath,
       size: size,
       position: position,
@@ -1317,7 +1317,7 @@ class RenderMultiChildDynamicShape extends RenderBox
     RenderBox? child = firstChild;
     while (child != null) {
       final childParentData =
-          child.parentData! as DynamicShapeMultiChildParentData;
+          child.parentData! as Material4MultiChildParentData;
       if (childParentData.zIndex != 0) {
         hasCustomZ = true;
         break;
@@ -1335,19 +1335,19 @@ class RenderMultiChildDynamicShape extends RenderBox
     while (child != null) {
       sortedChildren.add(child);
       final childParentData =
-          child.parentData! as DynamicShapeMultiChildParentData;
+          child.parentData! as Material4MultiChildParentData;
       child = childParentData.nextSibling;
     }
 
     sortedChildren.sort((a, b) {
-      final zA = (a.parentData! as DynamicShapeMultiChildParentData).zIndex;
-      final zB = (b.parentData! as DynamicShapeMultiChildParentData).zIndex;
+      final zA = (a.parentData! as Material4MultiChildParentData).zIndex;
+      final zB = (b.parentData! as Material4MultiChildParentData).zIndex;
       return zA.compareTo(zB);
     });
 
     for (int i = sortedChildren.length - 1; i >= 0; i--) {
       final c = sortedChildren[i];
-      final childParentData = c.parentData! as DynamicShapeMultiChildParentData;
+      final childParentData = c.parentData! as Material4MultiChildParentData;
       final isHit = result.addWithPaintOffset(
         offset: childParentData.offset,
         position: position,
@@ -1365,8 +1365,7 @@ class RenderMultiChildDynamicShape extends RenderBox
   @override
   void applyPaintTransform(RenderBox child, Matrix4 transform) {
     assert(child.parent == this);
-    final childParentData =
-        child.parentData! as DynamicShapeMultiChildParentData;
+    final childParentData = child.parentData! as Material4MultiChildParentData;
     transform.translateByDouble(
       childParentData.offset.dx,
       childParentData.offset.dy,
@@ -1378,7 +1377,7 @@ class RenderMultiChildDynamicShape extends RenderBox
   @override
   void describeSemanticsConfiguration(SemanticsConfiguration config) {
     super.describeSemanticsConfiguration(config);
-    DynamicShapeSemantics.applySemantics(
+    Material4Semantics.applySemantics(
       config: config,
       onTap: _onTap,
       onLongPress: _onLongPress,

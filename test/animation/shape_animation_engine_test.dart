@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:dynamic_shape/dynamic_shape.dart';
+import 'package:material_4/material_4.dart';
 
 void main() {
   group('ShapeGeometryInterpolator Unit Tests', () {
@@ -123,9 +123,8 @@ void main() {
       expect(lerped[1].width, closeTo(20.0, 0.001));
     });
 
-    test('DynamicShapeConfig.lerp interpolates all core parameters cleanly',
-        () {
-      const configA = DynamicShapeConfig(
+    test('Material4Config.lerp interpolates all core parameters cleanly', () {
+      const configA = Material4Config(
         cornerRadius: 10.0,
         tabWidth: 50.0,
         tabHeight: 25.0,
@@ -134,7 +133,7 @@ void main() {
         skewAngle: 0.1,
       );
 
-      const configB = DynamicShapeConfig(
+      const configB = Material4Config(
         cornerRadius: 30.0,
         tabWidth: 90.0,
         tabHeight: 45.0,
@@ -143,7 +142,7 @@ void main() {
         skewAngle: 0.5,
       );
 
-      final lerped = DynamicShapeConfig.lerp(configA, configB, 0.5);
+      final lerped = Material4Config.lerp(configA, configB, 0.5);
 
       expect(lerped.cornerRadius, closeTo(20.0, 0.001));
       expect(lerped.tabWidth, closeTo(70.0, 0.001));
@@ -161,15 +160,15 @@ void main() {
       // Rounded / Squircle family
       expect(
         ShapeMorphEngine.canMorphGeometrically(
-          DynamicShapeType.capsule,
-          DynamicShapeType.squircle,
+          Material4Type.capsule,
+          Material4Type.squircle,
         ),
         isTrue,
       );
       expect(
         ShapeMorphEngine.canMorphGeometrically(
-          DynamicShapeType.smoothRounded,
-          DynamicShapeType.asymmetricCard,
+          Material4Type.smoothRounded,
+          Material4Type.asymmetricCard,
         ),
         isTrue,
       );
@@ -177,15 +176,15 @@ void main() {
       // Notched / Tabbed family
       expect(
         ShapeMorphEngine.canMorphGeometrically(
-          DynamicShapeType.smoothRounded,
-          DynamicShapeType.ticketScallop,
+          Material4Type.smoothRounded,
+          Material4Type.ticketScallop,
         ),
         isTrue,
       );
       expect(
         ShapeMorphEngine.canMorphGeometrically(
-          DynamicShapeType.ticketScallop,
-          DynamicShapeType.notchedBadge,
+          Material4Type.ticketScallop,
+          Material4Type.notchedBadge,
         ),
         isTrue,
       );
@@ -193,15 +192,15 @@ void main() {
       // Polygons family
       expect(
         ShapeMorphEngine.canMorphGeometrically(
-          DynamicShapeType.diamond,
-          DynamicShapeType.octagon,
+          Material4Type.diamond,
+          Material4Type.octagon,
         ),
         isTrue,
       );
       expect(
         ShapeMorphEngine.canMorphGeometrically(
-          DynamicShapeType.shield,
-          DynamicShapeType.hexagonSoft,
+          Material4Type.shield,
+          Material4Type.hexagonSoft,
         ),
         isTrue,
       );
@@ -209,8 +208,8 @@ void main() {
       // Incompatible topologies
       expect(
         ShapeMorphEngine.canMorphGeometrically(
-          DynamicShapeType.octagon,
-          DynamicShapeType.folderTab,
+          Material4Type.octagon,
+          Material4Type.folderTab,
         ),
         isFalse,
       );
@@ -219,8 +218,8 @@ void main() {
     test(
         'Normalized sampling morph generates continuous vector paths for arbitrary shapes',
         () {
-      const fromConfig = DynamicShapeConfig(type: DynamicShapeType.octagon);
-      const toConfig = DynamicShapeConfig(type: DynamicShapeType.folderTab);
+      const fromConfig = Material4Config(type: Material4Type.octagon);
+      const toConfig = Material4Config(type: Material4Type.folderTab);
       const size = Size(200.0, 200.0);
 
       final pathAt0 = ShapeMorphEngine.computeMorphedPath(
@@ -272,13 +271,13 @@ void main() {
         (tester) async {
       final controller = ShapeAnimationController(
         vsync: tester,
-        initialConfig: const DynamicShapeConfig(cornerRadius: 10.0),
+        initialConfig: const Material4Config(cornerRadius: 10.0),
       );
 
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: DynamicShapeContainer(
+            body: Material4Container(
               controller: controller,
               width: 100,
               height: 100,
@@ -290,7 +289,7 @@ void main() {
       expect(controller.currentConfig.cornerRadius, equals(10.0));
 
       controller.morphTo(
-        const DynamicShapeConfig(cornerRadius: 30.0),
+        const Material4Config(cornerRadius: 30.0),
         duration: const Duration(milliseconds: 200),
       );
 
@@ -311,13 +310,13 @@ void main() {
         (tester) async {
       final controller = ShapeAnimationController(
         vsync: tester,
-        initialConfig: const DynamicShapeConfig(cornerRadius: 10.0),
+        initialConfig: const Material4Config(cornerRadius: 10.0),
       );
 
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: DynamicShapeContainer(
+            body: Material4Container(
               controller: controller,
               width: 100,
               height: 100,
@@ -328,7 +327,7 @@ void main() {
 
       // Start morph to 40.0
       controller.morphTo(
-        const DynamicShapeConfig(cornerRadius: 40.0),
+        const Material4Config(cornerRadius: 40.0),
         duration: const Duration(milliseconds: 400),
       );
 
@@ -339,7 +338,7 @@ void main() {
 
       // Interrupt with new target 80.0
       controller.morphTo(
-        const DynamicShapeConfig(cornerRadius: 80.0),
+        const Material4Config(cornerRadius: 80.0),
         duration: const Duration(milliseconds: 400),
       );
 
@@ -358,13 +357,13 @@ void main() {
         (tester) async {
       final controller = ShapeAnimationController(
         vsync: tester,
-        initialConfig: const DynamicShapeConfig(cornerRadius: 10.0),
+        initialConfig: const Material4Config(cornerRadius: 10.0),
       );
 
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: DynamicShapeContainer(
+            body: Material4Container(
               controller: controller,
               width: 100,
               height: 100,
@@ -374,7 +373,7 @@ void main() {
       );
 
       controller.morphTo(
-        const DynamicShapeConfig(cornerRadius: 50.0),
+        const Material4Config(cornerRadius: 50.0),
         duration: const Duration(milliseconds: 200),
       );
       await tester.pumpAndSettle();
@@ -397,13 +396,13 @@ void main() {
         (tester) async {
       final controller = ShapeAnimationController(
         vsync: tester,
-        initialConfig: const DynamicShapeConfig(cornerRadius: 0.0),
+        initialConfig: const Material4Config(cornerRadius: 0.0),
       );
 
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: DynamicShapeContainer(
+            body: Material4Container(
               controller: controller,
               width: 100,
               height: 100,
@@ -414,11 +413,11 @@ void main() {
 
       final sequence = ShapeAnimationSequence.builder()
           .then(
-            config: const DynamicShapeConfig(cornerRadius: 20.0),
+            config: const Material4Config(cornerRadius: 20.0),
             duration: const Duration(milliseconds: 100),
           )
           .then(
-            config: const DynamicShapeConfig(cornerRadius: 50.0),
+            config: const Material4Config(cornerRadius: 50.0),
             duration: const Duration(milliseconds: 100),
           );
 
@@ -447,14 +446,14 @@ void main() {
         (tester) async {
       final controller = ShapeAnimationController(
         vsync: tester,
-        initialConfig: const DynamicShapeConfig(cornerRadius: 10.0),
+        initialConfig: const Material4Config(cornerRadius: 10.0),
         respectReducedMotion: true,
       );
 
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: DynamicShapeContainer(
+            body: Material4Container(
               controller: controller,
               width: 100,
               height: 100,
@@ -464,7 +463,7 @@ void main() {
       );
 
       controller.morphTo(
-        const DynamicShapeConfig(cornerRadius: 45.0),
+        const Material4Config(cornerRadius: 45.0),
         duration: const Duration(milliseconds: 500),
         reducedMotion: true,
       );
@@ -476,7 +475,7 @@ void main() {
     });
 
     testWidgets(
-        'AnimatedDynamicShapeContainer honors disableAnimations in MediaQuery',
+        'AnimatedMaterial4Container honors disableAnimations in MediaQuery',
         (tester) async {
       double targetCornerRadius = 10.0;
 
@@ -488,10 +487,9 @@ void main() {
               builder: (context, setState) {
                 return Scaffold(
                   body: Center(
-                    child: AnimatedDynamicShapeContainer(
+                    child: AnimatedMaterial4Container(
                       duration: const Duration(milliseconds: 400),
-                      config:
-                          DynamicShapeConfig(cornerRadius: targetCornerRadius),
+                      config: Material4Config(cornerRadius: targetCornerRadius),
                       width: 100,
                       height: 100,
                       onTap: () {
@@ -508,12 +506,12 @@ void main() {
         ),
       );
 
-      await tester.tap(find.byType(AnimatedDynamicShapeContainer));
+      await tester.tap(find.byType(AnimatedMaterial4Container));
       await tester.pump();
 
       // Because animations are disabled, next immediate frame carries final target value
-      final renderBox = tester.renderObject<RenderDynamicShape>(
-        find.byType(DynamicShapeRenderWidget),
+      final renderBox = tester.renderObject<RenderMaterial4>(
+        find.byType(Material4RenderWidget),
       );
       expect(renderBox.config.cornerRadius, equals(50.0));
     });
@@ -527,8 +525,8 @@ void main() {
           home: Scaffold(
             body: Center(
               child: ShapeMorphTransition(
-                from: DynamicShapeType.capsule,
-                to: DynamicShapeType.squircle,
+                from: Material4Type.capsule,
+                to: Material4Type.squircle,
                 duration: Duration(milliseconds: 300),
                 width: 150,
                 height: 150,
@@ -541,14 +539,14 @@ void main() {
 
       expect(find.text('Morph Content'), findsOneWidget);
       await tester.pump(const Duration(milliseconds: 150));
-      expect(find.byType(DynamicShapeContainer), findsOneWidget);
+      expect(find.byType(Material4Container), findsOneWidget);
       await tester.pumpAndSettle();
       expect(find.text('Morph Content'), findsOneWidget);
     });
 
-    testWidgets('DynamicShapeContainer with animation config morphs implicitly',
+    testWidgets('Material4Container with animation config morphs implicitly',
         (tester) async {
-      DynamicShapeType activeShape = DynamicShapeType.smoothRounded;
+      Material4Type activeShape = Material4Type.smoothRounded;
 
       await tester.pumpWidget(
         MaterialApp(
@@ -556,7 +554,7 @@ void main() {
             builder: (context, setState) {
               return Scaffold(
                 body: Center(
-                  child: DynamicShapeContainer(
+                  child: Material4Container(
                     shape: activeShape,
                     animation: const ShapeAnimationConfig(
                       duration: Duration(milliseconds: 300),
@@ -565,7 +563,7 @@ void main() {
                     height: 200,
                     onTap: () {
                       setState(() {
-                        activeShape = DynamicShapeType.asymmetricCard;
+                        activeShape = Material4Type.asymmetricCard;
                       });
                     },
                     child: const Text('Tap to Morph'),
@@ -577,7 +575,7 @@ void main() {
         ),
       );
 
-      expect(find.byType(AnimatedDynamicShapeContainer), findsOneWidget);
+      expect(find.byType(AnimatedMaterial4Container), findsOneWidget);
       await tester.tap(find.text('Tap to Morph'));
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 150));
@@ -593,7 +591,7 @@ void main() {
       final controller = ShapeAnimationController(
         vsync: tester,
         // Start as diamond (where top-left (10, 10) is outside the diamond)
-        initialConfig: const DynamicShapeConfig(type: DynamicShapeType.diamond),
+        initialConfig: const Material4Config(type: Material4Type.diamond),
       );
 
       bool containerTapped = false;
@@ -603,7 +601,7 @@ void main() {
           home: Scaffold(
             body: Align(
               alignment: Alignment.topLeft,
-              child: DynamicShapeContainer(
+              child: Material4Container(
                 controller: controller,
                 width: 200,
                 height: 200,
@@ -623,8 +621,8 @@ void main() {
 
       // Now animate to smoothRounded with cornerRadius 0 (full rectangle)
       controller.animateConfig(
-        const DynamicShapeConfig(
-          type: DynamicShapeType.smoothRounded,
+        const Material4Config(
+          type: Material4Type.smoothRounded,
           cornerRadius: 0.0,
         ),
         duration: const Duration(milliseconds: 400),
@@ -648,7 +646,7 @@ void main() {
         (tester) async {
       final controller = ShapeAnimationController(
         vsync: tester,
-        initialConfig: const DynamicShapeConfig(
+        initialConfig: const Material4Config(
           corners: ShapeCorners.all(Radius.circular(10.0)),
         ),
       );
@@ -656,7 +654,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: DynamicShapeContainer(
+            body: Material4Container(
               controller: controller,
               width: 150,
               height: 150,

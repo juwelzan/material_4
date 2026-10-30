@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../dynamic_shape_config.dart';
+import '../../material_4_config.dart';
 
 /// Available icon position anchors on [SculptedIconCard].
 enum SculptedIconPosition {
@@ -106,7 +106,7 @@ enum SculptedPlateShape {
   /// Fluid organic blob shape.
   organic,
 
-  /// Inherits and scales the parent card's dynamic shape.
+  /// Inherits and scales the parent card's Material 4 shape.
   matchCard,
 
   /// Custom shape path.
@@ -158,7 +158,7 @@ class SculptedPlateConfig {
   final Color? borderColor;
 
   /// Custom shape config for the plate if [shape] is [SculptedPlateShape.custom].
-  final DynamicShapeConfig? customShapeConfig;
+  final Material4Config? customShapeConfig;
 
   const SculptedPlateConfig({
     this.style = SculptedSurfaceStyle.embossed,
@@ -261,7 +261,7 @@ class SculptedPlateConfig {
     bool? pressInteractive,
     double? borderWidth,
     Color? borderColor,
-    DynamicShapeConfig? customShapeConfig,
+    Material4Config? customShapeConfig,
   }) {
     return SculptedPlateConfig(
       style: style ?? this.style,

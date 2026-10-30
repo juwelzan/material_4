@@ -1,8 +1,8 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
-import '../../dynamic_shape_config.dart';
-import '../../dynamic_shape_container.dart';
+import '../../material_4_config.dart';
+import '../../material_4_container.dart';
 import '../borders/creative_border_config.dart';
 import '../materials/dynamic_material.dart';
 import '../paper/paper_background_config.dart';
@@ -50,7 +50,7 @@ enum CardSurfaceType {
 
 /// A master, highly tactile, universal dynamic card component combining:
 /// - Physical material models ([DynamicMaterial], [DynamicMaterialConfig])
-/// - Parametric shape geometry ([DynamicShapeType], [DynamicShapeConfig])
+/// - Parametric shape geometry ([Material4Type], [Material4Config])
 /// - Flexible icon surfaces and positions ([CardIconPosition], [CardSurfaceType])
 /// - Multi-layer typography hierarchy with overflow protection and Bengali/RTL support
 /// - Responsive spring physics, hover elevations, and accordion expansions ([CardInteractionConfig])
@@ -61,8 +61,8 @@ class MaterialDynamicCard extends StatefulWidget {
   /// Detailed material configuration. If provided, takes precedence over [material].
   final DynamicMaterialConfig? materialConfig;
 
-  /// Geometric dynamic shape preset for the container boundary.
-  final DynamicShapeType shape;
+  /// Geometric Material 4 shape preset for the container boundary.
+  final Material4Type shape;
 
   /// Corner radius for standard rounded shapes.
   final double cornerRadius;
@@ -73,8 +73,8 @@ class MaterialDynamicCard extends StatefulWidget {
   /// Custom edges contour configuration.
   final ShapeEdges? edges;
 
-  /// Base or custom dynamic shape configuration.
-  final DynamicShapeConfig? shapeConfig;
+  /// Base or custom Material 4 shape configuration.
+  final Material4Config? shapeConfig;
 
   /// Creative border style (torn paper, deckled edge, stamps, stitched, neon, etc.).
   final CreativeBorderConfig? creativeBorder;
@@ -230,7 +230,7 @@ class MaterialDynamicCard extends StatefulWidget {
     super.key,
     this.material,
     this.materialConfig,
-    this.shape = DynamicShapeType.smoothRounded,
+    this.shape = Material4Type.smoothRounded,
     this.cornerRadius = 16.0,
     this.corners,
     this.edges,
@@ -429,7 +429,7 @@ class _MaterialDynamicCardState extends State<MaterialDynamicCard>
     }
   }
 
-  DynamicShapeConfig _buildFinalShapeConfig(
+  Material4Config _buildFinalShapeConfig(
     DynamicMaterialConfig matConfig,
     ThemeData theme,
   ) {
@@ -437,7 +437,7 @@ class _MaterialDynamicCardState extends State<MaterialDynamicCard>
       return widget.shapeConfig!;
     }
 
-    DynamicShapeType shapeType = widget.shape;
+    Material4Type shapeType = widget.shape;
     if (_isHovered && widget.interaction.morphShapeOnHover != null) {
       shapeType = widget.interaction.morphShapeOnHover!;
     } else if (_isSelected && widget.interaction.morphShapeOnSelect != null) {
@@ -554,7 +554,7 @@ class _MaterialDynamicCardState extends State<MaterialDynamicCard>
     }
 
     // RenderBox dynamic container
-    Widget cardContainer = DynamicShapeContainer(
+    Widget cardContainer = Material4Container(
       width: widget.width,
       height: widget.height,
       padding: widget.padding,

@@ -1,11 +1,11 @@
 import 'package:flutter/animation.dart';
 
-import '../dynamic_shape_config.dart';
+import '../material_4_config.dart';
 
 /// An individual step in a composable [ShapeAnimationSequence].
 class ShapeAnimationStep {
   /// The target shape configuration to animate toward.
-  final DynamicShapeConfig targetConfig;
+  final Material4Config targetConfig;
 
   /// The duration of this transition step.
   final Duration duration;
@@ -76,7 +76,7 @@ class ShapeAnimationSequenceBuilder extends ShapeAnimationSequence {
 
   /// Appends a new animation step targeting [config].
   ShapeAnimationSequenceBuilder then({
-    required DynamicShapeConfig config,
+    required Material4Config config,
     Duration duration = const Duration(milliseconds: 350),
     Curve curve = Curves.easeInOutCubic,
     Duration delay = Duration.zero,

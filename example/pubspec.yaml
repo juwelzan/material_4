@@ -1,5 +1,5 @@
-name: dynamic_shape_example
-description: "Demonstration and example app for the dynamic_shape package."
+name: material_4_example
+description: "Demonstration and example app for the material_4 package."
 publish_to: 'none'
 version: 1.0.0+1
 
@@ -11,7 +11,7 @@ dependencies:
     sdk: flutter
   cupertino_icons: ^1.0.8
   google_fonts: ^6.0.0
-  dynamic_shape:
+  material_4:
     path: ../
 
 dev_dependencies:

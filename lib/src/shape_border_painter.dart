@@ -3,7 +3,7 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 
-import 'dynamic_shape_config.dart';
+import 'material_4_config.dart';
 
 /// Next-Generation high-performance border renderer supporting 20 unique border styles.
 ///
@@ -17,7 +17,7 @@ class ShapeBorderPainter {
     required Canvas canvas,
     required Size size,
     required Path path,
-    required DynamicShapeConfig config,
+    required Material4Config config,
     required Color borderColor,
     required double borderWidth,
   }) {
@@ -65,7 +65,7 @@ class ShapeBorderPainter {
     Canvas canvas,
     Size size,
     Path path,
-    DynamicShapeConfig config,
+    Material4Config config,
     Color borderColor,
     double borderWidth,
   ) {
@@ -329,7 +329,7 @@ class ShapeBorderPainter {
     Canvas canvas,
     Size size,
     Path path,
-    DynamicShapeConfig config,
+    Material4Config config,
     Color borderColor,
     double borderWidth,
   ) {
@@ -359,7 +359,7 @@ class ShapeBorderPainter {
     Canvas canvas,
     Size size,
     Path path,
-    DynamicShapeConfig config,
+    Material4Config config,
     Color borderColor,
     double borderWidth,
   ) {
@@ -396,7 +396,7 @@ class ShapeBorderPainter {
   static void _drawNeo3D(
     Canvas canvas,
     Path path,
-    DynamicShapeConfig config,
+    Material4Config config,
     Color borderColor,
     double borderWidth,
   ) {
@@ -464,7 +464,7 @@ class ShapeBorderPainter {
     Canvas canvas,
     Size size,
     Path path,
-    DynamicShapeConfig config,
+    Material4Config config,
     Color borderColor,
     double borderWidth,
   ) {
@@ -525,7 +525,7 @@ class ShapeBorderPainter {
     Canvas canvas,
     Size size,
     Path path,
-    DynamicShapeConfig config,
+    Material4Config config,
     double borderWidth,
   ) {
     final paint = Paint()
@@ -560,7 +560,7 @@ class ShapeBorderPainter {
   static void _drawNeonPulse(
     Canvas canvas,
     Path path,
-    DynamicShapeConfig config,
+    Material4Config config,
     Color borderColor,
     double borderWidth,
   ) {
@@ -599,7 +599,7 @@ class ShapeBorderPainter {
     Canvas canvas,
     Size size,
     Path path,
-    DynamicShapeConfig config,
+    Material4Config config,
     double borderWidth,
   ) {
     final paint = Paint()
@@ -667,7 +667,7 @@ class ShapeBorderPainter {
     Canvas canvas,
     Size size,
     Path path,
-    DynamicShapeConfig config,
+    Material4Config config,
     Color borderColor,
     double borderWidth,
   ) {
@@ -739,7 +739,7 @@ class ShapeBorderPainter {
     Canvas canvas,
     Size size,
     Path path,
-    DynamicShapeConfig config,
+    Material4Config config,
     Color borderColor,
     double borderWidth,
   ) {
@@ -776,7 +776,7 @@ class ShapeBorderPainter {
     Canvas canvas,
     Size size,
     Path path,
-    DynamicShapeConfig config,
+    Material4Config config,
     Color borderColor,
     double borderWidth,
   ) {
@@ -805,7 +805,7 @@ class ShapeBorderPainter {
   static void _drawAnimatedDashed(
     Canvas canvas,
     Path path,
-    DynamicShapeConfig config,
+    Material4Config config,
     Color borderColor,
     double borderWidth,
   ) {
@@ -828,7 +828,7 @@ class ShapeBorderPainter {
     Canvas canvas,
     Size size,
     Path path,
-    DynamicShapeConfig config,
+    Material4Config config,
     Color borderColor,
     double borderWidth,
   ) {
@@ -870,7 +870,7 @@ class ShapeBorderPainter {
     Canvas canvas,
     Size size,
     Path path,
-    DynamicShapeConfig config,
+    Material4Config config,
     Color borderColor,
     double borderWidth,
   ) {
@@ -890,7 +890,7 @@ class ShapeBorderPainter {
     Canvas canvas,
     Size size,
     Path path,
-    DynamicShapeConfig config,
+    Material4Config config,
     Color borderColor,
     double borderWidth,
   ) {
@@ -914,7 +914,7 @@ class ShapeBorderPainter {
   static void _drawNoiseTextured(
     Canvas canvas,
     Path path,
-    DynamicShapeConfig config,
+    Material4Config config,
     Color borderColor,
     double borderWidth,
   ) {
@@ -963,7 +963,7 @@ class ShapeBorderPainter {
   static void _drawHandDrawn(
     Canvas canvas,
     Path path,
-    DynamicShapeConfig config,
+    Material4Config config,
     Color borderColor,
     double borderWidth,
   ) {

@@ -2,8 +2,8 @@ import 'dart:collection';
 import 'dart:math' as math;
 import 'package:flutter/rendering.dart';
 
-import '../dynamic_shape_config.dart';
-import '../dynamic_shape_path_builder.dart';
+import '../material_4_config.dart';
+import '../material_4_path_builder.dart';
 
 /// Geometry-aware safe region and inscribed bounds engine.
 ///
@@ -32,7 +32,7 @@ class ShapeSafeRegion {
   /// to guarantee that children placed within the resulting bounds are never clipped.
   static EdgeInsets computeSafeInsets({
     required Size size,
-    required DynamicShapeConfig config,
+    required Material4Config config,
     EdgeInsets basePadding = EdgeInsets.zero,
     double borderWidth = 1.0,
     TextDirection textDirection = TextDirection.ltr,
@@ -76,7 +76,7 @@ class ShapeSafeRegion {
 
   static EdgeInsets _calculateSafeInsets({
     required Size size,
-    required DynamicShapeConfig config,
+    required Material4Config config,
     required EdgeInsets basePadding,
     required double borderWidth,
     required TextDirection textDirection,
@@ -142,7 +142,7 @@ class ShapeSafeRegion {
     // 3. Preset-Specific Mathematical Allowances
     // -------------------------------------------------------------------------
     switch (config.type) {
-      case DynamicShapeType.folderTab:
+      case Material4Type.folderTab:
         final anchor = _resolveAnchor(config.anchor, isRtl);
         if (anchor == ShapeAnchor.topLeft ||
             anchor == ShapeAnchor.topRight ||
@@ -153,7 +153,7 @@ class ShapeSafeRegion {
         }
         break;
 
-      case DynamicShapeType.notchedBadge:
+      case Material4Type.notchedBadge:
         final anchor = _resolveAnchor(config.anchor, isRtl);
         if (anchor == ShapeAnchor.topLeft ||
             anchor == ShapeAnchor.topRight ||
@@ -164,7 +164,7 @@ class ShapeSafeRegion {
         }
         break;
 
-      case DynamicShapeType.sideTab:
+      case Material4Type.sideTab:
         final anchor = _resolveAnchor(config.anchor, isRtl);
         if (anchor == ShapeAnchor.rightCenter ||
             anchor == ShapeAnchor.topRight) {
@@ -174,7 +174,7 @@ class ShapeSafeRegion {
         }
         break;
 
-      case DynamicShapeType.steppedCorner:
+      case Material4Type.steppedCorner:
         final anchor = _resolveAnchor(config.anchor, isRtl);
         if (anchor == ShapeAnchor.bottomRight) {
           bottom = math.max(bottom, config.tabHeight * 0.45);
@@ -191,13 +191,13 @@ class ShapeSafeRegion {
         }
         break;
 
-      case DynamicShapeType.ticketScallop:
+      case Material4Type.ticketScallop:
         final scallop = config.scallopRadius + strokeOffset + 2.0;
         left = math.max(left, scallop);
         right = math.max(right, scallop);
         break;
 
-      case DynamicShapeType.postageStamp:
+      case Material4Type.postageStamp:
         final pScallop = config.scallopRadius + strokeOffset + 2.0;
         left = math.max(left, pScallop);
         right = math.max(right, pScallop);
@@ -205,15 +205,15 @@ class ShapeSafeRegion {
         bottom = math.max(bottom, pScallop);
         break;
 
-      case DynamicShapeType.zigzagCut:
+      case Material4Type.zigzagCut:
         bottom = math.max(bottom, config.toothHeight + strokeOffset + 4.0);
         break;
 
-      case DynamicShapeType.arch:
+      case Material4Type.arch:
         top = math.max(top, size.width * 0.15 + strokeOffset);
         break;
 
-      case DynamicShapeType.hexagonSoft:
+      case Material4Type.hexagonSoft:
         final hexCorner =
             math.min(config.cornerRadius, 14.0) * 0.45 + strokeOffset;
         left = math.max(left, hexCorner);
@@ -222,13 +222,13 @@ class ShapeSafeRegion {
         bottom = math.max(bottom, size.height * 0.08 + strokeOffset);
         break;
 
-      case DynamicShapeType.chamferDiagonal:
+      case Material4Type.chamferDiagonal:
         final chamfer = config.tabWidth * 0.35 + strokeOffset;
         right = math.max(right, chamfer);
         top = math.max(top, chamfer);
         break;
 
-      case DynamicShapeType.organicBlob:
+      case Material4Type.organicBlob:
         final blobInset =
             math.min(size.width, size.height) * 0.14 + strokeOffset;
         left = math.max(left, blobInset);
@@ -237,7 +237,7 @@ class ShapeSafeRegion {
         bottom = math.max(bottom, blobInset);
         break;
 
-      case DynamicShapeType.scallopedPetal:
+      case Material4Type.scallopedPetal:
         final petalAllowance = config.cornerRadius * 0.35 + strokeOffset;
         left = math.max(left, petalAllowance);
         right = math.max(right, petalAllowance);
@@ -245,14 +245,14 @@ class ShapeSafeRegion {
         bottom = math.max(bottom, petalAllowance);
         break;
 
-      case DynamicShapeType.capsule:
+      case Material4Type.capsule:
         final capRadius =
             math.min(size.width, size.height) * 0.28 + strokeOffset;
         left = math.max(left, capRadius);
         right = math.max(right, capRadius);
         break;
 
-      case DynamicShapeType.waveEdge:
+      case Material4Type.waveEdge:
         final waveAllowance = config.waveAmplitude + strokeOffset + 4.0;
         final anchor = _resolveAnchor(config.anchor, isRtl);
         if (anchor == ShapeAnchor.bottomCenter) {
@@ -262,14 +262,14 @@ class ShapeSafeRegion {
         }
         break;
 
-      case DynamicShapeType.cloud:
+      case Material4Type.cloud:
         top = math.max(top, 16.0 + strokeOffset);
         bottom = math.max(bottom, 14.0 + strokeOffset);
         left = math.max(left, 16.0 + strokeOffset);
         right = math.max(right, 16.0 + strokeOffset);
         break;
 
-      case DynamicShapeType.speechBubble:
+      case Material4Type.speechBubble:
         final anchor = _resolveAnchor(config.anchor, isRtl);
         final tailAllowance =
             config.speechBubbleTailHeight + strokeOffset + 4.0;
@@ -288,20 +288,20 @@ class ShapeSafeRegion {
         }
         break;
 
-      case DynamicShapeType.shield:
+      case Material4Type.shield:
         bottom = math.max(bottom, size.height * 0.18 + strokeOffset);
         left = math.max(left, 14.0 + strokeOffset);
         right = math.max(right, 14.0 + strokeOffset);
         break;
 
-      case DynamicShapeType.diamond:
+      case Material4Type.diamond:
         left = math.max(left, size.width * 0.20 + strokeOffset);
         right = math.max(right, size.width * 0.20 + strokeOffset);
         top = math.max(top, size.height * 0.20 + strokeOffset);
         bottom = math.max(bottom, size.height * 0.20 + strokeOffset);
         break;
 
-      case DynamicShapeType.octagon:
+      case Material4Type.octagon:
         final octAllowance =
             math.min(size.width, size.height) * 0.12 + strokeOffset;
         left = math.max(left, octAllowance);
@@ -310,13 +310,13 @@ class ShapeSafeRegion {
         bottom = math.max(bottom, octAllowance);
         break;
 
-      case DynamicShapeType.waveCut:
+      case Material4Type.waveCut:
         right = math.max(right, config.waveAmplitude + strokeOffset + 8.0);
         bottom = math.max(bottom, config.waveAmplitude + strokeOffset + 6.0);
         break;
 
-      case DynamicShapeType.convexRounded:
-      case DynamicShapeType.concaveRounded:
+      case Material4Type.convexRounded:
+      case Material4Type.concaveRounded:
         final curvature = config.cornerRadius * 0.45 + strokeOffset;
         left = math.max(left, curvature);
         right = math.max(right, curvature);
@@ -324,7 +324,7 @@ class ShapeSafeRegion {
         bottom = math.max(bottom, curvature);
         break;
 
-      case DynamicShapeType.parallelogram:
+      case Material4Type.parallelogram:
         final skewRad = config.skewAngle.abs() * math.pi / 180.0;
         final skewAllowance =
             (math.tan(skewRad) * size.height * 0.35) + strokeOffset;
@@ -332,17 +332,17 @@ class ShapeSafeRegion {
         right = math.max(right, skewAllowance);
         break;
 
-      case DynamicShapeType.ribbon:
+      case Material4Type.ribbon:
         final fold = config.ribbonFoldDepth + strokeOffset + 4.0;
         left = math.max(left, fold);
         right = math.max(right, fold);
         break;
 
-      case DynamicShapeType.bookmark:
+      case Material4Type.bookmark:
         bottom = math.max(bottom, config.ribbonFoldDepth + strokeOffset + 4.0);
         break;
 
-      case DynamicShapeType.customBezier:
+      case Material4Type.customBezier:
         final defaultBezierInset =
             math.min(size.width, size.height) * 0.12 + strokeOffset;
         left = math.max(left, defaultBezierInset);
@@ -387,16 +387,16 @@ class ShapeSafeRegion {
     // For organic blobs, diamonds, custom Béziers, or transformed shapes,
     // verify and iteratively contract insets until all 8 boundary sample points
     // are strictly inside path.contains(point).
-    final needsPathRefinement = config.type == DynamicShapeType.diamond ||
-        config.type == DynamicShapeType.organicBlob ||
-        config.type == DynamicShapeType.customBezier ||
-        config.type == DynamicShapeType.shield ||
+    final needsPathRefinement = config.type == Material4Type.diamond ||
+        config.type == Material4Type.organicBlob ||
+        config.type == Material4Type.customBezier ||
+        config.type == Material4Type.shield ||
         config.resolvedTransform.rotation != 0.0 ||
         config.resolvedTransform.skewX != 0.0 ||
         config.resolvedTransform.skewY != 0.0;
 
     if (needsPathRefinement && size.width > 20 && size.height > 20) {
-      final path = DynamicShapePathBuilder.buildPath(size, config);
+      final path = Material4PathBuilder.buildPath(size, config);
       var refined = _probeAndContract(
         path: path,
         size: size,
@@ -495,7 +495,7 @@ class ShapeSafeRegion {
   /// Calculates the largest collision-free inscribed rectangular content box.
   static Rect computeInscribedBounds({
     required Size size,
-    required DynamicShapeConfig config,
+    required Material4Config config,
     EdgeInsets basePadding = EdgeInsets.zero,
     double borderWidth = 1.0,
     TextDirection textDirection = TextDirection.ltr,
@@ -520,7 +520,7 @@ class ShapeSafeRegion {
   /// [ShapeSafeRegionSet] provides both the primary inscribed rect and all sub-regions.
   static ShapeSafeRegionSet computeSafeRegionSet({
     required Size size,
-    required DynamicShapeConfig config,
+    required Material4Config config,
     EdgeInsets basePadding = EdgeInsets.zero,
     double borderWidth = 1.0,
     TextDirection textDirection = TextDirection.ltr,
@@ -598,7 +598,7 @@ class ShapeSafeRegion {
 
     // 2. Preset-specific region partitioning
     switch (config.type) {
-      case DynamicShapeType.ticketScallop:
+      case Material4Type.ticketScallop:
         final scallopY = size.height * 0.5;
         final scallopR = config.scallopRadius + strokeOffset;
         if (scallopY - scallopR > insets.top + 16.0) {
@@ -619,7 +619,7 @@ class ShapeSafeRegion {
         }
         break;
 
-      case DynamicShapeType.folderTab:
+      case Material4Type.folderTab:
         final tabH = config.tabHeight + strokeOffset;
         regions.add(Rect.fromLTWH(
           insets.left,
@@ -629,7 +629,7 @@ class ShapeSafeRegion {
         ));
         break;
 
-      case DynamicShapeType.steppedCorner:
+      case Material4Type.steppedCorner:
         final w = config.tabWidth;
         final h = config.tabHeight;
         if (config.anchor == ShapeAnchor.bottomRight) {
@@ -654,7 +654,7 @@ class ShapeSafeRegion {
   static bool isWithinSafeRegion({
     required Offset point,
     required Size size,
-    required DynamicShapeConfig config,
+    required Material4Config config,
     EdgeInsets basePadding = EdgeInsets.zero,
     double borderWidth = 1.0,
     TextDirection textDirection = TextDirection.ltr,
@@ -702,7 +702,7 @@ class ShapeSafeRegion {
   }
 }
 
-/// A comprehensive collection of safe content regions within a dynamic shape contour.
+/// A comprehensive collection of safe content regions within a Material 4 shape contour.
 ///
 /// Complex shapes (notched cards, ticket scallops, folder tabs, stepped corners)
 /// may offer multiple discrete compartments for child widgets. [ShapeSafeRegionSet]

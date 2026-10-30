@@ -1,19 +1,19 @@
 import 'dart:ui';
 
-import 'package:dynamic_shape/dynamic_shape.dart';
+import 'package:material_4/material_4.dart';
 import 'package:flutter/material.dart' hide BorderStyle;
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  group('RenderDynamicShape paintBounds Expansion Tests', () {
+  group('RenderMaterial4 paintBounds Expansion Tests', () {
     testWidgets('Default zero-border, zero-shadow paintBounds equals size', (
       tester,
     ) async {
       await tester.pumpWidget(
         Center(
-          child: DynamicShapeRenderWidget(
-            config: const DynamicShapeConfig(
-              type: DynamicShapeType.smoothRounded,
+          child: Material4RenderWidget(
+            config: const Material4Config(
+              type: Material4Type.smoothRounded,
             ),
             width: 200,
             height: 100,
@@ -23,8 +23,8 @@ void main() {
         ),
       );
 
-      final renderBox = tester.renderObject<RenderDynamicShape>(
-          find.byType(DynamicShapeRenderWidget));
+      final renderBox = tester
+          .renderObject<RenderMaterial4>(find.byType(Material4RenderWidget));
       expect(renderBox.size, const Size(200, 100));
       expect(renderBox.paintBounds, const Rect.fromLTWH(0, 0, 200, 100));
     });
@@ -34,9 +34,9 @@ void main() {
     ) async {
       await tester.pumpWidget(
         Center(
-          child: DynamicShapeRenderWidget(
-            config: const DynamicShapeConfig(
-              type: DynamicShapeType.smoothRounded,
+          child: Material4RenderWidget(
+            config: const Material4Config(
+              type: Material4Type.smoothRounded,
               strokeAlign: ShapeStrokeAlign.center,
             ),
             width: 200,
@@ -47,8 +47,8 @@ void main() {
         ),
       );
 
-      final renderBox = tester.renderObject<RenderDynamicShape>(
-          find.byType(DynamicShapeRenderWidget));
+      final renderBox = tester
+          .renderObject<RenderMaterial4>(find.byType(Material4RenderWidget));
       expect(renderBox.paintBounds, const Rect.fromLTWH(-5, -5, 210, 110));
     });
 
@@ -57,9 +57,9 @@ void main() {
     ) async {
       await tester.pumpWidget(
         Center(
-          child: DynamicShapeRenderWidget(
-            config: const DynamicShapeConfig(
-              type: DynamicShapeType.smoothRounded,
+          child: Material4RenderWidget(
+            config: const Material4Config(
+              type: Material4Type.smoothRounded,
               strokeAlign: ShapeStrokeAlign.outside,
             ),
             width: 200,
@@ -70,8 +70,8 @@ void main() {
         ),
       );
 
-      final renderBox = tester.renderObject<RenderDynamicShape>(
-          find.byType(DynamicShapeRenderWidget));
+      final renderBox = tester
+          .renderObject<RenderMaterial4>(find.byType(Material4RenderWidget));
       expect(renderBox.paintBounds, const Rect.fromLTWH(-12, -12, 224, 124));
     });
 
@@ -80,9 +80,9 @@ void main() {
     ) async {
       await tester.pumpWidget(
         Center(
-          child: DynamicShapeRenderWidget(
-            config: const DynamicShapeConfig(
-              type: DynamicShapeType.smoothRounded,
+          child: Material4RenderWidget(
+            config: const Material4Config(
+              type: Material4Type.smoothRounded,
               strokeAlign: ShapeStrokeAlign.inside,
             ),
             width: 200,
@@ -93,8 +93,8 @@ void main() {
         ),
       );
 
-      final renderBox = tester.renderObject<RenderDynamicShape>(
-          find.byType(DynamicShapeRenderWidget));
+      final renderBox = tester
+          .renderObject<RenderMaterial4>(find.byType(Material4RenderWidget));
       expect(renderBox.paintBounds, const Rect.fromLTWH(0, 0, 200, 100));
     });
 
@@ -103,9 +103,9 @@ void main() {
     ) async {
       await tester.pumpWidget(
         Center(
-          child: DynamicShapeRenderWidget(
-            config: const DynamicShapeConfig(
-              type: DynamicShapeType.smoothRounded,
+          child: Material4RenderWidget(
+            config: const Material4Config(
+              type: Material4Type.smoothRounded,
               borderStyle: BorderStyleType.neo3d,
               neoOffset: Offset(14, 18),
               neoColor: Colors.black,
@@ -119,8 +119,8 @@ void main() {
         ),
       );
 
-      final renderBox = tester.renderObject<RenderDynamicShape>(
-          find.byType(DynamicShapeRenderWidget));
+      final renderBox = tester
+          .renderObject<RenderMaterial4>(find.byType(Material4RenderWidget));
       final bounds = renderBox.paintBounds;
       expect(bounds.left, 0.0);
       expect(bounds.top, 0.0);
@@ -133,9 +133,9 @@ void main() {
     ) async {
       await tester.pumpWidget(
         Center(
-          child: DynamicShapeRenderWidget(
-            config: const DynamicShapeConfig(
-              type: DynamicShapeType.smoothRounded,
+          child: Material4RenderWidget(
+            config: const Material4Config(
+              type: Material4Type.smoothRounded,
               borderStyle: BorderStyleType.glow,
               glowBlurRadius: 24,
               glowColor: Colors.cyan,
@@ -149,8 +149,8 @@ void main() {
         ),
       );
 
-      final renderBox = tester.renderObject<RenderDynamicShape>(
-          find.byType(DynamicShapeRenderWidget));
+      final renderBox = tester
+          .renderObject<RenderMaterial4>(find.byType(Material4RenderWidget));
       final bounds = renderBox.paintBounds;
       expect(bounds.left, lessThan(-24));
       expect(bounds.top, lessThan(-24));
@@ -164,9 +164,9 @@ void main() {
     ) async {
       await tester.pumpWidget(
         Center(
-          child: DynamicShapeRenderWidget(
-            config: const DynamicShapeConfig(
-              type: DynamicShapeType.smoothRounded,
+          child: Material4RenderWidget(
+            config: const Material4Config(
+              type: Material4Type.smoothRounded,
               strokeAlign: ShapeStrokeAlign.inside,
             ),
             width: 120,
@@ -185,8 +185,8 @@ void main() {
         ),
       );
 
-      final renderBox = tester.renderObject<RenderDynamicShape>(
-          find.byType(DynamicShapeRenderWidget));
+      final renderBox = tester
+          .renderObject<RenderMaterial4>(find.byType(Material4RenderWidget));
       final bounds = renderBox.paintBounds;
       expect(bounds.left, lessThan(0));
       expect(bounds.bottom, greaterThanOrEqualTo(80 + 16 + 20));
@@ -197,9 +197,9 @@ void main() {
     ) async {
       await tester.pumpWidget(
         Center(
-          child: DynamicShapeRenderWidget(
-            config: const DynamicShapeConfig(
-              type: DynamicShapeType.smoothRounded,
+          child: Material4RenderWidget(
+            config: const Material4Config(
+              type: Material4Type.smoothRounded,
               borderStyle: BorderStyleType.multiLayer,
               multiLayerBorders: [
                 BorderLayer(color: Colors.blue, width: 2, offset: 0),
@@ -216,8 +216,8 @@ void main() {
         ),
       );
 
-      final renderBox = tester.renderObject<RenderDynamicShape>(
-          find.byType(DynamicShapeRenderWidget));
+      final renderBox = tester
+          .renderObject<RenderMaterial4>(find.byType(Material4RenderWidget));
       final bounds = renderBox.paintBounds;
       // Max layer extent is 16 offset + 4 width = 20
       expect(bounds.left, -20.0);
@@ -233,8 +233,8 @@ void main() {
       final recorder = PictureRecorder();
       final canvas = Canvas(recorder);
       const testSize = Size(200, 100);
-      const config = DynamicShapeConfig(
-        type: DynamicShapeType.smoothRounded,
+      const config = Material4Config(
+        type: Material4Type.smoothRounded,
         cornerRadius: 16,
         borderStyle: BorderStyleType.solid,
         pattern: ShapePattern.diagonalStripes,
@@ -244,10 +244,10 @@ void main() {
         isShimmering: true,
         shimmerProgress: 0.5,
       );
-      final path = DynamicShapePathBuilder.buildPath(testSize, config);
+      final path = Material4PathBuilder.buildPath(testSize, config);
 
       expect(
-        () => DynamicShapePainter.paintOuterShadows(
+        () => Material4Painter.paintOuterShadows(
           canvas: canvas,
           size: testSize,
           path: path,
@@ -258,7 +258,7 @@ void main() {
       );
 
       expect(
-        () => DynamicShapePainter.paintBackground(
+        () => Material4Painter.paintBackground(
           canvas: canvas,
           size: testSize,
           path: path,
@@ -270,7 +270,7 @@ void main() {
       );
 
       expect(
-        () => DynamicShapePainter.paintPatterns(
+        () => Material4Painter.paintPatterns(
           canvas: canvas,
           size: testSize,
           path: path,
@@ -281,7 +281,7 @@ void main() {
       );
 
       expect(
-        () => DynamicShapePainter.paintInnerShadows(
+        () => Material4Painter.paintInnerShadows(
           canvas: canvas,
           size: testSize,
           path: path,
@@ -291,7 +291,7 @@ void main() {
       );
 
       expect(
-        () => DynamicShapePainter.paintBorders(
+        () => Material4Painter.paintBorders(
           canvas: canvas,
           size: testSize,
           path: path,
@@ -303,7 +303,7 @@ void main() {
       );
 
       expect(
-        () => DynamicShapePainter.paintForegroundDecorations(
+        () => Material4Painter.paintForegroundDecorations(
           canvas: canvas,
           size: testSize,
           path: path,
@@ -322,8 +322,8 @@ void main() {
       for (final effect in BackgroundEffectType.values) {
         final recorder = PictureRecorder();
         final canvas = Canvas(recorder);
-        final config = DynamicShapeConfig(
-          type: DynamicShapeType.smoothRounded,
+        final config = Material4Config(
+          type: Material4Type.smoothRounded,
           backgroundEffect: effect,
           meshColors: const [
             Colors.red,
@@ -335,10 +335,10 @@ void main() {
           waveLevel: 0.6,
           particleCount: 8,
         );
-        final path = DynamicShapePathBuilder.buildPath(testSize, config);
+        final path = Material4PathBuilder.buildPath(testSize, config);
 
         expect(
-          () => DynamicShapePainter.paintBackground(
+          () => Material4Painter.paintBackground(
             canvas: canvas,
             size: testSize,
             path: path,
@@ -359,16 +359,16 @@ void main() {
       for (final pattern in ShapePattern.values) {
         final recorder = PictureRecorder();
         final canvas = Canvas(recorder);
-        final config = DynamicShapeConfig(
-          type: DynamicShapeType.smoothRounded,
+        final config = Material4Config(
+          type: Material4Type.smoothRounded,
           pattern: pattern,
           patternSpacing: 12,
           patternStrokeWidth: 1.5,
         );
-        final path = DynamicShapePathBuilder.buildPath(testSize, config);
+        final path = Material4PathBuilder.buildPath(testSize, config);
 
         expect(
-          () => DynamicShapePainter.paintPatterns(
+          () => Material4Painter.paintPatterns(
             canvas: canvas,
             size: testSize,
             path: path,
@@ -391,15 +391,15 @@ void main() {
       for (final progress in [0.0, 0.25, 0.5, 0.75, 1.0]) {
         final recorder = PictureRecorder();
         final canvas = Canvas(recorder);
-        final config = DynamicShapeConfig(
-          type: DynamicShapeType.smoothRounded,
+        final config = Material4Config(
+          type: Material4Type.smoothRounded,
           borderStyle: BorderStyleType.solid,
           borderProgress: progress,
         );
-        final path = DynamicShapePathBuilder.buildPath(testSize, config);
+        final path = Material4PathBuilder.buildPath(testSize, config);
 
         expect(
-          () => DynamicShapePainter.paintBorders(
+          () => Material4Painter.paintBorders(
             canvas: canvas,
             size: testSize,
             path: path,
@@ -423,15 +423,15 @@ void main() {
         for (final progress in [0.0, 0.5, 1.0]) {
           final recorder = PictureRecorder();
           final canvas = Canvas(recorder);
-          final config = DynamicShapeConfig(
-            type: DynamicShapeType.smoothRounded,
+          final config = Material4Config(
+            type: Material4Type.smoothRounded,
             borderStyle: style,
             borderProgress: progress,
           );
-          final path = DynamicShapePathBuilder.buildPath(testSize, config);
+          final path = Material4PathBuilder.buildPath(testSize, config);
 
           expect(
-            () => DynamicShapePainter.paintBorders(
+            () => Material4Painter.paintBorders(
               canvas: canvas,
               size: testSize,
               path: path,
@@ -462,8 +462,8 @@ void main() {
                 progress: 0.7,
                 borderColor: Colors.pink,
                 borderWidth: 3,
-                config: const DynamicShapeConfig(
-                  type: DynamicShapeType.smoothRounded,
+                config: const Material4Config(
+                  type: Material4Type.smoothRounded,
                   cornerRadius: 20,
                 ),
                 child: const Text('Revealed Child'),
@@ -474,8 +474,8 @@ void main() {
       );
 
       expect(find.text('Revealed Child'), findsOneWidget);
-      final renderBox = tester.renderObject<RenderDynamicShape>(
-          find.byType(DynamicShapeRenderWidget));
+      final renderBox = tester
+          .renderObject<RenderMaterial4>(find.byType(Material4RenderWidget));
       expect(renderBox.config.borderProgress, 0.7);
       expect(renderBox.borderColor, Colors.pink);
       expect(renderBox.borderWidth, 3.0);
@@ -486,7 +486,7 @@ void main() {
       final canvas = Canvas(recorder);
       const testSize = Size(120, 80);
       final painter = StrokeRevealPainter(
-        config: const DynamicShapeConfig(type: DynamicShapeType.smoothRounded),
+        config: const Material4Config(type: Material4Type.smoothRounded),
         progress: 0.6,
         borderColor: Colors.red,
         borderWidth: 2,
@@ -495,7 +495,7 @@ void main() {
       expect(() => painter.paint(canvas, testSize), returnsNormally);
 
       final oldPainter = StrokeRevealPainter(
-        config: const DynamicShapeConfig(type: DynamicShapeType.smoothRounded),
+        config: const Material4Config(type: Material4Type.smoothRounded),
         progress: 0.3,
         borderColor: Colors.red,
         borderWidth: 2,
@@ -504,22 +504,22 @@ void main() {
     });
   });
 
-  group('RenderDynamicShape Child Painting & Selective Clipping Tests', () {
-    testWidgets('Child renders and text is visible inside RenderDynamicShape', (
+  group('RenderMaterial4 Child Painting & Selective Clipping Tests', () {
+    testWidgets('Child renders and text is visible inside RenderMaterial4', (
       tester,
     ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
             body: Center(
-              child: DynamicShapeContainer(
+              child: Material4Container(
                 width: 200,
                 height: 100,
                 color: Colors.indigo,
                 borderColor: Colors.white,
                 borderWidth: 2,
                 child: const Text(
-                  'Hello Dynamic Shape',
+                  'Hello Material 4',
                   style: TextStyle(color: Colors.white),
                 ),
               ),
@@ -528,7 +528,7 @@ void main() {
         ),
       );
 
-      expect(find.text('Hello Dynamic Shape'), findsOneWidget);
+      expect(find.text('Hello Material 4'), findsOneWidget);
     });
 
     testWidgets(
@@ -538,9 +538,9 @@ void main() {
     ) async {
       await tester.pumpWidget(
         Center(
-          child: DynamicShapeRenderWidget(
-            config: const DynamicShapeConfig(
-              type: DynamicShapeType.smoothRounded,
+          child: Material4RenderWidget(
+            config: const Material4Config(
+              type: Material4Type.smoothRounded,
             ),
             width: 100,
             height: 50,
@@ -560,23 +560,23 @@ void main() {
         ),
       );
 
-      final renderBox = tester.renderObject<RenderDynamicShape>(
-          find.byType(DynamicShapeRenderWidget));
+      final renderBox = tester
+          .renderObject<RenderMaterial4>(find.byType(Material4RenderWidget));
       final bounds = renderBox.paintBounds;
       expect(bounds.right, greaterThan(100));
       expect(bounds.bottom, greaterThan(50));
     });
 
     testWidgets(
-        'DynamicShapeCustomPainter backwards compatibility renders cleanly', (
+        'Material4CustomPainter backwards compatibility renders cleanly', (
       tester,
     ) async {
       final recorder = PictureRecorder();
       final canvas = Canvas(recorder);
       const testSize = Size(150, 75);
-      const painter = DynamicShapeCustomPainter(
-        config: DynamicShapeConfig(
-          type: DynamicShapeType.smoothRounded,
+      const painter = Material4CustomPainter(
+        config: Material4Config(
+          type: Material4Type.smoothRounded,
           cornerRadius: 12,
         ),
         color: Colors.amber,
@@ -587,9 +587,9 @@ void main() {
 
       expect(() => painter.paint(canvas, testSize), returnsNormally);
 
-      const oldPainter = DynamicShapeCustomPainter(
-        config: DynamicShapeConfig(
-          type: DynamicShapeType.smoothRounded,
+      const oldPainter = Material4CustomPainter(
+        config: Material4Config(
+          type: Material4Type.smoothRounded,
           cornerRadius: 16,
         ),
         color: Colors.amber,

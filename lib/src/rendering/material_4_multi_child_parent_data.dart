@@ -1,14 +1,13 @@
 import 'package:flutter/rendering.dart';
 
-import '../dynamic_shape_config.dart';
 import '../layout/shape_collision_detector.dart';
+import '../material_4_config.dart';
 
-/// ParentData for children of [RenderMultiChildDynamicShape].
+/// ParentData for children of [RenderMultiChildMaterial4].
 ///
 /// Holds the local positioning offset, alignment metadata, priority,
 /// margin/padding, collision policies, and layout constraints for multi-child shapes.
-class DynamicShapeMultiChildParentData
-    extends ContainerBoxParentData<RenderBox> {
+class Material4MultiChildParentData extends ContainerBoxParentData<RenderBox> {
   /// Optional target alignment within the safe content region.
   AlignmentGeometry? alignment;
 

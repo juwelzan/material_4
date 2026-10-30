@@ -1,11 +1,11 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
-import '../dynamic_shape_config.dart';
+import '../material_4_config.dart';
 import 'shape_content_protection.dart';
 import 'shape_safe_region.dart';
 
-/// Result data structure describing child layout geometry inside a dynamic shape.
+/// Result data structure describing child layout geometry inside a Material 4 shape.
 class ShapeLayoutResult {
   /// Calculated top-left offset for the child within the container.
   final Offset childOffset;
@@ -35,7 +35,7 @@ class ShapeLayoutResult {
       'ShapeLayoutResult(offset: $childOffset, size: $childSize, bounds: $safeBounds, mode: $mode)';
 }
 
-/// Content layout engine that positions and aligns children within dynamic shapes.
+/// Content layout engine that positions and aligns children within Material 4 shapes.
 class ShapeContentLayout {
   const ShapeContentLayout._();
 
@@ -114,8 +114,8 @@ class ShapeSmartContent extends StatelessWidget {
   /// Custom child widget to display if not using slots.
   final Widget? child;
 
-  /// Dynamic shape configuration defining the parent contour.
-  final DynamicShapeConfig config;
+  /// Material 4 shape configuration defining the parent contour.
+  final Material4Config config;
 
   /// Content protection mode.
   final ShapeContentMode mode;
@@ -136,7 +136,7 @@ class ShapeSmartContent extends StatelessWidget {
     this.subtitle,
     this.trailing,
     this.child,
-    this.config = const DynamicShapeConfig(),
+    this.config = const Material4Config(),
     this.mode = ShapeContentMode.adaptive,
     this.basePadding = EdgeInsets.zero,
     this.spacing = 8.0,

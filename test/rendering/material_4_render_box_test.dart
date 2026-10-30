@@ -1,27 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:dynamic_shape/dynamic_shape.dart';
+import 'package:material_4/material_4.dart';
 
 void main() {
-  group('RenderDynamicShape Layout & Sizing Tests', () {
+  group('RenderMaterial4 Layout & Sizing Tests', () {
     testWidgets('Sizing with explicit width and height', (tester) async {
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
           child: Center(
-            child: DynamicShapeContainer(
+            child: Material4Container(
               width: 250,
               height: 120,
-              config: const DynamicShapeConfig(type: DynamicShapeType.squircle),
+              config: const Material4Config(type: Material4Type.squircle),
               child: const Text('Explicit Size'),
             ),
           ),
         ),
       );
 
-      final renderBox = tester.renderObject<RenderDynamicShape>(
-        find.byType(DynamicShapeRenderWidget),
+      final renderBox = tester.renderObject<RenderMaterial4>(
+        find.byType(Material4RenderWidget),
       );
 
       expect(renderBox.size.width, equals(250.0));
@@ -43,9 +43,8 @@ void main() {
                 minHeight: 40,
                 maxHeight: 200,
               ),
-              child: DynamicShapeContainer(
-                config:
-                    const DynamicShapeConfig(type: DynamicShapeType.capsule),
+              child: Material4Container(
+                config: const Material4Config(type: Material4Type.capsule),
                 child: const SizedBox(width: 80, height: 30),
               ),
             ),
@@ -53,8 +52,8 @@ void main() {
         ),
       );
 
-      final renderBox = tester.renderObject<RenderDynamicShape>(
-        find.byType(DynamicShapeRenderWidget),
+      final renderBox = tester.renderObject<RenderMaterial4>(
+        find.byType(Material4RenderWidget),
       );
 
       // Child is 80x30, capsule shape adds safe insets, fits inside [50..300, 40..200]
@@ -66,8 +65,8 @@ void main() {
 
     testWidgets('Calculates intrinsic dimensions and dry layout correctly',
         (tester) async {
-      final renderBox = RenderDynamicShape(
-        config: const DynamicShapeConfig(type: DynamicShapeType.smoothRounded),
+      final renderBox = RenderMaterial4(
+        config: const Material4Config(type: Material4Type.smoothRounded),
         child: RenderParagraph(
           const TextSpan(text: 'Intrinsic Text'),
           textDirection: TextDirection.ltr,
@@ -90,7 +89,7 @@ void main() {
     });
   });
 
-  group('RenderDynamicShape Hit Testing Tests', () {
+  group('RenderMaterial4 Hit Testing Tests', () {
     testWidgets(
         'Point-in-path hit testing respects exact shape contour vs bounding box',
         (tester) async {
@@ -100,10 +99,10 @@ void main() {
         Directionality(
           textDirection: TextDirection.ltr,
           child: Center(
-            child: DynamicShapeContainer(
+            child: Material4Container(
               width: 200,
               height: 200,
-              config: const DynamicShapeConfig(type: DynamicShapeType.diamond),
+              config: const Material4Config(type: Material4Type.diamond),
               hitTestBehavior: ShapeHitTestBehavior.shapeContour,
               onTap: () {
                 tapped = true;
@@ -114,7 +113,7 @@ void main() {
       );
 
       // Tap top-left corner of bounding box (10, 10), which is outside a diamond contour
-      final shapeFinder = find.byType(DynamicShapeRenderWidget);
+      final shapeFinder = find.byType(Material4RenderWidget);
       final topLeftOffset =
           tester.getTopLeft(shapeFinder) + const Offset(10, 10);
       await tester.tapAt(topLeftOffset);
@@ -136,10 +135,10 @@ void main() {
         Directionality(
           textDirection: TextDirection.ltr,
           child: Center(
-            child: DynamicShapeContainer(
+            child: Material4Container(
               width: 200,
               height: 200,
-              config: const DynamicShapeConfig(type: DynamicShapeType.diamond),
+              config: const Material4Config(type: Material4Type.diamond),
               hitTestBehavior: ShapeHitTestBehavior.boundingBox,
               onTap: () {
                 tapped = true;
@@ -149,7 +148,7 @@ void main() {
         ),
       );
 
-      final shapeFinder = find.byType(DynamicShapeRenderWidget);
+      final shapeFinder = find.byType(Material4RenderWidget);
       final topLeftOffset =
           tester.getTopLeft(shapeFinder) + const Offset(10, 10);
       await tester.tapAt(topLeftOffset);
@@ -158,7 +157,7 @@ void main() {
     });
   });
 
-  group('RenderDynamicShape Semantics & Accessibility Tests', () {
+  group('RenderMaterial4 Semantics & Accessibility Tests', () {
     testWidgets(
         'Interactive container reports button role in accessibility semantics',
         (tester) async {
@@ -167,7 +166,7 @@ void main() {
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
-          child: DynamicShapeContainer(
+          child: Material4Container(
             width: 150,
             height: 50,
             onTap: () {},
@@ -177,7 +176,7 @@ void main() {
       );
 
       expect(
-        tester.getSemantics(find.byType(DynamicShapeRenderWidget)),
+        tester.getSemantics(find.byType(Material4RenderWidget)),
         matchesSemantics(
           isButton: true,
           hasTapAction: true,
@@ -190,7 +189,7 @@ void main() {
     });
   });
 
-  group('RenderDynamicShape Direct Canvas Painting Tests', () {
+  group('RenderMaterial4 Direct Canvas Painting Tests', () {
     testWidgets(
         'Renders solid color, borders, shadows, and neo-3D without errors',
         (tester) async {
@@ -198,7 +197,7 @@ void main() {
         Directionality(
           textDirection: TextDirection.ltr,
           child: RepaintBoundary(
-            child: DynamicShapeContainer(
+            child: Material4Container(
               width: 200,
               height: 100,
               color: Colors.amber,
@@ -208,8 +207,8 @@ void main() {
                 BoxShadow(
                     color: Colors.black26, blurRadius: 8, offset: Offset(0, 4)),
               ],
-              config: const DynamicShapeConfig(
-                type: DynamicShapeType.scallopedPetal,
+              config: const Material4Config(
+                type: Material4Type.scallopedPetal,
                 borderStyle: BorderStyleType.neo3d,
                 neoColor: Colors.deepPurple,
                 neoOffset: Offset(6, 6),
@@ -220,7 +219,7 @@ void main() {
         ),
       );
 
-      expect(find.byType(DynamicShapeRenderWidget), findsOneWidget);
+      expect(find.byType(Material4RenderWidget), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
 
@@ -229,14 +228,14 @@ void main() {
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
-          child: DynamicShapeContainer(
+          child: Material4Container(
             width: 220,
             height: 110,
             gradient: const LinearGradient(
               colors: [Colors.blue, Colors.purple],
             ),
-            config: const DynamicShapeConfig(
-              type: DynamicShapeType.waveEdge,
+            config: const Material4Config(
+              type: Material4Type.waveEdge,
               pattern: ShapePattern.dotsMatrix,
               patternColor: Colors.white24,
               isShimmering: true,
@@ -247,12 +246,12 @@ void main() {
         ),
       );
 
-      expect(find.byType(DynamicShapeRenderWidget), findsOneWidget);
+      expect(find.byType(Material4RenderWidget), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
   });
 
-  group('RenderDynamicShape Comprehensive Constraint & Layout Tests', () {
+  group('RenderMaterial4 Comprehensive Constraint & Layout Tests', () {
     testWidgets('Unbounded width inside Row sizes to child width + safe insets',
         (tester) async {
       await tester.pumpWidget(
@@ -260,9 +259,9 @@ void main() {
           textDirection: TextDirection.ltr,
           child: Row(
             children: [
-              DynamicShapeContainer(
-                config: const DynamicShapeConfig(
-                  type: DynamicShapeType.folderTab,
+              Material4Container(
+                config: const Material4Config(
+                  type: Material4Type.folderTab,
                   tabHeight: 16,
                 ),
                 child: const SizedBox(width: 120, height: 40),
@@ -272,8 +271,8 @@ void main() {
         ),
       );
 
-      final renderBox = tester.renderObject<RenderDynamicShape>(
-        find.byType(DynamicShapeRenderWidget),
+      final renderBox = tester.renderObject<RenderMaterial4>(
+        find.byType(Material4RenderWidget),
       );
 
       // Child is 120 wide; folderTab adds safe insets; size is finite and > 120
@@ -292,9 +291,9 @@ void main() {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              DynamicShapeContainer(
-                config: const DynamicShapeConfig(
-                  type: DynamicShapeType.notchedBadge,
+              Material4Container(
+                config: const Material4Config(
+                  type: Material4Type.notchedBadge,
                   tabHeight: 20,
                 ),
                 child: const SizedBox(width: 80, height: 50),
@@ -304,8 +303,8 @@ void main() {
         ),
       );
 
-      final renderBox = tester.renderObject<RenderDynamicShape>(
-        find.byType(DynamicShapeRenderWidget),
+      final renderBox = tester.renderObject<RenderMaterial4>(
+        find.byType(Material4RenderWidget),
       );
 
       expect(renderBox.size.height.isFinite, isTrue);
@@ -320,16 +319,16 @@ void main() {
         Directionality(
           textDirection: TextDirection.ltr,
           child: UnconstrainedBox(
-            child: DynamicShapeContainer(
-              config: const DynamicShapeConfig(type: DynamicShapeType.capsule),
+            child: Material4Container(
+              config: const Material4Config(type: Material4Type.capsule),
               child: const SizedBox(width: 90, height: 35),
             ),
           ),
         ),
       );
 
-      final renderBox = tester.renderObject<RenderDynamicShape>(
-        find.byType(DynamicShapeRenderWidget),
+      final renderBox = tester.renderObject<RenderMaterial4>(
+        find.byType(Material4RenderWidget),
       );
 
       expect(renderBox.size.width.isFinite, isTrue);
@@ -345,11 +344,11 @@ void main() {
         Directionality(
           textDirection: TextDirection.ltr,
           child: Center(
-            child: DynamicShapeContainer(
+            child: Material4Container(
               width: 50, // requested 50, but min is 120
               height: 400, // requested 400, but max is 250
-              config: const DynamicShapeConfig(
-                type: DynamicShapeType.smoothRounded,
+              config: const Material4Config(
+                type: Material4Type.smoothRounded,
                 constraints: ShapeConstraints(
                   minWidth: 120,
                   maxWidth: 250,
@@ -363,8 +362,8 @@ void main() {
         ),
       );
 
-      final renderBox = tester.renderObject<RenderDynamicShape>(
-        find.byType(DynamicShapeRenderWidget),
+      final renderBox = tester.renderObject<RenderMaterial4>(
+        find.byType(Material4RenderWidget),
       );
 
       expect(renderBox.size.width, equals(120.0));
@@ -377,12 +376,12 @@ void main() {
         Directionality(
           textDirection: TextDirection.ltr,
           child: Center(
-            child: DynamicShapeContainer(
+            child: Material4Container(
               width: 200,
               height: 200,
               alignment: Alignment.bottomRight,
-              config: const DynamicShapeConfig(
-                type: DynamicShapeType.smoothRounded,
+              config: const Material4Config(
+                type: Material4Type.smoothRounded,
                 cornerRadius: 0,
               ),
               padding: const EdgeInsets.all(10),
@@ -399,7 +398,7 @@ void main() {
       final childBox = tester.renderObject<RenderBox>(
         find.byKey(const Key('aligned-child')),
       );
-      final parentData = childBox.parentData as DynamicShapeParentData;
+      final parentData = childBox.parentData as Material4ParentData;
 
       // Container is 200x200, padding 10 all sides => available 180x180.
       // Child is 40x40.
@@ -414,17 +413,16 @@ void main() {
         Directionality(
           textDirection: TextDirection.ltr,
           child: Center(
-            child: DynamicShapeContainer(
+            child: Material4Container(
               width: 260,
               height: 160,
-              config:
-                  const DynamicShapeConfig(type: DynamicShapeType.folderTab),
+              config: const Material4Config(type: Material4Type.folderTab),
               child: Center(
-                child: DynamicShapeContainer(
+                child: Material4Container(
                   width: 120,
                   height: 60,
-                  config: const DynamicShapeConfig(
-                      type: DynamicShapeType.notchedBadge),
+                  config:
+                      const Material4Config(type: Material4Type.notchedBadge),
                   child: const Text('Inner Shape'),
                 ),
               ),
@@ -433,18 +431,18 @@ void main() {
         ),
       );
 
-      expect(find.byType(DynamicShapeRenderWidget), findsNWidgets(2));
+      expect(find.byType(Material4RenderWidget), findsNWidgets(2));
       expect(find.text('Inner Shape'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
   });
 
-  group('RenderDynamicShape Lifecycle & Invalidation Tests', () {
+  group('RenderMaterial4 Lifecycle & Invalidation Tests', () {
     testWidgets('Geometry config update triggers performLayout',
         (tester) async {
-      final configNotifier = ValueNotifier<DynamicShapeConfig>(
-        const DynamicShapeConfig(
-          type: DynamicShapeType.folderTab,
+      final configNotifier = ValueNotifier<Material4Config>(
+        const Material4Config(
+          type: Material4Type.folderTab,
           tabHeight: 14,
         ),
       );
@@ -454,10 +452,10 @@ void main() {
           textDirection: TextDirection.ltr,
           child: Align(
             alignment: Alignment.topLeft,
-            child: ValueListenableBuilder<DynamicShapeConfig>(
+            child: ValueListenableBuilder<Material4Config>(
               valueListenable: configNotifier,
               builder: (context, cfg, child) {
-                return DynamicShapeContainer(
+                return Material4Container(
                   config: cfg,
                   child: const SizedBox(width: 80, height: 40),
                 );
@@ -468,22 +466,22 @@ void main() {
       );
 
       final initialHeight = tester
-          .renderObject<RenderDynamicShape>(
-            find.byType(DynamicShapeRenderWidget),
+          .renderObject<RenderMaterial4>(
+            find.byType(Material4RenderWidget),
           )
           .size
           .height;
 
       // Update geometry with much taller tab
-      configNotifier.value = const DynamicShapeConfig(
-        type: DynamicShapeType.folderTab,
+      configNotifier.value = const Material4Config(
+        type: Material4Type.folderTab,
         tabHeight: 40,
       );
       await tester.pumpAndSettle();
 
       final updatedHeight = tester
-          .renderObject<RenderDynamicShape>(
-            find.byType(DynamicShapeRenderWidget),
+          .renderObject<RenderMaterial4>(
+            find.byType(Material4RenderWidget),
           )
           .size
           .height;
@@ -502,7 +500,7 @@ void main() {
             child: ValueListenableBuilder<Color>(
               valueListenable: colorNotifier,
               builder: (context, col, child) {
-                return DynamicShapeContainer(
+                return Material4Container(
                   width: 100,
                   height: 100,
                   color: col,
@@ -514,8 +512,8 @@ void main() {
         ),
       );
 
-      final renderBox = tester.renderObject<RenderDynamicShape>(
-        find.byType(DynamicShapeRenderWidget),
+      final renderBox = tester.renderObject<RenderMaterial4>(
+        find.byType(Material4RenderWidget),
       );
       expect(renderBox.color, equals(Colors.red));
 
@@ -535,7 +533,7 @@ void main() {
           child: ValueListenableBuilder<Widget>(
             valueListenable: childNotifier,
             builder: (context, ch, _) {
-              return DynamicShapeContainer(
+              return Material4Container(
                 width: 120,
                 height: 60,
                 child: ch,
@@ -555,7 +553,7 @@ void main() {
     });
   });
 
-  group('RenderDynamicShape Child & Transformed Hit Testing Tests', () {
+  group('RenderMaterial4 Child & Transformed Hit Testing Tests', () {
     testWidgets('Child GestureDetector receives touch events inside shape',
         (tester) async {
       bool childTapped = false;
@@ -565,7 +563,7 @@ void main() {
         Directionality(
           textDirection: TextDirection.ltr,
           child: Center(
-            child: DynamicShapeContainer(
+            child: Material4Container(
               width: 200,
               height: 200,
               onTap: () => containerTapped = true,
@@ -598,11 +596,11 @@ void main() {
         Directionality(
           textDirection: TextDirection.ltr,
           child: Center(
-            child: DynamicShapeContainer(
+            child: Material4Container(
               width: 280,
               height: 180,
               child: Center(
-                child: DynamicShapeContainer(
+                child: Material4Container(
                   width: 120,
                   height: 60,
                   onTap: () => innerTapped = true,
@@ -629,11 +627,11 @@ void main() {
         Directionality(
           textDirection: TextDirection.ltr,
           child: Center(
-            child: DynamicShapeContainer(
+            child: Material4Container(
               width: 100,
               height: 100,
-              config: DynamicShapeConfig(
-                type: DynamicShapeType.smoothRounded,
+              config: Material4Config(
+                type: Material4Type.smoothRounded,
                 transform: ShapeTransform.degrees(degrees: 45),
               ),
               onTap: () => tapped = true,
@@ -642,7 +640,7 @@ void main() {
         ),
       );
 
-      final shapeFinder = find.byType(DynamicShapeRenderWidget);
+      final shapeFinder = find.byType(Material4RenderWidget);
       // Center of diamond/rotated square
       await tester.tapAt(tester.getCenter(shapeFinder));
       await tester.pumpAndSettle();

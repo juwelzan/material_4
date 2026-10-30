@@ -1,9 +1,9 @@
-name: dynamic_shape
-description: "A next-generation universal dynamic shape engine for Flutter with 28+ adaptive shapes, borders, physics animations, background effects, and collision-free layouts."
+name: material_4
+description: "Material 4 — A Custom Flutter Design System with 28+ adaptive shapes, borders, physics animations, background effects, and collision-free layouts."
 version: 1.0.0
-homepage: https://github.com/juwelzan/dynamic_shape
-repository: https://github.com/juwelzan/dynamic_shape
-issue_tracker: https://github.com/juwelzan/dynamic_shape/issues
+homepage: https://github.com/juwelzan/material_4
+repository: https://github.com/juwelzan/material_4
+issue_tracker: https://github.com/juwelzan/material_4/issues
 
 topics:
   - shapes

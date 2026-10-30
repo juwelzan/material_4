@@ -1,9 +1,9 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
-import '../dynamic_shape_config.dart';
+import '../material_4_config.dart';
 
-/// Comprehensive geometry and parameter interpolation engine for dynamic shapes.
+/// Comprehensive geometry and parameter interpolation engine for Material 4 shapes.
 ///
 /// Provides robust, finite-guaranteed mathematical interpolation across
 /// corners, elliptical radii, edges, notches, affine transformations,
@@ -196,10 +196,10 @@ class ShapeGeometryInterpolator {
     );
   }
 
-  /// Interpolates between two [DynamicShapeConfig] instances completely.
-  static DynamicShapeConfig lerpConfig(
-    DynamicShapeConfig a,
-    DynamicShapeConfig b,
+  /// Interpolates between two [Material4Config] instances completely.
+  static Material4Config lerpConfig(
+    Material4Config a,
+    Material4Config b,
     double t,
   ) {
     if (identical(a, b)) return a;

@@ -3,19 +3,19 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/physics.dart';
 
-import 'dynamic_shape_config.dart';
+import 'material_4_config.dart';
 
 export 'animation/shape_morph_transition.dart';
-import 'dynamic_shape_container.dart';
-import 'dynamic_shape_path_builder.dart';
+import 'material_4_container.dart';
+import 'material_4_path_builder.dart';
 import 'layout/shape_content_protection.dart';
-import 'rendering/dynamic_shape_render_widget.dart';
+import 'rendering/material_4_render_widget.dart';
 
 /// Tactile pressable container that reacts to touch with realistic spring physics,
 /// slight scale squish, and smooth release rebound.
 class ShapePressable extends StatefulWidget {
   final Widget child;
-  final DynamicShapeConfig config;
+  final Material4Config config;
   final VoidCallback? onTap;
   final double pressScale;
   final Duration duration;
@@ -32,7 +32,7 @@ class ShapePressable extends StatefulWidget {
   const ShapePressable({
     super.key,
     required this.child,
-    this.config = const DynamicShapeConfig(),
+    this.config = const Material4Config(),
     this.onTap,
     this.pressScale = 0.96,
     this.duration = const Duration(milliseconds: 120),
@@ -107,7 +107,7 @@ class _ShapePressableState extends State<ShapePressable>
         builder: (context, child) {
           return Transform.scale(
             scale: _scaleAnimation.value,
-            child: DynamicShapeContainer(
+            child: Material4Container(
               config: widget.config,
               color: widget.color,
               gradient: widget.gradient,
@@ -210,7 +210,7 @@ class _ShapeMagneticHoverState extends State<ShapeMagneticHover>
 /// Swipe gesture container that morphs smoothly between a list of shape presets
 /// as the user drags horizontally or vertically.
 class ShapeSwipeMorph extends StatefulWidget {
-  final List<DynamicShapeConfig> shapes;
+  final List<Material4Config> shapes;
   final Widget child;
   final double width;
   final double height;
@@ -280,7 +280,7 @@ class _ShapeSwipeMorphState extends State<ShapeSwipeMorph> {
     return GestureDetector(
       onHorizontalDragUpdate: _onHorizontalDragUpdate,
       onHorizontalDragEnd: _onHorizontalDragEnd,
-      child: DynamicShapeContainer(
+      child: Material4Container(
         config: activeConfig,
         width: widget.width,
         height: widget.height,
@@ -298,14 +298,14 @@ class _ShapeSwipeMorphState extends State<ShapeSwipeMorph> {
 class ShapeReveal extends StatelessWidget {
   final Widget child;
   final Animation<double> progress;
-  final DynamicShapeConfig config;
+  final Material4Config config;
   final Alignment origin;
 
   const ShapeReveal({
     super.key,
     required this.child,
     required this.progress,
-    this.config = const DynamicShapeConfig(),
+    this.config = const Material4Config(),
     this.origin = Alignment.center,
   });
 
@@ -362,7 +362,7 @@ class _ShapeRevealClipper extends CustomClipper<Path> {
 /// Progressively draws the outline contour from 0% to 100% perimeter length.
 class ShapeBorderDrawReveal extends StatelessWidget {
   final Widget child;
-  final DynamicShapeConfig config;
+  final Material4Config config;
   final double progress; // 0.0 to 1.0
   final Color borderColor;
   final double borderWidth;
@@ -372,7 +372,7 @@ class ShapeBorderDrawReveal extends StatelessWidget {
     super.key,
     required this.child,
     required this.size,
-    this.config = const DynamicShapeConfig(),
+    this.config = const Material4Config(),
     this.progress = 1.0,
     this.borderColor = Colors.blue,
     this.borderWidth = 2.0,
@@ -380,7 +380,7 @@ class ShapeBorderDrawReveal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DynamicShapeRenderWidget(
+    return Material4RenderWidget(
       config: config.copyWith(
         borderProgress: progress.clamp(0.0, 1.0),
       ),
@@ -397,12 +397,12 @@ class ShapeBorderDrawReveal extends StatelessWidget {
 
 /// Legacy stroke reveal painter preserved for backward compatibility.
 ///
-/// Use [DynamicShapeRenderWidget] or [RenderDynamicShape] directly.
+/// Use [Material4RenderWidget] or [RenderMaterial4] directly.
 @Deprecated(
-  'Use DynamicShapeRenderWidget or RenderDynamicShape direct rendering instead.',
+  'Use Material4RenderWidget or RenderMaterial4 direct rendering instead.',
 )
 class StrokeRevealPainter extends CustomPainter {
-  final DynamicShapeConfig config;
+  final Material4Config config;
   final double progress;
   final Color borderColor;
   final double borderWidth;
@@ -418,7 +418,7 @@ class StrokeRevealPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     if (progress <= 0.0 || borderWidth <= 0) return;
 
-    final fullPath = DynamicShapePathBuilder.buildPath(size, config);
+    final fullPath = Material4PathBuilder.buildPath(size, config);
     final paint = Paint()
       ..style = PaintingStyle.stroke
       ..strokeWidth = borderWidth

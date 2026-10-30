@@ -1,7 +1,7 @@
 import 'dart:math' as math;
 import 'package:flutter/rendering.dart';
 
-import '../dynamic_shape_config.dart';
+import '../material_4_config.dart';
 
 /// Collision handling policy when sibling children or boundaries conflict.
 enum ShapeCollisionPolicy {
@@ -93,7 +93,7 @@ class ShapeCollisionDetector {
   static ShapeCollisionReport detectCollision({
     required Rect candidateRect,
     required Size shapeSize,
-    required DynamicShapeConfig config,
+    required Material4Config config,
     EdgeInsets safeInsets = EdgeInsets.zero,
     TextDirection textDirection = TextDirection.ltr,
   }) {
@@ -154,7 +154,7 @@ class ShapeCollisionDetector {
     }
 
     // 3. Stepped Corner Cutout Check
-    if (config.type == DynamicShapeType.steppedCorner) {
+    if (config.type == Material4Type.steppedCorner) {
       final cornerCutout = _computeSteppedCornerCutout(config, shapeSize);
       if (cornerCutout != null && candidateRect.overlaps(cornerCutout)) {
         collisions.add(
@@ -214,7 +214,7 @@ class ShapeCollisionDetector {
     required Rect badgeRect,
     required Rect contentRect,
     required Size shapeSize,
-    required DynamicShapeConfig config,
+    required Material4Config config,
   }) {
     final collisions = <String>[];
     Rect? overlap;
@@ -378,8 +378,7 @@ class ShapeCollisionDetector {
     }
   }
 
-  static Rect? _computeSteppedCornerCutout(
-      DynamicShapeConfig config, Size size) {
+  static Rect? _computeSteppedCornerCutout(Material4Config config, Size size) {
     final w = config.tabWidth;
     final h = config.tabHeight;
     switch (config.anchor) {

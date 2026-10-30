@@ -2,7 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-/// Available background pattern textures for dynamic shape containers.
+/// Available background pattern textures for Material 4 shape containers.
 enum ShapePattern {
   none,
 

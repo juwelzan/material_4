@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:dynamic_shape/dynamic_shape.dart';
+import 'package:material_4/material_4.dart';
 
 void main() {
   group('Advanced Shape Hit Testing & Contour Accuracy', () {
@@ -26,11 +26,11 @@ void main() {
                   ),
                 ),
                 Center(
-                  child: DynamicShapeContainer(
+                  child: Material4Container(
                     width: 200,
                     height: 200,
-                    config: const DynamicShapeConfig(
-                      type: DynamicShapeType.diamond,
+                    config: const Material4Config(
+                      type: Material4Type.diamond,
                     ),
                     onTap: () {
                       tappedShape = true;
@@ -44,8 +44,7 @@ void main() {
         ),
       );
 
-      final containerRect =
-          tester.getRect(find.byType(DynamicShapeRenderWidget));
+      final containerRect = tester.getRect(find.byType(Material4RenderWidget));
 
       // 1. Center of diamond is inside the shape contour
       await tester.tapAt(containerRect.center);
@@ -86,11 +85,11 @@ void main() {
                   ),
                 ),
                 Center(
-                  child: DynamicShapeContainer(
+                  child: Material4Container(
                     width: 200,
                     height: 200,
-                    config: const DynamicShapeConfig(
-                      type: DynamicShapeType.arch,
+                    config: const Material4Config(
+                      type: Material4Type.arch,
                     ),
                     onTap: () {
                       tappedShape = true;
@@ -103,8 +102,7 @@ void main() {
         ),
       );
 
-      final containerRect =
-          tester.getRect(find.byType(DynamicShapeRenderWidget));
+      final containerRect = tester.getRect(find.byType(Material4RenderWidget));
 
       // Center is inside arch
       await tester.tapAt(containerRect.center);
@@ -132,11 +130,10 @@ void main() {
         MaterialApp(
           home: Scaffold(
             body: Center(
-              child: DynamicShapeContainer(
+              child: Material4Container(
                 width: 100,
                 height: 100,
-                config:
-                    const DynamicShapeConfig(type: DynamicShapeType.diamond),
+                config: const Material4Config(type: Material4Type.diamond),
                 hitTestBehavior: ShapeHitTestBehavior.shape,
                 onTap: () {
                   tapped = true;
@@ -147,7 +144,7 @@ void main() {
         ),
       );
 
-      final rect = tester.getRect(find.byType(DynamicShapeRenderWidget));
+      final rect = tester.getRect(find.byType(Material4RenderWidget));
       // Top left corner is outside diamond
       await tester.tapAt(rect.topLeft + const Offset(5, 5));
       await tester.pump();
@@ -167,11 +164,10 @@ void main() {
         MaterialApp(
           home: Scaffold(
             body: Center(
-              child: DynamicShapeContainer(
+              child: Material4Container(
                 width: 100,
                 height: 100,
-                config:
-                    const DynamicShapeConfig(type: DynamicShapeType.diamond),
+                config: const Material4Config(type: Material4Type.diamond),
                 hitTestBehavior: ShapeHitTestBehavior.rectangular,
                 onTap: () {
                   tapped = true;
@@ -182,7 +178,7 @@ void main() {
         ),
       );
 
-      final rect = tester.getRect(find.byType(DynamicShapeRenderWidget));
+      final rect = tester.getRect(find.byType(Material4RenderWidget));
       // Top left corner is inside rectangular bounding box
       await tester.tapAt(rect.topLeft + const Offset(5, 5));
       await tester.pump();
@@ -208,11 +204,10 @@ void main() {
                   ),
                 ),
                 Center(
-                  child: DynamicShapeContainer(
+                  child: Material4Container(
                     width: 100,
                     height: 100,
-                    config: const DynamicShapeConfig(
-                        type: DynamicShapeType.diamond),
+                    config: const Material4Config(type: Material4Type.diamond),
                     hitTestBehavior: ShapeHitTestBehavior.opaque,
                     // No onTap callback, but opaque consumes the hit!
                   ),
@@ -223,7 +218,7 @@ void main() {
         ),
       );
 
-      final rect = tester.getRect(find.byType(DynamicShapeRenderWidget));
+      final rect = tester.getRect(find.byType(Material4RenderWidget));
       await tester.tapAt(rect.topLeft + const Offset(5, 5));
       await tester.pump();
       // Opaque blocks underlying background
@@ -251,11 +246,11 @@ void main() {
                   ),
                 ),
                 Center(
-                  child: DynamicShapeContainer(
+                  child: Material4Container(
                     width: 200,
                     height: 200,
-                    config: const DynamicShapeConfig(
-                        type: DynamicShapeType.smoothRounded),
+                    config: const Material4Config(
+                        type: Material4Type.smoothRounded),
                     hitTestBehavior: ShapeHitTestBehavior.deferToChild,
                     onTap: () {
                       containerTapped = true;
@@ -280,8 +275,7 @@ void main() {
         ),
       );
 
-      final containerRect =
-          tester.getRect(find.byType(DynamicShapeRenderWidget));
+      final containerRect = tester.getRect(find.byType(Material4RenderWidget));
 
       // Click on child
       await tester.tapAt(containerRect.center);
@@ -320,11 +314,11 @@ void main() {
                   ),
                 ),
                 Center(
-                  child: DynamicShapeContainer(
+                  child: Material4Container(
                     width: 200,
                     height: 200,
-                    config: const DynamicShapeConfig(
-                      type: DynamicShapeType.smoothRounded,
+                    config: const Material4Config(
+                      type: Material4Type.smoothRounded,
                       notches: [
                         ShapeNotch(
                           edge: ShapeEdge.top,
@@ -335,7 +329,7 @@ void main() {
                         ),
                       ],
                     ),
-                    interaction: const DynamicShapeInteraction(
+                    interaction: const Material4Interaction(
                       enableNotchInteraction: false,
                     ),
                     onTap: () {
@@ -349,8 +343,7 @@ void main() {
         ),
       );
 
-      final containerRect =
-          tester.getRect(find.byType(DynamicShapeRenderWidget));
+      final containerRect = tester.getRect(find.byType(Material4RenderWidget));
 
       // Click inside top center notch (x = 100, y = 20)
       final notchPoint =
@@ -382,11 +375,11 @@ void main() {
                   ),
                 ),
                 Center(
-                  child: DynamicShapeContainer(
+                  child: Material4Container(
                     width: 200,
                     height: 200,
-                    config: const DynamicShapeConfig(
-                      type: DynamicShapeType.smoothRounded,
+                    config: const Material4Config(
+                      type: Material4Type.smoothRounded,
                       notches: [
                         ShapeNotch(
                           edge: ShapeEdge.top,
@@ -397,7 +390,7 @@ void main() {
                         ),
                       ],
                     ),
-                    interaction: const DynamicShapeInteraction(
+                    interaction: const Material4Interaction(
                       enableNotchInteraction: true,
                     ),
                     onTap: () {
@@ -411,8 +404,7 @@ void main() {
         ),
       );
 
-      final containerRect =
-          tester.getRect(find.byType(DynamicShapeRenderWidget));
+      final containerRect = tester.getRect(find.byType(Material4RenderWidget));
 
       // Click inside top center notch (x = 100, y = 20)
       final notchPoint =
@@ -433,12 +425,11 @@ void main() {
         MaterialApp(
           home: Scaffold(
             body: Center(
-              child: DynamicShapeContainer(
+              child: Material4Container(
                 width: 150,
                 height: 150,
-                config:
-                    const DynamicShapeConfig(type: DynamicShapeType.diamond),
-                interaction: const DynamicShapeInteraction(
+                config: const Material4Config(type: Material4Type.diamond),
+                interaction: const Material4Interaction(
                   enableTransparentRegionInteraction: true,
                 ),
                 onTap: () {
@@ -450,7 +441,7 @@ void main() {
         ),
       );
 
-      final rect = tester.getRect(find.byType(DynamicShapeRenderWidget));
+      final rect = tester.getRect(find.byType(Material4RenderWidget));
       // Top left corner is outside diamond path, but inside rectangular box
       await tester.tapAt(rect.topLeft + const Offset(5, 5));
       await tester.pump();
@@ -469,11 +460,11 @@ void main() {
         MaterialApp(
           home: Scaffold(
             body: Center(
-              child: DynamicShapeContainer(
+              child: Material4Container(
                 width: 100,
                 height: 100,
-                config: const DynamicShapeConfig(
-                  type: DynamicShapeType.smoothRounded,
+                config: const Material4Config(
+                  type: Material4Type.smoothRounded,
                   transform: ShapeTransform(
                     rotation: 0.5, // ~28.6 degrees
                     scaleX: 1.1,
@@ -489,7 +480,7 @@ void main() {
         ),
       );
 
-      final rect = tester.getRect(find.byType(DynamicShapeRenderWidget));
+      final rect = tester.getRect(find.byType(Material4RenderWidget));
       await tester.tapAt(rect.center);
       await tester.pump();
       expect(shapeTapped, isTrue);
@@ -515,7 +506,7 @@ void main() {
       const size = Size(100, 100);
 
       expect(
-        DynamicShapeHitTester.containsPoint(
+        Material4HitTester.containsPoint(
           path: path,
           size: size,
           position: const Offset(double.nan, 50),
@@ -524,7 +515,7 @@ void main() {
       );
 
       expect(
-        DynamicShapeHitTester.containsPoint(
+        Material4HitTester.containsPoint(
           path: path,
           size: size,
           position: const Offset(50, double.infinity),
@@ -543,9 +534,8 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: DynamicShapeStack(
-              config: const DynamicShapeConfig(
-                  type: DynamicShapeType.smoothRounded),
+            body: Material4Stack(
+              config: const Material4Config(type: Material4Type.smoothRounded),
               width: 200,
               height: 200,
               layoutStrategy: ShapeLayoutStrategy.stack,
@@ -585,7 +575,7 @@ void main() {
       );
 
       final stackRect =
-          tester.getRect(find.byType(DynamicShapeMultiChildRenderWidget));
+          tester.getRect(find.byType(Material4MultiChildRenderWidget));
       await tester.tapAt(stackRect.center);
       await tester.pump();
 
@@ -606,11 +596,11 @@ void main() {
         MaterialApp(
           home: Scaffold(
             body: Center(
-              child: DynamicShapeContainer(
+              child: Material4Container(
                 width: 250,
                 height: 150,
-                config: const DynamicShapeConfig(
-                    type: DynamicShapeType.smoothRounded),
+                config:
+                    const Material4Config(type: Material4Type.smoothRounded),
                 onTap: () {
                   containerTapped = true;
                 },
@@ -645,11 +635,11 @@ void main() {
         MaterialApp(
           home: Scaffold(
             body: Center(
-              child: DynamicShapeContainer(
+              child: Material4Container(
                 width: 150,
                 height: 150,
-                config: const DynamicShapeConfig(
-                    type: DynamicShapeType.smoothRounded),
+                config:
+                    const Material4Config(type: Material4Type.smoothRounded),
                 onLongPress: () {
                   longPressed = true;
                 },
@@ -662,7 +652,7 @@ void main() {
         ),
       );
 
-      final target = find.byType(DynamicShapeRenderWidget);
+      final target = find.byType(Material4RenderWidget);
 
       // Long press
       await tester.longPress(target);
@@ -696,13 +686,13 @@ void main() {
       expect(modified.clipBackground, isTrue);
     });
 
-    test('DynamicShapeClipManager determines clipping accurately', () {
-      const config = DynamicShapeConfig();
+    test('Material4ClipManager determines clipping accurately', () {
+      const config = Material4Config();
       const protection =
           ShapeContentProtection(mode: ShapeContentMode.adaptive);
 
       expect(
-        DynamicShapeClipManager.shouldClipChild(
+        Material4ClipManager.shouldClipChild(
           protection: protection,
           config: config,
           clipBehavior: Clip.antiAlias,
@@ -712,7 +702,7 @@ void main() {
       );
 
       expect(
-        DynamicShapeClipManager.shouldClipChild(
+        Material4ClipManager.shouldClipChild(
           protection: protection,
           config: config,
           clipBehavior: Clip.none,
@@ -724,13 +714,13 @@ void main() {
   });
 
   group('Accessibility & Semantics', () {
-    testWidgets('DynamicShapeContainer publishes semantic button and label',
+    testWidgets('Material4Container publishes semantic button and label',
         (tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
             body: Center(
-              child: DynamicShapeContainer(
+              child: Material4Container(
                 width: 150,
                 height: 80,
                 semanticLabel: 'Submit Order Shape',
@@ -743,7 +733,7 @@ void main() {
       );
 
       expect(
-        tester.getSemantics(find.byType(DynamicShapeRenderWidget)),
+        tester.getSemantics(find.byType(Material4RenderWidget)),
         matchesSemantics(
           label: 'Submit Order Shape',
           hint: 'Double tap to place order',

@@ -1,8 +1,8 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
-import '../../dynamic_shape_config.dart';
-import '../../dynamic_shape_path_builder.dart';
+import '../../material_4_config.dart';
+import '../../material_4_path_builder.dart';
 import 'sculpted_card_config.dart';
 
 /// CustomPainter rendering the tactile, physically sculpted icon plate.
@@ -111,23 +111,23 @@ class SculptedSurfacePainter extends CustomPainter {
         return Path()..addRRect(RRect.fromRectAndRadius(Offset.zero & size, r));
 
       case SculptedPlateShape.squircle:
-        final cfg = DynamicShapeConfig(
-          type: DynamicShapeType.squircle,
+        final cfg = Material4Config(
+          type: Material4Type.squircle,
           cornerRadius: config.cornerRadius,
         );
-        return DynamicShapePathBuilder.buildPath(size, cfg);
+        return Material4PathBuilder.buildPath(size, cfg);
 
       case SculptedPlateShape.organic:
-        final cfg = DynamicShapeConfig(
-          type: DynamicShapeType.organicBlob,
+        final cfg = Material4Config(
+          type: Material4Type.organicBlob,
           cornerRadius: config.cornerRadius,
         );
-        return DynamicShapePathBuilder.buildPath(size, cfg);
+        return Material4PathBuilder.buildPath(size, cfg);
 
       case SculptedPlateShape.matchCard:
       case SculptedPlateShape.custom:
         if (config.customShapeConfig != null) {
-          return DynamicShapePathBuilder.buildPath(
+          return Material4PathBuilder.buildPath(
               size, config.customShapeConfig!);
         }
         final r = Radius.circular(config.cornerRadius);

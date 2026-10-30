@@ -1,4 +1,4 @@
-# Universal Dynamic Shape Engine — RenderBox Architecture Migration Audit
+# Universal Material 4 Engine — RenderBox Architecture Migration Audit
 
 **Document Version:** 1.0.0  
 **Phase:** Phase 1: Complete RenderBox Migration Audit  
@@ -9,7 +9,7 @@
 
 ## Executive Summary
 
-This document provides the definitive, comprehensive architecture audit, feature inventory, rendering implementation index, risk analysis, and migration blueprint for migrating the **Flutter Universal Dynamic Shape Engine** (`dynamic_shape`) to a unified, hardware-accelerated **RenderBox-centric architecture**.
+This document provides the definitive, comprehensive architecture audit, feature inventory, rendering implementation index, risk analysis, and migration blueprint for migrating the **Flutter Universal Material 4 Engine** (`material_4`) to a unified, hardware-accelerated **RenderBox-centric architecture**.
 
 In accordance with Phase 1 constraints:
 - **No source code has been modified or deleted.**
@@ -26,16 +26,16 @@ The package currently operates on a hybrid architecture bridging traditional wid
 ```mermaid
 flowchart TD
     subgraph PublicWidgetLayer [Public Widget Layer]
-        DSC[DynamicShapeContainer\n38 Factory Constructors]
+        DSC[Material4Container\n38 Factory Constructors]
         ASC[AdaptiveShapeCard]
-        ADSC[AnimatedDynamicShapeContainer]
+        ADSC[AnimatedMaterial4Container]
         SW[Shape Widgets: Button, Badge, ProgressBar, Tag]
         SMW[Shape Motion Widgets: Morph, Reveal, Bounce]
         SSC[ShapeSmartContent]
     end
 
     subgraph ConfigLayer [Configuration & Cache Layer]
-        DSCfg[DynamicShapeConfig]
+        DSCfg[Material4Config]
         SCorners[ShapeCorners & CornerRadii]
         SEdges[ShapeEdges & ShapeEdgeConfig]
         SNotch[ShapeNotch & Collision Engine]
@@ -56,15 +56,15 @@ flowchart TD
     end
 
     subgraph RenderingSubsystem [Rendering Subsystem]
-        DSRW[DynamicShapeRenderWidget\nSingleChildRenderObjectWidget]
-        RDS[RenderDynamicShape\nRenderBox with RenderObjectWithChildMixin]
-        DSP[DynamicShapePainter]
+        DSRW[Material4RenderWidget\nSingleChildRenderObjectWidget]
+        RDS[RenderMaterial4\nRenderBox with RenderObjectWithChildMixin]
+        DSP[Material4Painter]
         SBP[ShapeBorderPainter]
         SBR[ShapeBackgroundRenderer]
         SPattern[ShapePatternPainter]
-        DSHT[DynamicShapeHitTester]
-        DSCM[DynamicShapeClipManager]
-        DSSem[DynamicShapeSemantics]
+        DSHT[Material4HitTester]
+        DSCM[Material4ClipManager]
+        DSSem[Material4Semantics]
     end
 
     PublicWidgetLayer --> ConfigLayer
@@ -83,10 +83,10 @@ flowchart TD
 ```
 
 ### Architectural Flow:
-1. **Configuration**: Immutable `DynamicShapeConfig` holds corner, edge, notch, transform, and constraint models.
-2. **Path Generation**: `DynamicShapePathBuilder` queries `ShapePathCache` (LRU 64 entries) to avoid rebuilding complex paths.
+1. **Configuration**: Immutable `Material4Config` holds corner, edge, notch, transform, and constraint models.
+2. **Path Generation**: `Material4PathBuilder` queries `ShapePathCache` (LRU 64 entries) to avoid rebuilding complex paths.
 3. **Layout & Safe Region**: Insets are resolved by `ShapeSafeRegion` (cached in an LRU of 128 entries) with dynamic ray-probing fallback for concave/organic contours.
-4. **RenderBox Orchestration**: `RenderDynamicShape` coordinates child layout, bounds enforcement, direct Canvas painting (shadows, backgrounds, patterns, borders), point-in-path hit testing, and clip management.
+4. **RenderBox Orchestration**: `RenderMaterial4` coordinates child layout, bounds enforcement, direct Canvas painting (shadows, backgrounds, patterns, borders), point-in-path hit testing, and clip management.
 
 ---
 
@@ -97,64 +97,64 @@ The package comprises **42 Dart source files** organized into 4 primary modules,
 ### A. Root Library Entrypoint (1 file)
 | File Path | Lines | Responsibilities |
 |---|---|---|
-| [`lib/dynamic_shape.dart`](file:///Users/juwel/flutter_project/dynamic_shape/lib/dynamic_shape.dart) | 28 | Primary public library export barrel. Re-exports all public widgets, configs, layouts, rendering classes, presets, and dev tools. |
+| [`lib/material_4.dart`](file:///Users/juwel/flutter_project/material_4/lib/material_4.dart) | 28 | Primary public library export barrel. Re-exports all public widgets, configs, layouts, rendering classes, presets, and dev tools. |
 
 ### B. Core Shape & Widget Engine (15 files)
 | File Path | Lines | Responsibilities |
 |---|---|---|
-| [`lib/src/dynamic_shape_container.dart`](file:///Users/juwel/flutter_project/dynamic_shape/lib/src/dynamic_shape_container.dart) | 1,646 | Primary public container widget featuring 38 factory constructors, legacy painter fallback, gesture binding, and glassmorphism. |
-| [`lib/src/dynamic_shape_config.dart`](file:///Users/juwel/flutter_project/dynamic_shape/lib/src/dynamic_shape_config.dart) | 851 | Central immutable configuration model. Houses `DynamicShapeConfig`, `DynamicShapeType` (28 presets), `BorderStyleType`, and `ShapeAnchor`. |
-| [`lib/src/dynamic_shape_path_builder.dart`](file:///Users/juwel/flutter_project/dynamic_shape/lib/src/dynamic_shape_path_builder.dart) | 885 | Core vector geometry generator. Calculates parametric paths for all 28 shapes, notches, custom bezier curves, and independent edge configs. |
-| [`lib/src/shape_path_cache.dart`](file:///Users/juwel/flutter_project/dynamic_shape/lib/src/shape_path_cache.dart) | 203 | Bounded 64-entry LRU cache (`ShapePathCache`) and composite immutable key (`ShapeCacheKey`) for zero-allocation geometry reuse. |
-| [`lib/src/shape_border_painter.dart`](file:///Users/juwel/flutter_project/dynamic_shape/lib/src/shape_border_painter.dart) | 903 | Direct Canvas border renderer supporting solid, dashed, dotted, gradient, neon glow, dual tone, double contour, and technical borders. |
-| [`lib/src/shape_background_renderer.dart`](file:///Users/juwel/flutter_project/dynamic_shape/lib/src/shape_background_renderer.dart) | 412 | Direct Canvas background engine: solid, linear/radial/sweep gradients, metallic lustres, aurora wave, liquid gradient, and noise grain. |
-| [`lib/src/shape_pattern.dart`](file:///Users/juwel/flutter_project/dynamic_shape/lib/src/shape_pattern.dart) | 179 | Canvas pattern generator: polka dots, grid mesh, diagonal stripes, tech circuits, and guilloche security watermarks. |
-| [`lib/src/adaptive_shape_card.dart`](file:///Users/juwel/flutter_project/dynamic_shape/lib/src/adaptive_shape_card.dart) | 291 | High-level interactive card with shape-aware layout, auto-contrast text, tactile feedback, and accessory docking. |
-| [`lib/src/animated_dynamic_shape.dart`](file:///Users/juwel/flutter_project/dynamic_shape/lib/src/animated_dynamic_shape.dart) | 227 | Implicitly animated shape container interpolating shape configs, colors, borders, and dimensions. |
-| [`lib/src/shape_animation_controller.dart`](file:///Users/juwel/flutter_project/dynamic_shape/lib/src/shape_animation_controller.dart) | 185 | Physics spring simulation and 60fps pan/drag gesture interpolation engine. |
-| [`lib/src/shape_motion_widgets.dart`](file:///Users/juwel/flutter_project/dynamic_shape/lib/src/shape_motion_widgets.dart) | 479 | Specialized motion widgets: `ShapeMorphTransition`, `ShapeReveal`, `ShapeBounce`, `ShapeBorderDrawReveal`. |
-| [`lib/src/shape_smart_layout.dart`](file:///Users/juwel/flutter_project/dynamic_shape/lib/src/shape_smart_layout.dart) | 332 | Legacy smart layout utility and `ShapeSafeArea` widget with RTL anchor mirroring and touch-target diagnostics. |
-| [`lib/src/shape_widgets.dart`](file:///Users/juwel/flutter_project/dynamic_shape/lib/src/shape_widgets.dart) | 760 | Production component library: `AnimatedShapeCard`, `ShapeButton`, `ShapeBadge`, `ShapeTag`, `ShapeProgressBar`, `ShapeDivider`. |
-| [`lib/src/shape_dev_tools.dart`](file:///Users/juwel/flutter_project/dynamic_shape/lib/src/shape_dev_tools.dart) | 215 | Visual developer overlay: path contour inspection, safe region outlines, anchor coordinates, and notch boundaries. |
-| [`lib/src/school_shape_presets.dart`](file:///Users/juwel/flutter_project/dynamic_shape/lib/src/school_shape_presets.dart) | 148 | 10 specialized domain presets: ID card, hall pass, diploma banner, attendance token, library badge, etc. |
+| [`lib/src/material_4_container.dart`](file:///Users/juwel/flutter_project/material_4/lib/src/material_4_container.dart) | 1,646 | Primary public container widget featuring 38 factory constructors, legacy painter fallback, gesture binding, and glassmorphism. |
+| [`lib/src/material_4_config.dart`](file:///Users/juwel/flutter_project/material_4/lib/src/material_4_config.dart) | 851 | Central immutable configuration model. Houses `Material4Config`, `Material4Type` (28 presets), `BorderStyleType`, and `ShapeAnchor`. |
+| [`lib/src/material_4_path_builder.dart`](file:///Users/juwel/flutter_project/material_4/lib/src/material_4_path_builder.dart) | 885 | Core vector geometry generator. Calculates parametric paths for all 28 shapes, notches, custom bezier curves, and independent edge configs. |
+| [`lib/src/shape_path_cache.dart`](file:///Users/juwel/flutter_project/material_4/lib/src/shape_path_cache.dart) | 203 | Bounded 64-entry LRU cache (`ShapePathCache`) and composite immutable key (`ShapeCacheKey`) for zero-allocation geometry reuse. |
+| [`lib/src/shape_border_painter.dart`](file:///Users/juwel/flutter_project/material_4/lib/src/shape_border_painter.dart) | 903 | Direct Canvas border renderer supporting solid, dashed, dotted, gradient, neon glow, dual tone, double contour, and technical borders. |
+| [`lib/src/shape_background_renderer.dart`](file:///Users/juwel/flutter_project/material_4/lib/src/shape_background_renderer.dart) | 412 | Direct Canvas background engine: solid, linear/radial/sweep gradients, metallic lustres, aurora wave, liquid gradient, and noise grain. |
+| [`lib/src/shape_pattern.dart`](file:///Users/juwel/flutter_project/material_4/lib/src/shape_pattern.dart) | 179 | Canvas pattern generator: polka dots, grid mesh, diagonal stripes, tech circuits, and guilloche security watermarks. |
+| [`lib/src/adaptive_shape_card.dart`](file:///Users/juwel/flutter_project/material_4/lib/src/adaptive_shape_card.dart) | 291 | High-level interactive card with shape-aware layout, auto-contrast text, tactile feedback, and accessory docking. |
+| [`lib/src/animated_material_4.dart`](file:///Users/juwel/flutter_project/material_4/lib/src/animated_material_4.dart) | 227 | Implicitly animated shape container interpolating shape configs, colors, borders, and dimensions. |
+| [`lib/src/shape_animation_controller.dart`](file:///Users/juwel/flutter_project/material_4/lib/src/shape_animation_controller.dart) | 185 | Physics spring simulation and 60fps pan/drag gesture interpolation engine. |
+| [`lib/src/shape_motion_widgets.dart`](file:///Users/juwel/flutter_project/material_4/lib/src/shape_motion_widgets.dart) | 479 | Specialized motion widgets: `ShapeMorphTransition`, `ShapeReveal`, `ShapeBounce`, `ShapeBorderDrawReveal`. |
+| [`lib/src/shape_smart_layout.dart`](file:///Users/juwel/flutter_project/material_4/lib/src/shape_smart_layout.dart) | 332 | Legacy smart layout utility and `ShapeSafeArea` widget with RTL anchor mirroring and touch-target diagnostics. |
+| [`lib/src/shape_widgets.dart`](file:///Users/juwel/flutter_project/material_4/lib/src/shape_widgets.dart) | 760 | Production component library: `AnimatedShapeCard`, `ShapeButton`, `ShapeBadge`, `ShapeTag`, `ShapeProgressBar`, `ShapeDivider`. |
+| [`lib/src/shape_dev_tools.dart`](file:///Users/juwel/flutter_project/material_4/lib/src/shape_dev_tools.dart) | 215 | Visual developer overlay: path contour inspection, safe region outlines, anchor coordinates, and notch boundaries. |
+| [`lib/src/school_shape_presets.dart`](file:///Users/juwel/flutter_project/material_4/lib/src/school_shape_presets.dart) | 148 | 10 specialized domain presets: ID card, hall pass, diploma banner, attendance token, library badge, etc. |
 
 ### C. Shape Configuration Subsystem (`lib/src/config/`, 7 files)
 | File Path | Lines | Responsibilities |
 |---|---|---|
-| [`lib/src/config/config.dart`](file:///Users/juwel/flutter_project/dynamic_shape/lib/src/config/config.dart) | 12 | Configuration module export barrel. |
-| [`lib/src/config/shape_corners.dart`](file:///Users/juwel/flutter_project/dynamic_shape/lib/src/config/shape_corners.dart) | 225 | Immutable corner configuration supporting independent elliptical radii (`Radius`), CSS-style proportional scaling, and validation. |
-| [`lib/src/config/shape_edge_config.dart`](file:///Users/juwel/flutter_project/dynamic_shape/lib/src/config/shape_edge_config.dart) | 184 | Independent configuration for Top, Right, Bottom, Left edges (straight, convex, concave, wave, zigzag, bezier). |
-| [`lib/src/config/shape_notch.dart`](file:///Users/juwel/flutter_project/dynamic_shape/lib/src/config/shape_notch.dart) | 362 | Multi-notch placement engine with normalized positioning, depth ratios, inward/outward directions, and deterministic collision detection. |
-| [`lib/src/config/shape_transform.dart`](file:///Users/juwel/flutter_project/dynamic_shape/lib/src/config/shape_transform.dart) | 205 | Matrix transformation engine: rotation (radians/degrees), scale X/Y, skew X/Y, custom origin, and aspect ratio constraints. |
-| [`lib/src/config/bezier_config.dart`](file:///Users/juwel/flutter_project/dynamic_shape/lib/src/config/bezier_config.dart) | 165 | Cubic and quadratic Bézier curve definition with normalized coordinates, continuity validation, and degenerate segment detection. |
-| [`lib/src/config/shape_constraints.dart`](file:///Users/juwel/flutter_project/dynamic_shape/lib/src/config/shape_constraints.dart) | 178 | Geometric constraint engine: min/max dimensions, max corner radius ratios, max notch depth limits, and touch target validation. |
+| [`lib/src/config/config.dart`](file:///Users/juwel/flutter_project/material_4/lib/src/config/config.dart) | 12 | Configuration module export barrel. |
+| [`lib/src/config/shape_corners.dart`](file:///Users/juwel/flutter_project/material_4/lib/src/config/shape_corners.dart) | 225 | Immutable corner configuration supporting independent elliptical radii (`Radius`), CSS-style proportional scaling, and validation. |
+| [`lib/src/config/shape_edge_config.dart`](file:///Users/juwel/flutter_project/material_4/lib/src/config/shape_edge_config.dart) | 184 | Independent configuration for Top, Right, Bottom, Left edges (straight, convex, concave, wave, zigzag, bezier). |
+| [`lib/src/config/shape_notch.dart`](file:///Users/juwel/flutter_project/material_4/lib/src/config/shape_notch.dart) | 362 | Multi-notch placement engine with normalized positioning, depth ratios, inward/outward directions, and deterministic collision detection. |
+| [`lib/src/config/shape_transform.dart`](file:///Users/juwel/flutter_project/material_4/lib/src/config/shape_transform.dart) | 205 | Matrix transformation engine: rotation (radians/degrees), scale X/Y, skew X/Y, custom origin, and aspect ratio constraints. |
+| [`lib/src/config/bezier_config.dart`](file:///Users/juwel/flutter_project/material_4/lib/src/config/bezier_config.dart) | 165 | Cubic and quadratic Bézier curve definition with normalized coordinates, continuity validation, and degenerate segment detection. |
+| [`lib/src/config/shape_constraints.dart`](file:///Users/juwel/flutter_project/material_4/lib/src/config/shape_constraints.dart) | 178 | Geometric constraint engine: min/max dimensions, max corner radius ratios, max notch depth limits, and touch target validation. |
 
 ### D. Shape-Aware Layout Subsystem (`lib/src/layout/`, 10 files)
 | File Path | Lines | Responsibilities |
 |---|---|---|
-| [`lib/src/layout/layout.dart`](file:///Users/juwel/flutter_project/dynamic_shape/lib/src/layout/layout.dart) | 10 | Layout subsystem export barrel. |
-| [`lib/src/layout/shape_safe_region.dart`](file:///Users/juwel/flutter_project/dynamic_shape/lib/src/layout/shape_safe_region.dart) | 310 | Geometry-driven safe content boundary engine for all 28 presets + dynamic ray-probing with 128-entry LRU caching. |
-| [`lib/src/layout/shape_content_protection.dart`](file:///Users/juwel/flutter_project/dynamic_shape/lib/src/layout/shape_content_protection.dart) | 88 | Content protection policies: `ShapeContentMode.strict`, `adaptive`, and `visibleOverflow`. |
-| [`lib/src/layout/shape_content_constraints.dart`](file:///Users/juwel/flutter_project/dynamic_shape/lib/src/layout/shape_content_constraints.dart) | 68 | Calculates strictly bounded child `BoxConstraints` from container constraints and geometric insets. |
-| [`lib/src/layout/shape_text_fitter.dart`](file:///Users/juwel/flutter_project/dynamic_shape/lib/src/layout/shape_text_fitter.dart) | 240 | Text layout engine: multiline metrics, accessible font scaling floor ($\ge 11.0$ dp), and Bengali/Arabic complex script support. |
-| [`lib/src/layout/shape_anchor_placer.dart`](file:///Users/juwel/flutter_project/dynamic_shape/lib/src/layout/shape_anchor_placer.dart) | 148 | Resolves exact semantic attachment coordinates for notches, tabs, badges, and RTL mirroring. |
-| [`lib/src/layout/shape_collision_detector.dart`](file:///Users/juwel/flutter_project/dynamic_shape/lib/src/layout/shape_collision_detector.dart) | 185 | Mathematical collision detection between children, badges, notch cutouts, stepped corners, and shape boundaries. |
-| [`lib/src/layout/shape_content_placer.dart`](file:///Users/juwel/flutter_project/dynamic_shape/lib/src/layout/shape_content_placer.dart) | 145 | Multi-slot placement engine (leading, center, trailing, accessory) computing collision-free horizontal and vertical offsets. |
-| [`lib/src/layout/shape_clipping_protection.dart`](file:///Users/juwel/flutter_project/dynamic_shape/lib/src/layout/shape_clipping_protection.dart) | 82 | Fine-grained clipping arbitrator decoupling child clipping from background container clipping. |
-| [`lib/src/layout/shape_content_layout.dart`](file:///Users/juwel/flutter_project/dynamic_shape/lib/src/layout/shape_content_layout.dart) | 230 | High-level layout orchestrator and reusable `ShapeSmartContent` widget. |
+| [`lib/src/layout/layout.dart`](file:///Users/juwel/flutter_project/material_4/lib/src/layout/layout.dart) | 10 | Layout subsystem export barrel. |
+| [`lib/src/layout/shape_safe_region.dart`](file:///Users/juwel/flutter_project/material_4/lib/src/layout/shape_safe_region.dart) | 310 | Geometry-driven safe content boundary engine for all 28 presets + dynamic ray-probing with 128-entry LRU caching. |
+| [`lib/src/layout/shape_content_protection.dart`](file:///Users/juwel/flutter_project/material_4/lib/src/layout/shape_content_protection.dart) | 88 | Content protection policies: `ShapeContentMode.strict`, `adaptive`, and `visibleOverflow`. |
+| [`lib/src/layout/shape_content_constraints.dart`](file:///Users/juwel/flutter_project/material_4/lib/src/layout/shape_content_constraints.dart) | 68 | Calculates strictly bounded child `BoxConstraints` from container constraints and geometric insets. |
+| [`lib/src/layout/shape_text_fitter.dart`](file:///Users/juwel/flutter_project/material_4/lib/src/layout/shape_text_fitter.dart) | 240 | Text layout engine: multiline metrics, accessible font scaling floor ($\ge 11.0$ dp), and Bengali/Arabic complex script support. |
+| [`lib/src/layout/shape_anchor_placer.dart`](file:///Users/juwel/flutter_project/material_4/lib/src/layout/shape_anchor_placer.dart) | 148 | Resolves exact semantic attachment coordinates for notches, tabs, badges, and RTL mirroring. |
+| [`lib/src/layout/shape_collision_detector.dart`](file:///Users/juwel/flutter_project/material_4/lib/src/layout/shape_collision_detector.dart) | 185 | Mathematical collision detection between children, badges, notch cutouts, stepped corners, and shape boundaries. |
+| [`lib/src/layout/shape_content_placer.dart`](file:///Users/juwel/flutter_project/material_4/lib/src/layout/shape_content_placer.dart) | 145 | Multi-slot placement engine (leading, center, trailing, accessory) computing collision-free horizontal and vertical offsets. |
+| [`lib/src/layout/shape_clipping_protection.dart`](file:///Users/juwel/flutter_project/material_4/lib/src/layout/shape_clipping_protection.dart) | 82 | Fine-grained clipping arbitrator decoupling child clipping from background container clipping. |
+| [`lib/src/layout/shape_content_layout.dart`](file:///Users/juwel/flutter_project/material_4/lib/src/layout/shape_content_layout.dart) | 230 | High-level layout orchestrator and reusable `ShapeSmartContent` widget. |
 
 ### E. RenderBox Subsystem (`lib/src/rendering/`, 9 files)
 | File Path | Lines | Responsibilities |
 |---|---|---|
-| [`lib/src/rendering/rendering.dart`](file:///Users/juwel/flutter_project/dynamic_shape/lib/src/rendering/rendering.dart) | 8 | Rendering subsystem export barrel. |
-| [`lib/src/rendering/dynamic_shape_render_object.dart`](file:///Users/juwel/flutter_project/dynamic_shape/lib/src/rendering/dynamic_shape_render_object.dart) | 571 | The central hardware-accelerated `RenderBox` engine. Coordinates path caching, layout, dry layout, intrinsics, direct canvas painting, hit testing, and clip isolation. |
-| [`lib/src/rendering/dynamic_shape_render_widget.dart`](file:///Users/juwel/flutter_project/dynamic_shape/lib/src/rendering/dynamic_shape_render_widget.dart) | 85 | `SingleChildRenderObjectWidget` integrating `RenderDynamicShape` into Flutter's Element tree. |
-| [`lib/src/rendering/dynamic_shape_parent_data.dart`](file:///Users/juwel/flutter_project/dynamic_shape/lib/src/rendering/dynamic_shape_parent_data.dart) | 35 | `DynamicShapeParentData extends ContainerBoxParentData<RenderBox>` holding child layout offsets and clipping overrides. |
-| [`lib/src/rendering/dynamic_shape_painter.dart`](file:///Users/juwel/flutter_project/dynamic_shape/lib/src/rendering/dynamic_shape_painter.dart) | 165 | Direct Canvas coordinator for `RenderDynamicShape`: draws neo-3D shadows, backgrounds, borders, shimmer sweeps, and patterns. |
-| [`lib/src/rendering/dynamic_shape_hit_test.dart`](file:///Users/juwel/flutter_project/dynamic_shape/lib/src/rendering/dynamic_shape_hit_test.dart) | 78 | Exact vector contour point-in-path testing (`DynamicShapeHitTester`) with inverted transformation matrix handling. |
-| [`lib/src/rendering/dynamic_shape_clip_manager.dart`](file:///Users/juwel/flutter_project/dynamic_shape/lib/src/rendering/dynamic_shape_clip_manager.dart) | 68 | Hardware clip arbitrator managing `context.pushClipPath` and selective child clipping. |
-| [`lib/src/rendering/dynamic_shape_layout_manager.dart`](file:///Users/juwel/flutter_project/dynamic_shape/lib/src/rendering/dynamic_shape_layout_manager.dart) | 165 | Helper computing intrinsic dimensions (`computeMinIntrinsicWidth`, `computeMaxIntrinsicWidth`, etc.). |
-| [`lib/src/rendering/dynamic_shape_semantics.dart`](file:///Users/juwel/flutter_project/dynamic_shape/lib/src/rendering/dynamic_shape_semantics.dart) | 38 | Accessibility semantics manager configuring `SemanticsConfiguration` for tap gestures, buttons, and accessibility labels. |
+| [`lib/src/rendering/rendering.dart`](file:///Users/juwel/flutter_project/material_4/lib/src/rendering/rendering.dart) | 8 | Rendering subsystem export barrel. |
+| [`lib/src/rendering/material_4_render_object.dart`](file:///Users/juwel/flutter_project/material_4/lib/src/rendering/material_4_render_object.dart) | 571 | The central hardware-accelerated `RenderBox` engine. Coordinates path caching, layout, dry layout, intrinsics, direct canvas painting, hit testing, and clip isolation. |
+| [`lib/src/rendering/material_4_render_widget.dart`](file:///Users/juwel/flutter_project/material_4/lib/src/rendering/material_4_render_widget.dart) | 85 | `SingleChildRenderObjectWidget` integrating `RenderMaterial4` into Flutter's Element tree. |
+| [`lib/src/rendering/material_4_parent_data.dart`](file:///Users/juwel/flutter_project/material_4/lib/src/rendering/material_4_parent_data.dart) | 35 | `Material4ParentData extends ContainerBoxParentData<RenderBox>` holding child layout offsets and clipping overrides. |
+| [`lib/src/rendering/material_4_painter.dart`](file:///Users/juwel/flutter_project/material_4/lib/src/rendering/material_4_painter.dart) | 165 | Direct Canvas coordinator for `RenderMaterial4`: draws neo-3D shadows, backgrounds, borders, shimmer sweeps, and patterns. |
+| [`lib/src/rendering/material_4_hit_test.dart`](file:///Users/juwel/flutter_project/material_4/lib/src/rendering/material_4_hit_test.dart) | 78 | Exact vector contour point-in-path testing (`Material4HitTester`) with inverted transformation matrix handling. |
+| [`lib/src/rendering/material_4_clip_manager.dart`](file:///Users/juwel/flutter_project/material_4/lib/src/rendering/material_4_clip_manager.dart) | 68 | Hardware clip arbitrator managing `context.pushClipPath` and selective child clipping. |
+| [`lib/src/rendering/material_4_layout_manager.dart`](file:///Users/juwel/flutter_project/material_4/lib/src/rendering/material_4_layout_manager.dart) | 165 | Helper computing intrinsic dimensions (`computeMinIntrinsicWidth`, `computeMaxIntrinsicWidth`, etc.). |
+| [`lib/src/rendering/material_4_semantics.dart`](file:///Users/juwel/flutter_project/material_4/lib/src/rendering/material_4_semantics.dart) | 38 | Accessibility semantics manager configuring `SemanticsConfiguration` for tap gestures, buttons, and accessibility labels. |
 
 ---
 
@@ -164,28 +164,28 @@ Every rendering-related Flutter engine type and method across `lib/` has been id
 
 | Primitive / Class | File Path & Line | Current Responsibility | Dependencies | Proposed Destination | Disposition |
 |---|---|---|---|---|---|
-| **`CustomPainter`** | `dynamic_shape_container.dart:35` | `DynamicShapeCustomPainter`: legacy fallback painter for custom painting without RenderBox | `DynamicShapeConfig`, `DynamicShapePathBuilder`, `DynamicShapePainter` | `lib/src/dynamic_shape_container.dart` | **Keep as deprecated adapter** for backwards compatibility |
-| **`CustomPainter`** | `shape_motion_widgets.dart:391` | `_StrokeRevealPainter`: draws animated border stroke reveal progress | `DynamicShapeConfig`, `DynamicShapePathBuilder`, `Canvas` | `RenderShapeBorderReveal` or Direct RenderBox Painting | **Migrate to RenderBox** in Phase 2 |
+| **`CustomPainter`** | `material_4_container.dart:35` | `Material4CustomPainter`: legacy fallback painter for custom painting without RenderBox | `Material4Config`, `Material4PathBuilder`, `Material4Painter` | `lib/src/material_4_container.dart` | **Keep as deprecated adapter** for backwards compatibility |
+| **`CustomPainter`** | `shape_motion_widgets.dart:391` | `_StrokeRevealPainter`: draws animated border stroke reveal progress | `Material4Config`, `Material4PathBuilder`, `Canvas` | `RenderShapeBorderReveal` or Direct RenderBox Painting | **Migrate to RenderBox** in Phase 2 |
 | **`CustomPaint`** | `shape_motion_widgets.dart:379` | `ShapeBorderDrawReveal`: wraps `_StrokeRevealPainter` in `CustomPaint` | Flutter `CustomPaint` | RenderObjectWidget | **Migrate to RenderBox** |
-| **`RenderBox`** | `dynamic_shape_render_object.dart:26` | `RenderDynamicShape`: central single-child RenderBox | Flutter `rendering.dart` | `lib/src/rendering/dynamic_shape_render_object.dart` | **Central Engine (Retain & Expand to Multi-Child)** |
-| **`RenderBox`** | `dynamic_shape_layout_manager.dart:18` | Sizing & Intrinsic dimension calculation on child RenderBox | `RenderBox? child` | `lib/src/rendering/dynamic_shape_layout_manager.dart` | **Keep as Reusable Helper** |
-| **`RenderObjectWidget`** | `dynamic_shape_render_widget.dart:9` | `DynamicShapeRenderWidget extends SingleChildRenderObjectWidget` | Flutter `widgets.dart` | `lib/src/rendering/dynamic_shape_render_widget.dart` | **Retain as Primary Widget Bridge** |
-| **`ClipPath`** | `dynamic_shape_container.dart:1627` | Clips backdrop filter layer for glassmorphic shapes | Flutter `ClipPath`, `DynamicShapeClipper` | `DynamicShapeClipManager` / `RenderDynamicShape.paint` | **Replace with Direct Canvas Clip** |
-| **`ClipPath`** | `shape_widgets.dart:292` | `ShapeProgressBar`: clips progress indicator fill to shape path | Flutter `ClipPath`, `DynamicShapeClipper` | `RenderShapeProgressBar` | **Migrate to RenderBox** |
+| **`RenderBox`** | `material_4_render_object.dart:26` | `RenderMaterial4`: central single-child RenderBox | Flutter `rendering.dart` | `lib/src/rendering/material_4_render_object.dart` | **Central Engine (Retain & Expand to Multi-Child)** |
+| **`RenderBox`** | `material_4_layout_manager.dart:18` | Sizing & Intrinsic dimension calculation on child RenderBox | `RenderBox? child` | `lib/src/rendering/material_4_layout_manager.dart` | **Keep as Reusable Helper** |
+| **`RenderObjectWidget`** | `material_4_render_widget.dart:9` | `Material4RenderWidget extends SingleChildRenderObjectWidget` | Flutter `widgets.dart` | `lib/src/rendering/material_4_render_widget.dart` | **Retain as Primary Widget Bridge** |
+| **`ClipPath`** | `material_4_container.dart:1627` | Clips backdrop filter layer for glassmorphic shapes | Flutter `ClipPath`, `Material4Clipper` | `Material4ClipManager` / `RenderMaterial4.paint` | **Replace with Direct Canvas Clip** |
+| **`ClipPath`** | `shape_widgets.dart:292` | `ShapeProgressBar`: clips progress indicator fill to shape path | Flutter `ClipPath`, `Material4Clipper` | `RenderShapeProgressBar` | **Migrate to RenderBox** |
 | **`ClipPath`** | `shape_motion_widgets.dart:314` | `ShapeReveal`: clips child during transition | Flutter `ClipPath`, `_ShapeRevealClipper` | `RenderShapeReveal` | **Migrate to RenderBox** |
-| **`ClipPath` (`pushClipPath`)** | `dynamic_shape_clip_manager.dart:35` | Hardware-accelerated Canvas clipping via `PaintingContext.pushClipPath` | Flutter `PaintingContext` | `lib/src/rendering/dynamic_shape_clip_manager.dart` | **Retain as Core Clip Arbitrator** |
-| **`ShapeBorder`** | `shape_border_painter.dart:12` | Static methods for painting specialized borders | `Canvas`, `Path`, `DynamicShapeConfig` | `lib/src/shape_border_painter.dart` | **Retain as Direct Drawing Engine** |
-| **`Canvas`** | `dynamic_shape_render_object.dart:447` | Canvas transformations, translation, save/restore | Flutter `Canvas` | `RenderDynamicShape.paint()` | **Core RenderBox Lifecycle** |
-| **`Canvas`** | `dynamic_shape_painter.dart:18` | Coordinates backgrounds, borders, shadows, and patterns | `Canvas`, `Path`, `DynamicShapeConfig` | `lib/src/rendering/dynamic_shape_painter.dart` | **Retain as Canvas Drawing Engine** |
+| **`ClipPath` (`pushClipPath`)** | `material_4_clip_manager.dart:35` | Hardware-accelerated Canvas clipping via `PaintingContext.pushClipPath` | Flutter `PaintingContext` | `lib/src/rendering/material_4_clip_manager.dart` | **Retain as Core Clip Arbitrator** |
+| **`ShapeBorder`** | `shape_border_painter.dart:12` | Static methods for painting specialized borders | `Canvas`, `Path`, `Material4Config` | `lib/src/shape_border_painter.dart` | **Retain as Direct Drawing Engine** |
+| **`Canvas`** | `material_4_render_object.dart:447` | Canvas transformations, translation, save/restore | Flutter `Canvas` | `RenderMaterial4.paint()` | **Core RenderBox Lifecycle** |
+| **`Canvas`** | `material_4_painter.dart:18` | Coordinates backgrounds, borders, shadows, and patterns | `Canvas`, `Path`, `Material4Config` | `lib/src/rendering/material_4_painter.dart` | **Retain as Canvas Drawing Engine** |
 | **`Canvas`** | `shape_background_renderer.dart:18` | Draws solid, gradient, metallic, aurora, noise backgrounds | `Canvas`, `Path`, `Size` | `lib/src/shape_background_renderer.dart` | **Retain as Procedural Background Helper** |
 | **`Canvas`** | `shape_pattern.dart:28` | Draws procedural dot, grid, stripe, circuit, guilloche patterns | `Canvas`, `Path`, `Size` | `lib/src/shape_pattern.dart` | **Retain as Pattern Helper** |
-| **`Path`** | `dynamic_shape_path_builder.dart:25` | Generates parametric vector contours for 28 presets | `Path`, `Size`, `DynamicShapeConfig` | `lib/src/dynamic_shape_path_builder.dart` | **Retain as Core Geometry Engine** |
+| **`Path`** | `material_4_path_builder.dart:25` | Generates parametric vector contours for 28 presets | `Path`, `Size`, `Material4Config` | `lib/src/material_4_path_builder.dart` | **Retain as Core Geometry Engine** |
 | **`Path`** | `shape_path_cache.dart:164` | Caches evaluated Path objects in 64-entry LRU | `Path`, `ShapeCacheKey` | `lib/src/shape_path_cache.dart` | **Retain as Shared Geometry Cache** |
 | **`Path`** | `shape_safe_region.dart:270` | Ray-probing to evaluate concave inner bounds | `Path`, `PathMetric` | `lib/src/layout/shape_safe_region.dart` | **Retain as Safe Region Prober** |
 | **`saveLayer`** | *None* | *Zero occurrences across entire codebase.* | N/A | Direct `canvas.clipPath` preferred | **Keep Zero saveLayer** (prevents GPU offscreen render-target thrashing) |
 | **`TextPainter`** | `shape_text_fitter.dart:60, 85, 129, 216` | Multiline measurement, text wrapping, and accessible font scale floor | Flutter `TextPainter` | `lib/src/layout/shape_text_fitter.dart` | **Retain as Text Layout Engine** |
-| **`hitTest`** | `dynamic_shape_render_object.dart:509` | Contour-aware hit testing and child hit dispatching | `BoxHitTestResult`, `BoxHitTestEntry` | `RenderDynamicShape.hitTest` | **Core RenderBox Lifecycle** |
-| **`hitTest`** | `dynamic_shape_hit_test.dart:18` | Inverted transform coordinate mapping & `path.contains()` | `Path`, `Offset`, `Matrix4` | `lib/src/rendering/dynamic_shape_hit_test.dart` | **Retain as Hit Test Helper** |
+| **`hitTest`** | `material_4_render_object.dart:509` | Contour-aware hit testing and child hit dispatching | `BoxHitTestResult`, `BoxHitTestEntry` | `RenderMaterial4.hitTest` | **Core RenderBox Lifecycle** |
+| **`hitTest`** | `material_4_hit_test.dart:18` | Inverted transform coordinate mapping & `path.contains()` | `Path`, `Offset`, `Matrix4` | `lib/src/rendering/material_4_hit_test.dart` | **Retain as Hit Test Helper** |
 
 ---
 
@@ -193,39 +193,39 @@ Every rendering-related Flutter engine type and method across `lib/` has been id
 
 | Subsystem | Feature | Current Implementation | Proposed RenderBox Responsibility | Verified? |
 |---|---|---|---|---|
-| **Shape Geometry** | 28 Shape Presets | `DynamicShapePathBuilder.buildPath()` | Cached geometry evaluation inside `RenderDynamicShape` | Yes |
+| **Shape Geometry** | 28 Shape Presets | `Material4PathBuilder.buildPath()` | Cached geometry evaluation inside `RenderMaterial4` | Yes |
 | **Shape Geometry** | Independent Corners | `ShapeCorners` & `CornerRadii` | Geometry evaluation with CSS proportional scaling | Yes |
 | **Shape Geometry** | Independent Edges | `ShapeEdges` & `ShapeEdgeConfig` | 4-edge custom contours (convex, concave, wave, zigzag) | Yes |
 | **Shape Geometry** | Multi-Notch Engine | `ShapeNotch` & collision engine | Evaluated inside path builder with collision safety | Yes |
 | **Shape Geometry** | Custom Bézier Curves | `CustomBezierConfig` & builder | Vector path evaluation with continuity verification | Yes |
 | **Shape Geometry** | Geometry Constraints | `ShapeConstraints` | Dimension clamping inside `performLayout()` & `computeDryLayout()` | Yes |
-| **Layout** | Geometry Safe Insets | `ShapeSafeRegion` | `RenderDynamicShape.performLayout()` child positioning | Yes |
+| **Layout** | Geometry Safe Insets | `ShapeSafeRegion` | `RenderMaterial4.performLayout()` child positioning | Yes |
 | **Layout** | Layout Modes | `ShapeContentMode` (strict, adaptive, visibleOverflow) | Arbitrates child layout constraints and clipping | Yes |
 | **Layout** | Safe Constraints | `ShapeContentConstraints` | Generates bounded BoxConstraints for children | Yes |
 | **Layout** | Multi-Slot Placement | `ShapeContentPlacer` & `ShapeAnchorPlacer` | Future multi-child RenderBox positioning | Yes |
 | **Layout** | Text Fitting | `ShapeTextFitter` | Smart multiline text fitting with accessible scaling | Yes |
 | **Layout** | Collision Detection | `ShapeCollisionDetector` | Validates child-to-notch, badge, and corner bounds | Yes |
-| **Painting** | Solid Colors & Gradients | `DynamicShapePainter.paintShape()` | Direct Canvas drawing in `RenderDynamicShape.paint()` | Yes |
-| **Painting** | Neo-3D Shadows & Glow | `DynamicShapePainter._paintShadows()` | Direct Canvas shadow path offsetting | Yes |
-| **Painting** | Shimmer Sweeps | `DynamicShapePainter._paintShimmer()` | Animated gradient shader sweep on Canvas | Yes |
+| **Painting** | Solid Colors & Gradients | `Material4Painter.paintShape()` | Direct Canvas drawing in `RenderMaterial4.paint()` | Yes |
+| **Painting** | Neo-3D Shadows & Glow | `Material4Painter._paintShadows()` | Direct Canvas shadow path offsetting | Yes |
+| **Painting** | Shimmer Sweeps | `Material4Painter._paintShimmer()` | Animated gradient shader sweep on Canvas | Yes |
 | **Borders** | 8 Border Styles | `ShapeBorderPainter` | Direct Canvas border strokes, dashes, and neon glows | Yes |
 | **Background Effects** | Glassmorphism | `ClipPath` + `BackdropFilter` / Canvas tint | Integrated into RenderBox paint lifecycle | Yes |
 | **Background Effects** | Procedural Patterns | `ShapePatternPainter` | Direct Canvas pattern tiling within shape bounds | Yes |
 | **Background Effects** | Shaders & Textures | `ShapeBackgroundRenderer` | Direct Canvas procedural shaders (aurora, liquid, metal) | Yes |
-| **Hit Testing** | Exact Contour Hit Test | `DynamicShapeHitTester` | `RenderDynamicShape.hitTest()` with `path.contains()` | Yes |
-| **Hit Testing** | Inverted Coordinate Map | `DynamicShapeHitTester` | Maps screen touch coordinates via inverted matrix | Yes |
-| **Clipping** | Selective Child Clip | `DynamicShapeClipManager` | `PaintingContext.pushClipPath()` in RenderBox | Yes |
+| **Hit Testing** | Exact Contour Hit Test | `Material4HitTester` | `RenderMaterial4.hitTest()` with `path.contains()` | Yes |
+| **Hit Testing** | Inverted Coordinate Map | `Material4HitTester` | Maps screen touch coordinates via inverted matrix | Yes |
+| **Clipping** | Selective Child Clip | `Material4ClipManager` | `PaintingContext.pushClipPath()` in RenderBox | Yes |
 | **Clipping** | Child vs Background Isolation | `ShapeClippingProtection` | Decouples container contour from child overflow | Yes |
-| **Animation** | Implicit Shape Morphing | `AnimatedDynamicShapeContainer` | Drives RenderDynamicShape properties smoothly | Yes |
-| **Animation** | Physics Spring Drag | `DynamicShapeAnimationController` | 60fps pan/drag simulation updates RenderBox | Yes |
+| **Animation** | Implicit Shape Morphing | `AnimatedMaterial4Container` | Drives RenderMaterial4 properties smoothly | Yes |
+| **Animation** | Physics Spring Drag | `Material4AnimationController` | 60fps pan/drag simulation updates RenderBox | Yes |
 | **Transform** | Matrix Transformations | `ShapeTransform` | Applied to path, paint canvas, and hit testing | Yes |
 | **Cache** | LRU Vector Path Cache | `ShapePathCache` (64 entries) | Eliminates path recalculations across frames | Yes |
 | **Cache** | LRU Safe Insets Cache | `ShapeSafeRegion._insetsCache` (128 entries) | Eliminates layout inset recalculations | Yes |
-| **Public Widgets** | 38 Factory Presets | `DynamicShapeContainer` | Wraps `DynamicShapeRenderWidget` seamlessly | Yes |
-| **Public Widgets** | Adaptive Cards | `AdaptiveShapeCard` | High-level card wrapping `DynamicShapeContainer` | Yes |
+| **Public Widgets** | 38 Factory Presets | `Material4Container` | Wraps `Material4RenderWidget` seamlessly | Yes |
+| **Public Widgets** | Adaptive Cards | `AdaptiveShapeCard` | High-level card wrapping `Material4Container` | Yes |
 | **Public Widgets** | Smart Content Container | `ShapeSmartContent` | Wraps content with automatic slot layout | Yes |
 | **Accessibility** | Touch Target Guarantee | `ShapeConstraints.validateTouchTarget()` | Enforces $\ge 48\times 48$ dp touch targets | Yes |
-| **Accessibility** | Semantics Integration | `DynamicShapeSemantics` | Maps tap callbacks and accessibility labels | Yes |
+| **Accessibility** | Semantics Integration | `Material4Semantics` | Maps tap callbacks and accessibility labels | Yes |
 | **Developer Tools** | Contour & Region Overlay | `ShapeDevTools` | Debug inspection overlays painted on Canvas | Yes |
 
 ---
@@ -234,36 +234,36 @@ Every rendering-related Flutter engine type and method across `lib/` has been id
 
 | Existing Component | Current Implementation | Target RenderBox Architecture Destination | Architectural Rationale |
 |---|---|---|---|
-| `DynamicShapeContainer` | High-level `StatelessWidget` with 38 factory constructors | Public API Facade wrapping `DynamicShapeRenderWidget` | Preserves 100% public API compatibility while delegating all work to RenderBox |
-| `DynamicShapeCustomPainter` | Legacy `CustomPainter` adapter in `dynamic_shape_container.dart` | Standalone adapter in `lib/src/dynamic_shape_container.dart` | Maintained for users needing direct `CustomPaint` interop |
-| `DynamicShapeRenderWidget` | `SingleChildRenderObjectWidget` | Core RenderObjectWidget in `lib/src/rendering/` | Bridges Flutter Element tree to `RenderDynamicShape` |
-| `RenderDynamicShape` | Single-child `RenderBox` | Central RenderBox in `lib/src/rendering/` | Single source of truth for sizing, layout, painting, clipping, and hit testing |
-| `ShapeSafeArea` | Widget using `LayoutBuilder` + `Padding` | Lightweight compatibility widget | RenderDynamicShape already handles safe insets automatically in `performLayout()` |
-| `ShapeProgressBar` | Widget using `LayoutBuilder` + `ClipPath` | `RenderShapeProgressBar` (or RenderDynamicShape child) | Replaces external `ClipPath` with direct path clipping in RenderBox |
+| `Material4Container` | High-level `StatelessWidget` with 38 factory constructors | Public API Facade wrapping `Material4RenderWidget` | Preserves 100% public API compatibility while delegating all work to RenderBox |
+| `Material4CustomPainter` | Legacy `CustomPainter` adapter in `material_4_container.dart` | Standalone adapter in `lib/src/material_4_container.dart` | Maintained for users needing direct `CustomPaint` interop |
+| `Material4RenderWidget` | `SingleChildRenderObjectWidget` | Core RenderObjectWidget in `lib/src/rendering/` | Bridges Flutter Element tree to `RenderMaterial4` |
+| `RenderMaterial4` | Single-child `RenderBox` | Central RenderBox in `lib/src/rendering/` | Single source of truth for sizing, layout, painting, clipping, and hit testing |
+| `ShapeSafeArea` | Widget using `LayoutBuilder` + `Padding` | Lightweight compatibility widget | RenderMaterial4 already handles safe insets automatically in `performLayout()` |
+| `ShapeProgressBar` | Widget using `LayoutBuilder` + `ClipPath` | `RenderShapeProgressBar` (or RenderMaterial4 child) | Replaces external `ClipPath` with direct path clipping in RenderBox |
 | `ShapeReveal` | Widget using `ClipPath` + `CustomClipper` | `RenderShapeReveal` (RenderBox) | Eliminates intermediate `ClipPath` widget overhead |
 | `ShapeBorderDrawReveal` | Widget using `CustomPaint` + `CustomPainter` | `RenderShapeBorderDraw` (RenderBox) | Renders animated border strokes directly on Canvas |
-| `AdaptiveShapeCard` | Interactive card widget | High-level component using `DynamicShapeContainer` | Zero-clipping protection powered by RenderDynamicShape |
+| `AdaptiveShapeCard` | Interactive card widget | High-level component using `Material4Container` | Zero-clipping protection powered by RenderMaterial4 |
 | `ShapeSmartContent` | Multi-slot layout widget | Multi-child layout coordinator | Positions children based on `ShapeContentPlacer` |
-| `DynamicShapePathBuilder` | Vector path calculation | Shared Geometry Engine | Reusable by RenderDynamicShape, cache, and dev tools |
-| `ShapeBorderPainter` | Border Canvas painting | Direct Canvas Border Engine | Called directly from `DynamicShapePainter` within RenderBox |
-| `ShapeBackgroundRenderer` | Background shaders & textures | Direct Canvas Background Engine | Called directly from `DynamicShapePainter` within RenderBox |
-| `DynamicShapeHitTester` | Point-in-path logic | Hit Testing Engine | Called directly from `RenderDynamicShape.hitTest` |
-| `DynamicShapeClipManager` | Canvas clipping arbitrator | Clipping Engine | Called directly from `RenderDynamicShape.paint` |
+| `Material4PathBuilder` | Vector path calculation | Shared Geometry Engine | Reusable by RenderMaterial4, cache, and dev tools |
+| `ShapeBorderPainter` | Border Canvas painting | Direct Canvas Border Engine | Called directly from `Material4Painter` within RenderBox |
+| `ShapeBackgroundRenderer` | Background shaders & textures | Direct Canvas Background Engine | Called directly from `Material4Painter` within RenderBox |
+| `Material4HitTester` | Point-in-path logic | Hit Testing Engine | Called directly from `RenderMaterial4.hitTest` |
+| `Material4ClipManager` | Canvas clipping arbitrator | Clipping Engine | Called directly from `RenderMaterial4.paint` |
 
 ---
 
 ## 6. Critical Technical Risks & Mitigation Strategies
 
 ### Risk 1: Multi-Child Layout in RenderBox
-- **Problem**: When a dynamic shape container hosts multiple children (e.g. leading icon, title, subtitle, trailing badge, docked notch accessory), a single-child `RenderObjectWithChildMixin<RenderBox>` cannot lay them out without nesting intermediate flex/stack widgets.
+- **Problem**: When a Material 4 shape container hosts multiple children (e.g. leading icon, title, subtitle, trailing badge, docked notch accessory), a single-child `RenderObjectWithChildMixin<RenderBox>` cannot lay them out without nesting intermediate flex/stack widgets.
 - **Mitigation**:
-  1. Maintain `RenderDynamicShape` as a high-performance single-child RenderBox for all primary containers (which host 95% of use cases).
-  2. Implement `RenderMultiChildDynamicShape` using `ContainerRenderObjectMixin<RenderBox, DynamicShapeParentData>` for multi-slot layouts (`ShapeSmartContent`), where each child is positioned into geometric anchor pockets resolved by `ShapeAnchorPlacer`.
+  1. Maintain `RenderMaterial4` as a high-performance single-child RenderBox for all primary containers (which host 95% of use cases).
+  2. Implement `RenderMultiChildMaterial4` using `ContainerRenderObjectMixin<RenderBox, Material4ParentData>` for multi-slot layouts (`ShapeSmartContent`), where each child is positioned into geometric anchor pockets resolved by `ShapeAnchorPlacer`.
 
 ### Risk 2: BoxConstraints Negotiation & Dry Layout
 - **Problem**: If incoming constraints are unbounded (e.g., inside an unconstrained horizontal/vertical scroll view or Row/Column), `performLayout()` or `computeDryLayout()` can throw `BoxConstraints has no maximum width/height` or size children infinitely.
 - **Mitigation**:
-  - `RenderDynamicShape.performLayout()` and `computeDryLayout()` explicitly resolve tentative dimensions:
+  - `RenderMaterial4.performLayout()` and `computeDryLayout()` explicitly resolve tentative dimensions:
     ```dart
     double tentativeWidth = explicitWidth ?? (constraints.hasBoundedWidth ? constraints.maxWidth : 300.0);
     double tentativeHeight = explicitHeight ?? (constraints.hasBoundedHeight ? constraints.maxHeight : 150.0);
@@ -273,19 +273,19 @@ Every rendering-related Flutter engine type and method across `lib/` has been id
 ### Risk 3: Intrinsic Sizing Calculations
 - **Problem**: In complex layouts (e.g., `IntrinsicHeight` rows), Flutter queries `computeMinIntrinsicWidth`, `computeMaxIntrinsicWidth`, `computeMinIntrinsicHeight`, and `computeMaxIntrinsicHeight`. Returning dummy zeroes breaks multi-column alignment.
 - **Mitigation**:
-  - Delegated to `DynamicShapeLayoutManager`, which accounts for child intrinsic sizes + geometric insets calculated by `ShapeSafeRegion`.
+  - Delegated to `Material4LayoutManager`, which accounts for child intrinsic sizes + geometric insets calculated by `ShapeSafeRegion`.
 
 ### Risk 4: Coordinate Transformations & Hit Testing
 - **Problem**: When `ShapeTransform` applies rotation, scale, or skew from a custom transformation origin (e.g., `Alignment.bottomRight`), screen touch coordinates do not align with the untransformed vector path.
 - **Mitigation**:
-  - `DynamicShapeHitTester` uses the inverted transformation matrix:
+  - `Material4HitTester` uses the inverted transformation matrix:
     ```dart
     final inverted = Matrix4.identity();
     inverted.copyInverse(transformMatrix);
     final localPoint = MatrixUtils.transformPoint(inverted, position);
     return path.contains(localPoint);
     ```
-  - For child hit testing, `RenderDynamicShape.hitTestChildren()` uses `result.addWithPaintOffset` to offset touch events by `childParentData.offset`.
+  - For child hit testing, `RenderMaterial4.hitTestChildren()` uses `result.addWithPaintOffset` to offset touch events by `childParentData.offset`.
 
 ### Risk 5: Child Clipping Performance vs. `saveLayer`
 - **Problem**: Indiscriminate use of `canvas.saveLayer()` forces the GPU to allocate offscreen textures, severely degrading FPS during animations and scrolling.
@@ -296,7 +296,7 @@ Every rendering-related Flutter engine type and method across `lib/` has been id
 ### Risk 6: Semantics & Accessibility
 - **Problem**: Custom RenderBoxes without semantics fail screen-reader accessibility audits and WCAG compliance.
 - **Mitigation**:
-  - `RenderDynamicShape.describeSemanticsConfiguration()` integrates `DynamicShapeSemantics`:
+  - `RenderMaterial4.describeSemanticsConfiguration()` integrates `Material4Semantics`:
     - Registers `onTap` accessibility action.
     - Marks widget as button when interactive.
     - Exposes minimum $48\times 48$ dp touch target dimensions.
@@ -304,7 +304,7 @@ Every rendering-related Flutter engine type and method across `lib/` has been id
 ### Risk 7: Layout vs. Paint Invalidation Separation
 - **Problem**: In Flutter, calling `markNeedsLayout()` when only visual properties change forces an unnecessary layout pass across the entire widget subtree.
 - **Mitigation**:
-  - Strict property setter separation in `RenderDynamicShape`:
+  - Strict property setter separation in `RenderMaterial4`:
     - `markNeedsPaint()` is called for `color`, `gradient`, `borderColor`, `shadows`, `clipBehavior`.
     - `markNeedsLayout()` is called only when geometry changes (`cornerRadius`, `corners`, `edges`, `notches`, `transform`, `constraints`, `borderWidth`, `padding`, `explicitWidth/Height`).
 
@@ -318,7 +318,7 @@ Every rendering-related Flutter engine type and method across `lib/` has been id
 ### Risk 9: Material Splash & `InkWell` Compatibility
 - **Problem**: `InkWell` default rectangular splash overflows non-rectangular shapes.
 - **Mitigation**:
-  - `DynamicShapeContainer` provides custom ink response clipping and taps directly inside `RenderDynamicShape.handleEvent` using a dedicated `TapGestureRecognizer`.
+  - `Material4Container` provides custom ink response clipping and taps directly inside `RenderMaterial4.handleEvent` using a dedicated `TapGestureRecognizer`.
 
 ---
 
@@ -329,55 +329,55 @@ The following public APIs are guaranteed **100% backward compatible** across the
 ### A. Primary Container & Constructors
 ```dart
 // Standard Constructor
-DynamicShapeContainer(...)
+Material4Container(...)
 
 // 38 Factory Constructors:
-DynamicShapeContainer.roundedRectangle(...)
-DynamicShapeContainer.capsule(...)
-DynamicShapeContainer.circle(...)
-DynamicShapeContainer.oval(...)
-DynamicShapeContainer.egg(...)
-DynamicShapeContainer.superellipse(...)
-DynamicShapeContainer.squircle(...)
-DynamicShapeContainer.teardrop(...)
-DynamicShapeContainer.arch(...)
-DynamicShapeContainer.leaf(...)
-DynamicShapeContainer.heart(...)
-DynamicShapeContainer.diamond(...)
-DynamicShapeContainer.star(...)
-DynamicShapeContainer.hexagon(...)
-DynamicShapeContainer.octagon(...)
-DynamicShapeContainer.cutCorner(...)
-DynamicShapeContainer.scallopedCircle(...)
-DynamicShapeContainer.badge(...)
-DynamicShapeContainer.speechBubble(...)
-DynamicShapeContainer.banner(...)
-DynamicShapeContainer.ribbon(...)
-DynamicShapeContainer.shield(...)
-DynamicShapeContainer.clover(...)
-DynamicShapeContainer.trapezoid(...)
-DynamicShapeContainer.parallelogram(...)
-DynamicShapeContainer.ticket(...)
-DynamicShapeContainer.curvedCorner(...)
-DynamicShapeContainer.steppedCorner(...)
-DynamicShapeContainer.folderTab(...)
-DynamicShapeContainer.notchedBadge(...)
-DynamicShapeContainer.sideTab(...)
-DynamicShapeContainer.waveEdge(...)
-DynamicShapeContainer.ticketScallop(...)
-DynamicShapeContainer.hexagonSoft(...)
-DynamicShapeContainer.chamferDiagonal(...)
-DynamicShapeContainer.organicBlob(...)
-DynamicShapeContainer.zigzagReceipt(...)
-DynamicShapeContainer.customBezier(...)
+Material4Container.roundedRectangle(...)
+Material4Container.capsule(...)
+Material4Container.circle(...)
+Material4Container.oval(...)
+Material4Container.egg(...)
+Material4Container.superellipse(...)
+Material4Container.squircle(...)
+Material4Container.teardrop(...)
+Material4Container.arch(...)
+Material4Container.leaf(...)
+Material4Container.heart(...)
+Material4Container.diamond(...)
+Material4Container.star(...)
+Material4Container.hexagon(...)
+Material4Container.octagon(...)
+Material4Container.cutCorner(...)
+Material4Container.scallopedCircle(...)
+Material4Container.badge(...)
+Material4Container.speechBubble(...)
+Material4Container.banner(...)
+Material4Container.ribbon(...)
+Material4Container.shield(...)
+Material4Container.clover(...)
+Material4Container.trapezoid(...)
+Material4Container.parallelogram(...)
+Material4Container.ticket(...)
+Material4Container.curvedCorner(...)
+Material4Container.steppedCorner(...)
+Material4Container.folderTab(...)
+Material4Container.notchedBadge(...)
+Material4Container.sideTab(...)
+Material4Container.waveEdge(...)
+Material4Container.ticketScallop(...)
+Material4Container.hexagonSoft(...)
+Material4Container.chamferDiagonal(...)
+Material4Container.organicBlob(...)
+Material4Container.zigzagReceipt(...)
+Material4Container.customBezier(...)
 
 // Adaptive Mode Constructors:
-DynamicShapeContainer.withMode(mode: ShapeContentMode, ...)
+Material4Container.withMode(mode: ShapeContentMode, ...)
 ```
 
 ### B. Configuration Models & Enums
-- `DynamicShapeConfig`: All properties, `copyWith`, `toJson`, `fromJson`, `operator ==`, `hashCode`.
-- `DynamicShapeType`: All 28 enum values.
+- `Material4Config`: All properties, `copyWith`, `toJson`, `fromJson`, `operator ==`, `hashCode`.
+- `Material4Type`: All 28 enum values.
 - `BorderStyleType`: `none`, `solid`, `dashed`, `dotted`, `gradient`, `neonGlow`, `dual`, `double`, `technical`.
 - `ShapeAnchor`: `topLeft`, `topCenter`, `topRight`, `bottomLeft`, `bottomCenter`, `bottomRight`, `leftCenter`, `rightCenter`, `center`.
 - `ShapeCorners`: Independent elliptical corner radii.
@@ -416,7 +416,7 @@ DynamicShapeContainer.withMode(mode: ShapeContentMode, ...)
    - *Baseline Optimization*: Protected by the 128-entry LRU cache (`_insetsCache`), reducing average frame evaluation time to $< 0.01$ ms on hit.
 2. **Dashed Border Path Splitting**:
    - `ShapeBorderPainter._paintDashedBorder` extracts dash segments using `PathMetric.extractPath`.
-   - *Baseline Optimization*: Fast-path caching inside RenderDynamicShape prevents path metric extraction unless border width or dash length changes.
+   - *Baseline Optimization*: Fast-path caching inside RenderMaterial4 prevents path metric extraction unless border width or dash length changes.
 3. **Offscreen Buffer Allocations**:
    - Zero `saveLayer()` calls ensures GPU memory allocations remain constant regardless of container count.
 
@@ -429,23 +429,23 @@ To maintain modularity and prevent duplicate responsibilities, Phase 2 will stru
 ```
 lib/src/
 ├── 1. Public Widget Layer
-│   ├── dynamic_shape_container.dart       (38 factory constructors)
+│   ├── material_4_container.dart       (38 factory constructors)
 │   ├── adaptive_shape_card.dart          (Zero-clipping card)
-│   ├── animated_dynamic_shape.dart       (Implicit animation)
+│   ├── animated_material_4.dart       (Implicit animation)
 │   ├── shape_smart_layout.dart           (ShapeSafeArea compatibility)
 │   └── shape_widgets.dart                (Button, Badge, Tag, Progress)
 │
 ├── 2. RenderObject Widget Layer
-│   ├── dynamic_shape_render_widget.dart  (SingleChildRenderObjectWidget)
+│   ├── material_4_render_widget.dart  (SingleChildRenderObjectWidget)
 │   └── shape_smart_content_widget.dart   (MultiChildRenderObjectWidget)
 │
 ├── 3. RenderBox Layer
-│   ├── dynamic_shape_render_object.dart  (RenderDynamicShape)
-│   ├── dynamic_shape_parent_data.dart    (DynamicShapeParentData)
-│   └── dynamic_shape_layout_manager.dart (Intrinsics & sizing)
+│   ├── material_4_render_object.dart  (RenderMaterial4)
+│   ├── material_4_parent_data.dart    (Material4ParentData)
+│   └── material_4_layout_manager.dart (Intrinsics & sizing)
 │
 ├── 4. Geometry Engine
-│   ├── dynamic_shape_path_builder.dart   (28 presets, beziers, edges)
+│   ├── material_4_path_builder.dart   (28 presets, beziers, edges)
 │   └── school_shape_presets.dart         (10 domain presets)
 │
 ├── 5. Shape-Aware Layout Engine
@@ -456,12 +456,12 @@ lib/src/
 │   └── shape_collision_detector.dart      (Collision validation)
 │
 ├── 6. Direct Canvas Rendering
-│   ├── dynamic_shape_painter.dart        (Drawing orchestrator)
+│   ├── material_4_painter.dart        (Drawing orchestrator)
 │   └── shape_border_painter.dart         (8 border styles)
 │
 ├── 7. Hit Testing & Semantics
-│   ├── dynamic_shape_hit_test.dart       (Contour point-in-path)
-│   └── dynamic_shape_semantics.dart      (Accessibility nodes)
+│   ├── material_4_hit_test.dart       (Contour point-in-path)
+│   └── material_4_semantics.dart      (Accessibility nodes)
 │
 ├── 8. Animation Engine
 │   ├── shape_animation_controller.dart   (Physics spring simulation)
@@ -480,15 +480,15 @@ lib/src/
 ## 10. Recommended Migration Order & Testing Strategy
 
 ### Step 1: RenderBox Core Hardening
-- Complete `RenderDynamicShape` layout, dry layout, and intrinsics.
-- Verify with `dynamic_shape_render_box_test.dart` and `render_box_compatibility_test.dart`.
+- Complete `RenderMaterial4` layout, dry layout, and intrinsics.
+- Verify with `material_4_render_box_test.dart` and `render_box_compatibility_test.dart`.
 
 ### Step 2: Widget Layer Binding
-- Connect `DynamicShapeContainer` directly to `DynamicShapeRenderWidget`.
+- Connect `Material4Container` directly to `Material4RenderWidget`.
 - Ensure all 38 factory constructors seamlessly pass properties without creating intermediate wrapper widgets.
 
 ### Step 3: Multi-Child Slot Layout Integration
-- Implement `RenderMultiChildDynamicShape` for `ShapeSmartContent`, laying out leading, center, trailing, and badge slots using `ShapeContentPlacer`.
+- Implement `RenderMultiChildMaterial4` for `ShapeSmartContent`, laying out leading, center, trailing, and badge slots using `ShapeContentPlacer`.
 
 ### Step 4: Full Test Suite & Benchmark Verification
 - Run full 145-test suite across root and example.
@@ -501,7 +501,7 @@ lib/src/
 1. **Self-Intersecting Custom Bézier Paths**:
    - Highly irregular custom Bézier curves with intentional self-intersections cannot have a purely convex interior. The engine applies `_probeAndContract` safety checks and falls back to bounding-box safe margins when intersections are detected.
 2. **Glassmorphism Backdrop Blurs**:
-   - `BackdropFilter` requires an underlying composited layer. `RenderDynamicShape` paints a translucent frosted tint natively and uses clip path isolation to prevent blur leakage outside the shape contour.
+   - `BackdropFilter` requires an underlying composited layer. `RenderMaterial4` paints a translucent frosted tint natively and uses clip path isolation to prevent blur leakage outside the shape contour.
 3. **Text Scaling Extreme Bounds**:
    - For extreme system accessibility font scale factors ($> 2.5\times$), text will scale up to available slot space and ellipsis gracefully to protect container integrity, respecting the `accessibleMinFontSize = 11.0` dp accessibility floor.
 

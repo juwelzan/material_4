@@ -26,7 +26,7 @@ enum ShapeEdgeStyle {
 /// Identifies one of the four bounding edges of a rectangular container.
 enum ShapeEdge { top, right, bottom, left }
 
-/// Immutable configuration for a single contour edge of a dynamic shape.
+/// Immutable configuration for a single contour edge of a Material 4 shape.
 @immutable
 class ShapeEdgeConfig {
   /// The geometric profile style for this edge.

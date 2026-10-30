@@ -3,7 +3,7 @@ import 'package:flutter/rendering.dart';
 
 import 'shape_content_protection.dart';
 
-/// Derives and enforces safe layout constraints for child content within dynamic shapes.
+/// Derives and enforces safe layout constraints for child content within Material 4 shapes.
 class ShapeContentConstraints {
   const ShapeContentConstraints._();
 

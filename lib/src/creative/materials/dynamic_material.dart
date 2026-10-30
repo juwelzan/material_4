@@ -1,8 +1,8 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
-import '../../dynamic_shape_config.dart';
-import '../../rendering/dynamic_shape_interaction.dart';
+import '../../material_4_config.dart';
+import '../../rendering/material_4_interaction.dart';
 import '../borders/creative_border_config.dart';
 import '../paper/paper_background_config.dart';
 
@@ -271,16 +271,16 @@ class DynamicMaterialConfig {
     );
   }
 
-  /// Converts this [DynamicMaterialConfig] into an equivalent [DynamicShapeConfig]
-  /// that plugs seamlessly into [RenderDynamicShape].
-  DynamicShapeConfig toShapeConfig({
-    DynamicShapeType shapeType = DynamicShapeType.smoothRounded,
+  /// Converts this [DynamicMaterialConfig] into an equivalent [Material4Config]
+  /// that plugs seamlessly into [RenderMaterial4].
+  Material4Config toShapeConfig({
+    Material4Type shapeType = Material4Type.smoothRounded,
     double cornerRadius = 16.0,
     ShapeCorners? corners,
     ShapeEdges? edges,
     ShapeTransform? transform,
     ShapeConstraints? constraints,
-    DynamicShapeInteraction? interaction,
+    Material4Interaction? interaction,
     ShapeClipConfig? clipConfig,
     CreativePatternConfig? creativePattern,
   }) {
@@ -376,7 +376,7 @@ class DynamicMaterialConfig {
         break;
     }
 
-    return DynamicShapeConfig(
+    return Material4Config(
       type: shapeType,
       cornerRadius: cornerRadius,
       corners: corners,

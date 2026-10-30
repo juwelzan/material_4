@@ -1,10 +1,10 @@
 import 'package:flutter/rendering.dart';
 
-/// Accessibility and semantics coordinator for [RenderDynamicShape] and [RenderMultiChildDynamicShape].
-class DynamicShapeSemantics {
-  const DynamicShapeSemantics._();
+/// Accessibility and semantics coordinator for [RenderMaterial4] and [RenderMultiChildMaterial4].
+class Material4Semantics {
+  const Material4Semantics._();
 
-  /// Configures semantics on [config] for an interactive or labeled dynamic shape.
+  /// Configures semantics on [config] for an interactive or labeled Material 4 shape.
   static void applySemantics({
     required SemanticsConfiguration config,
     VoidCallback? onTap,

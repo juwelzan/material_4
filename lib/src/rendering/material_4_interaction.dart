@@ -1,11 +1,11 @@
 import 'package:flutter/foundation.dart';
 
-import 'dynamic_shape_hit_test.dart';
+import 'material_4_hit_test.dart';
 
 /// Immutable configuration governing shape-aware interaction, hit-testing,
 /// and pointer event routing.
 @immutable
-class DynamicShapeInteraction {
+class Material4Interaction {
   /// Defines how pointer hits are evaluated against the container and shape geometry.
   final ShapeHitTestBehavior hitTestBehavior;
 
@@ -30,7 +30,7 @@ class DynamicShapeInteraction {
   /// Defaults to `false` (transparent corner clicks pass through).
   final bool enableTransparentRegionInteraction;
 
-  const DynamicShapeInteraction({
+  const Material4Interaction({
     this.hitTestBehavior = ShapeHitTestBehavior.shape,
     this.enableShapeHitTesting = true,
     this.enableChildHitTesting = true,
@@ -40,43 +40,43 @@ class DynamicShapeInteraction {
 
   /// Standard default interaction:
   /// Evaluates the exact vector shape contour and passes clicks through notches and transparent corners.
-  static const DynamicShapeInteraction standard = DynamicShapeInteraction();
+  static const Material4Interaction standard = Material4Interaction();
 
-  /// Interaction matching the exact vector contour of the dynamic shape.
-  static const DynamicShapeInteraction contour = DynamicShapeInteraction(
+  /// Interaction matching the exact vector contour of the Material 4 shape.
+  static const Material4Interaction contour = Material4Interaction(
     hitTestBehavior: ShapeHitTestBehavior.shape,
   );
 
   /// Interaction evaluating the entire rectangular bounding box.
-  static const DynamicShapeInteraction rectangular = DynamicShapeInteraction(
+  static const Material4Interaction rectangular = Material4Interaction(
     hitTestBehavior: ShapeHitTestBehavior.rectangular,
   );
 
   /// Entire rectangular bounds receive interaction and consume pointer events,
   /// blocking touches from reaching underlying widgets.
-  static const DynamicShapeInteraction opaque = DynamicShapeInteraction(
+  static const Material4Interaction opaque = Material4Interaction(
     hitTestBehavior: ShapeHitTestBehavior.opaque,
   );
 
   /// Participates in hit testing while allowing underlying eligible targets to receive events.
-  static const DynamicShapeInteraction translucent = DynamicShapeInteraction(
+  static const Material4Interaction translucent = Material4Interaction(
     hitTestBehavior: ShapeHitTestBehavior.translucent,
   );
 
   /// The shape itself does not claim empty regions; only eligible child widgets receive interaction.
-  static const DynamicShapeInteraction deferToChild = DynamicShapeInteraction(
+  static const Material4Interaction deferToChild = Material4Interaction(
     hitTestBehavior: ShapeHitTestBehavior.deferToChild,
   );
 
-  /// Creates a copy of this [DynamicShapeInteraction] with the given fields replaced.
-  DynamicShapeInteraction copyWith({
+  /// Creates a copy of this [Material4Interaction] with the given fields replaced.
+  Material4Interaction copyWith({
     ShapeHitTestBehavior? hitTestBehavior,
     bool? enableShapeHitTesting,
     bool? enableChildHitTesting,
     bool? enableNotchInteraction,
     bool? enableTransparentRegionInteraction,
   }) {
-    return DynamicShapeInteraction(
+    return Material4Interaction(
       hitTestBehavior: hitTestBehavior ?? this.hitTestBehavior,
       enableShapeHitTesting:
           enableShapeHitTesting ?? this.enableShapeHitTesting,
@@ -92,7 +92,7 @@ class DynamicShapeInteraction {
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-    return other is DynamicShapeInteraction &&
+    return other is Material4Interaction &&
         other.hitTestBehavior == hitTestBehavior &&
         other.enableShapeHitTesting == enableShapeHitTesting &&
         other.enableChildHitTesting == enableChildHitTesting &&
@@ -111,7 +111,7 @@ class DynamicShapeInteraction {
       );
 
   @override
-  String toString() => 'DynamicShapeInteraction('
+  String toString() => 'Material4Interaction('
       'hitTestBehavior: $hitTestBehavior, '
       'enableShapeHitTesting: $enableShapeHitTesting, '
       'enableChildHitTesting: $enableChildHitTesting, '

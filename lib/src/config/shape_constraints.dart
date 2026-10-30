@@ -51,7 +51,7 @@ class ShapeConstraintReport {
   bool get hasViolations => violations.isNotEmpty;
 }
 
-/// Immutable geometric and accessibility boundary constraints for dynamic shapes.
+/// Immutable geometric and accessibility boundary constraints for Material 4 shapes.
 ///
 /// Separates layout constraints from visual painting constraints. Touch-target
 /// enforcement (WCAG 48×48 dp) is surfaced as a non-destructive diagnostic report

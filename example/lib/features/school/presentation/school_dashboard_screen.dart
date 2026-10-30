@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:dynamic_shape/dynamic_shape.dart';
+import 'package:material_4/material_4.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -210,7 +210,7 @@ class _SchoolDashboardScreenState extends State<SchoolDashboardScreen> {
           ),
         ),
         const SizedBox(width: 4),
-        DynamicShapeContainer.scallopedPetal(
+        Material4Container.scallopedPetal(
           width: 44,
           height: 44,
           petalCount: 10,
@@ -239,7 +239,7 @@ class _SchoolDashboardScreenState extends State<SchoolDashboardScreen> {
 
   /// 2. "UP NEXT" Hero Card
   Widget _buildUpNextHeroCard() {
-    return DynamicShapeContainer.notchedBadge(
+    return Material4Container.notchedBadge(
       anchor: ShapeAnchor.bottomRight,
       notchWidth: 110,
       notchHeight: 34,
@@ -388,7 +388,7 @@ class _SchoolDashboardScreenState extends State<SchoolDashboardScreen> {
               child: AdaptiveShapeCard(
                 title: 'Take\nAttendance',
                 icon: Icons.assignment_turned_in_outlined,
-                shapeType: DynamicShapeType.steppedCorner,
+                shapeType: Material4Type.steppedCorner,
                 color: const Color(0xFFFFDFD3),
                 borderColor: const Color(0x28E0A994),
                 textColor: const Color(0xFF221F1F),
@@ -402,7 +402,7 @@ class _SchoolDashboardScreenState extends State<SchoolDashboardScreen> {
               child: AdaptiveShapeCard(
                 title: 'Marks\nEntry',
                 icon: Icons.fact_check_outlined,
-                shapeType: DynamicShapeType.folderTab,
+                shapeType: Material4Type.folderTab,
                 color: const Color(0xFFD6F5E3),
                 borderColor: const Color(0x2897CFAD),
                 textColor: const Color(0xFF1A261E),
@@ -420,7 +420,7 @@ class _SchoolDashboardScreenState extends State<SchoolDashboardScreen> {
               child: AdaptiveShapeCard(
                 title: 'Daily\nRegister',
                 icon: Icons.edit_note_rounded,
-                shapeType: DynamicShapeType.steppedCorner,
+                shapeType: Material4Type.steppedCorner,
                 color: const Color(0xFFD3E9FD),
                 borderColor: const Color(0x289DC0DF),
                 textColor: const Color(0xFF15222E),
@@ -434,7 +434,7 @@ class _SchoolDashboardScreenState extends State<SchoolDashboardScreen> {
               child: AdaptiveShapeCard(
                 title: 'Notice\nBoard',
                 icon: Icons.campaign_outlined,
-                shapeType: DynamicShapeType.sideTab,
+                shapeType: Material4Type.sideTab,
                 color: const Color(0xFFEADBFF),
                 borderColor: const Color(0x28BFA9DD),
                 textColor: const Color(0xFF221631),
@@ -451,7 +451,7 @@ class _SchoolDashboardScreenState extends State<SchoolDashboardScreen> {
 
   /// 4. "Today's Timetable" Section Card
   Widget _buildTodaysTimetableCard() {
-    return DynamicShapeContainer.notchedBadge(
+    return Material4Container.notchedBadge(
       anchor: ShapeAnchor.topRight,
       notchWidth: 92,
       notchHeight: 28,
@@ -546,7 +546,7 @@ class _SchoolDashboardScreenState extends State<SchoolDashboardScreen> {
 
   /// 5. "Pending Marks" Section Card with Dashed Border
   Widget _buildPendingMarksCard() {
-    return DynamicShapeContainer.ticket(
+    return Material4Container.ticket(
       color: const Color(0xFFFAF9F6),
       borderColor: const Color(0x442A2A2A),
       borderWidth: 1.2,
@@ -636,32 +636,32 @@ class _SchoolDashboardScreenState extends State<SchoolDashboardScreen> {
     );
   }
 
-  /// 7. Live Interactive Shape Morphing Showcase Card (AnimatedDynamicShapeContainer)
+  /// 7. Live Interactive Shape Morphing Showcase Card (AnimatedMaterial4Container)
   Widget _buildLiveMorphingShowcaseCard() {
     // Defines 4 state configs to morph smoothly between
     final configs = [
-      const DynamicShapeConfig(
-        type: DynamicShapeType.folderTab,
+      const Material4Config(
+        type: Material4Type.folderTab,
         cornerRadius: 24,
         tabWidth: 70,
         tabHeight: 18,
         borderStyle: BorderStyleType.solid,
       ),
-      const DynamicShapeConfig(
-        type: DynamicShapeType.notchedBadge,
+      const Material4Config(
+        type: Material4Type.notchedBadge,
         cornerRadius: 28,
         tabWidth: 88,
         tabHeight: 28,
         borderStyle: BorderStyleType.solid,
       ),
-      const DynamicShapeConfig(
-        type: DynamicShapeType.ticketScallop,
+      const Material4Config(
+        type: Material4Type.ticketScallop,
         cornerRadius: 20,
         scallopRadius: 14,
         borderStyle: BorderStyleType.dashed,
       ),
-      const DynamicShapeConfig(
-        type: DynamicShapeType.hexagonSoft,
+      const Material4Config(
+        type: Material4Type.hexagonSoft,
         cornerRadius: 18,
         borderStyle: BorderStyleType.solid,
       ),
@@ -681,7 +681,7 @@ class _SchoolDashboardScreenState extends State<SchoolDashboardScreen> {
       'Soft Hexagon (State 4)',
     ];
 
-    return AnimatedDynamicShapeContainer(
+    return AnimatedMaterial4Container(
       duration: const Duration(milliseconds: 400),
       curve: Curves.easeOutCubic,
       config: configs[_morphStep],
@@ -770,7 +770,7 @@ class _SchoolDashboardScreenState extends State<SchoolDashboardScreen> {
 
   /// 7. Cathedral Arch Spotlight Card with Layered Double Border Frame
   Widget _buildAcademicSpotlightArchCard() {
-    return DynamicShapeContainer.arch(
+    return Material4Container.arch(
       height: 125,
       color: const Color(0xFFFFF9EE),
       borderColor: const Color(0xFFD4A745),
@@ -856,7 +856,7 @@ class _SchoolDashboardScreenState extends State<SchoolDashboardScreen> {
 
   /// 8. Sawtooth / Zigzag Cut Receipt Card with Technical Grid Pattern
   Widget _buildExamPassReceiptCard() {
-    return DynamicShapeContainer.zigzagReceipt(
+    return Material4Container.zigzagReceipt(
       color: const Color(0xFFFFFFFF),
       borderColor: const Color(0x3835495E),
       borderWidth: 1.2,
@@ -917,15 +917,15 @@ class _SchoolDashboardScreenState extends State<SchoolDashboardScreen> {
 
   /// 9. Frosted Glassmorphic Library Pass with Guilloche Waves Texture
   Widget _buildFrostedLibraryCard() {
-    return DynamicShapeContainer.patterned(
+    return Material4Container.patterned(
       pattern: ShapePattern.guillocheWaves,
       patternSpacing: 14,
       patternColor: const Color(0x122D68C4),
       color: const Color(0xFFEBF3FD),
       borderColor: const Color(0x40316BC2),
       borderWidth: 1.2,
-      config: const DynamicShapeConfig(
-        type: DynamicShapeType.folderTab,
+      config: const Material4Config(
+        type: Material4Type.folderTab,
         cornerRadius: 22,
         tabWidth: 65,
         tabHeight: 14,
@@ -1023,7 +1023,7 @@ class _SchoolDashboardScreenState extends State<SchoolDashboardScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Dynamic Shape & Texture Studio',
+                        'Material 4 & Texture Studio',
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
                         style: GoogleFonts.plusJakartaSans(
@@ -1172,7 +1172,7 @@ class _ShapePlaygroundModal extends StatefulWidget {
 }
 
 class _ShapePlaygroundModalState extends State<_ShapePlaygroundModal> {
-  DynamicShapeType _selectedType = DynamicShapeType.folderTab;
+  Material4Type _selectedType = Material4Type.folderTab;
   BorderStyleType _selectedBorder = BorderStyleType.solid;
   ShapePattern _selectedPattern = ShapePattern.none;
   ShapeAnchor _selectedAnchor = ShapeAnchor.topRight;
@@ -1188,7 +1188,7 @@ class _ShapePlaygroundModalState extends State<_ShapePlaygroundModal> {
 
   @override
   Widget build(BuildContext context) {
-    final config = DynamicShapeConfig(
+    final config = Material4Config(
       type: _selectedType,
       borderStyle: _selectedBorder,
       anchor: _selectedAnchor,
@@ -1243,7 +1243,7 @@ class _ShapePlaygroundModalState extends State<_ShapePlaygroundModal> {
           ),
           const SizedBox(height: 14),
           Text(
-            'Dynamic Shape & Texture Studio',
+            'Material 4 & Texture Studio',
             style: GoogleFonts.plusJakartaSans(
               fontSize: 18,
               fontWeight: FontWeight.w800,
@@ -1262,7 +1262,7 @@ class _ShapePlaygroundModalState extends State<_ShapePlaygroundModal> {
 
           // LIVE INTERACTIVE PREVIEW CONTAINER
           Center(
-            child: DynamicShapeContainer(
+            child: Material4Container(
               width: double.infinity,
               height: 130,
               config: config,
@@ -1410,7 +1410,7 @@ class _ShapePlaygroundModalState extends State<_ShapePlaygroundModal> {
                 ),
                 const SizedBox(height: 14),
 
-                // 4. Dynamic Shape Presets
+                // 4. Material 4 Presets
                 Text(
                   'Select Shape Type (28 Presets):',
                   style: GoogleFonts.plusJakartaSans(
@@ -1422,7 +1422,7 @@ class _ShapePlaygroundModalState extends State<_ShapePlaygroundModal> {
                 Wrap(
                   spacing: 6,
                   runSpacing: 6,
-                  children: DynamicShapeType.values.map((type) {
+                  children: Material4Type.values.map((type) {
                     final isSelected = _selectedType == type;
                     return ChoiceChip(
                       label: Text(type.name),
@@ -1438,119 +1438,119 @@ class _ShapePlaygroundModalState extends State<_ShapePlaygroundModal> {
                           setState(() {
                             _selectedType = type;
                             switch (type) {
-                              case DynamicShapeType.folderTab:
+                              case Material4Type.folderTab:
                                 _cardColor = const Color(0xFFD6F5E3);
                                 _borderColor = const Color(0xFF285E3B);
                                 break;
-                              case DynamicShapeType.notchedBadge:
+                              case Material4Type.notchedBadge:
                                 _cardColor = const Color(0xFFF9F7F2);
                                 _borderColor = const Color(0xFF2A2A2A);
                                 break;
-                              case DynamicShapeType.sideTab:
+                              case Material4Type.sideTab:
                                 _cardColor = const Color(0xFFEADBFF);
                                 _borderColor = const Color(0xFF563583);
                                 break;
-                              case DynamicShapeType.steppedCorner:
+                              case Material4Type.steppedCorner:
                                 _cardColor = const Color(0xFFFFDFD3);
                                 _borderColor = const Color(0xFF8B4D36);
                                 break;
-                              case DynamicShapeType.ticketScallop:
+                              case Material4Type.ticketScallop:
                                 _cardColor = const Color(0xFFFAF9F6);
                                 _borderColor = const Color(0xFF333333);
                                 break;
-                              case DynamicShapeType.postageStamp:
+                              case Material4Type.postageStamp:
                                 _cardColor = const Color(0xFFFFF0F5);
                                 _borderColor = const Color(0xFF9C27B0);
                                 break;
-                              case DynamicShapeType.zigzagCut:
+                              case Material4Type.zigzagCut:
                                 _cardColor = const Color(0xFFF0F7FF);
                                 _borderColor = const Color(0xFF1976D2);
                                 break;
-                              case DynamicShapeType.arch:
+                              case Material4Type.arch:
                                 _cardColor = const Color(0xFFFFF9EE);
                                 _borderColor = const Color(0xFFB58416);
                                 break;
-                              case DynamicShapeType.hexagonSoft:
+                              case Material4Type.hexagonSoft:
                                 _cardColor = const Color(0xFFE0F7FA);
                                 _borderColor = const Color(0xFF00838F);
                                 break;
-                              case DynamicShapeType.chamferDiagonal:
+                              case Material4Type.chamferDiagonal:
                                 _cardColor = const Color(0xFFFBE9E7);
                                 _borderColor = const Color(0xFFD84315);
                                 break;
-                              case DynamicShapeType.organicBlob:
+                              case Material4Type.organicBlob:
                                 _cardColor = const Color(0xFFF3E5F5);
                                 _borderColor = const Color(0xFF6A1B9A);
                                 break;
-                              case DynamicShapeType.scallopedPetal:
+                              case Material4Type.scallopedPetal:
                                 _cardColor = const Color(0xFFFFE0EC);
                                 _borderColor = const Color(0xFFAD1457);
                                 break;
-                              case DynamicShapeType.smoothRounded:
+                              case Material4Type.smoothRounded:
                                 _cardColor = const Color(0xFFD3E9FD);
                                 _borderColor = const Color(0xFF1565C0);
                                 break;
-                              case DynamicShapeType.asymmetricCard:
+                              case Material4Type.asymmetricCard:
                                 _cardColor = const Color(0xFFE8F5E9);
                                 _borderColor = const Color(0xFF388E3C);
                                 break;
-                              case DynamicShapeType.capsule:
+                              case Material4Type.capsule:
                                 _cardColor = const Color(0xFFEDE7F6);
                                 _borderColor = const Color(0xFF512DA8);
                                 break;
-                              case DynamicShapeType.waveEdge:
+                              case Material4Type.waveEdge:
                                 _cardColor = const Color(0xFFE1F5FE);
                                 _borderColor = const Color(0xFF0288D1);
                                 break;
-                              case DynamicShapeType.cloud:
+                              case Material4Type.cloud:
                                 _cardColor = const Color(0xFFF1F8E9);
                                 _borderColor = const Color(0xFF689F38);
                                 break;
-                              case DynamicShapeType.speechBubble:
+                              case Material4Type.speechBubble:
                                 _cardColor = const Color(0xFFFFF8E1);
                                 _borderColor = const Color(0xFFFFA000);
                                 break;
-                              case DynamicShapeType.shield:
+                              case Material4Type.shield:
                                 _cardColor = const Color(0xFFFCE4EC);
                                 _borderColor = const Color(0xFFC2185B);
                                 break;
-                              case DynamicShapeType.diamond:
+                              case Material4Type.diamond:
                                 _cardColor = const Color(0xFFE0F2F1);
                                 _borderColor = const Color(0xFF00796B);
                                 break;
-                              case DynamicShapeType.octagon:
+                              case Material4Type.octagon:
                                 _cardColor = const Color(0xFFEFEBE9);
                                 _borderColor = const Color(0xFF5D4037);
                                 break;
-                              case DynamicShapeType.waveCut:
+                              case Material4Type.waveCut:
                                 _cardColor = const Color(0xFFE8EAF6);
                                 _borderColor = const Color(0xFF3949AB);
                                 break;
-                              case DynamicShapeType.concaveRounded:
+                              case Material4Type.concaveRounded:
                                 _cardColor = const Color(0xFFFFF3E0);
                                 _borderColor = const Color(0xFFF57C00);
                                 break;
-                              case DynamicShapeType.convexRounded:
+                              case Material4Type.convexRounded:
                                 _cardColor = const Color(0xFFF9FBE7);
                                 _borderColor = const Color(0xFFAFB42B);
                                 break;
-                              case DynamicShapeType.squircle:
+                              case Material4Type.squircle:
                                 _cardColor = const Color(0xFFEDE7F6);
                                 _borderColor = const Color(0xFF673AB7);
                                 break;
-                              case DynamicShapeType.parallelogram:
+                              case Material4Type.parallelogram:
                                 _cardColor = const Color(0xFFE0F7FA);
                                 _borderColor = const Color(0xFF0097A7);
                                 break;
-                              case DynamicShapeType.ribbon:
+                              case Material4Type.ribbon:
                                 _cardColor = const Color(0xFFFFEBEE);
                                 _borderColor = const Color(0xFFD32F2F);
                                 break;
-                              case DynamicShapeType.bookmark:
+                              case Material4Type.bookmark:
                                 _cardColor = const Color(0xFFE8F5E9);
                                 _borderColor = const Color(0xFF2E7D32);
                                 break;
-                              case DynamicShapeType.customBezier:
+                              case Material4Type.customBezier:
                                 _cardColor = const Color(0xFFF3E5F5);
                                 _borderColor = const Color(0xFF7B1FA2);
                                 break;

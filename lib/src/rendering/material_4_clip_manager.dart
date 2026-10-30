@@ -1,17 +1,17 @@
 import 'package:flutter/rendering.dart';
 
-import '../dynamic_shape_config.dart';
 import '../layout/shape_content_protection.dart';
+import '../material_4_config.dart';
 
 /// Coordinates granular, independent clipping operations between background,
 /// child content, shadows, borders, and visual overflow.
-class DynamicShapeClipManager {
-  const DynamicShapeClipManager._();
+class Material4ClipManager {
+  const Material4ClipManager._();
 
   /// Determines whether child rendering requires path clipping.
   static bool shouldClipChild({
     required ShapeContentProtection protection,
-    required DynamicShapeConfig config,
+    required Material4Config config,
     required Clip clipBehavior,
     ShapeClipConfig? clipConfig,
   }) {
@@ -31,7 +31,7 @@ class DynamicShapeClipManager {
 
   /// Determines whether the shape background should be clipped to the shape path.
   static bool shouldClipBackground({
-    required DynamicShapeConfig config,
+    required Material4Config config,
     ShapeClipConfig? clipConfig,
   }) {
     final resolvedClip = clipConfig ?? config.clipConfig;
@@ -40,7 +40,7 @@ class DynamicShapeClipManager {
 
   /// Determines whether shape borders should be clipped to the shape path.
   static bool shouldClipBorder({
-    required DynamicShapeConfig config,
+    required Material4Config config,
     ShapeClipConfig? clipConfig,
   }) {
     final resolvedClip = clipConfig ?? config.clipConfig;
@@ -49,7 +49,7 @@ class DynamicShapeClipManager {
 
   /// Determines whether drop shadows should be clipped to the shape path.
   static bool shouldClipShadows({
-    required DynamicShapeConfig config,
+    required Material4Config config,
     ShapeClipConfig? clipConfig,
   }) {
     final resolvedClip = clipConfig ?? config.clipConfig;
@@ -58,7 +58,7 @@ class DynamicShapeClipManager {
 
   /// Determines whether foreground effects (like shimmer sweeps) should be clipped.
   static bool shouldClipForeground({
-    required DynamicShapeConfig config,
+    required Material4Config config,
     ShapeClipConfig? clipConfig,
   }) {
     final resolvedClip = clipConfig ?? config.clipConfig;
@@ -67,7 +67,7 @@ class DynamicShapeClipManager {
 
   /// Determines whether visual overflow outside container rectangular bounds should be clipped.
   static bool shouldClipOverflow({
-    required DynamicShapeConfig config,
+    required Material4Config config,
     ShapeClipConfig? clipConfig,
   }) {
     final resolvedClip = clipConfig ?? config.clipConfig;

@@ -3,7 +3,7 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 
-import 'dynamic_shape_config.dart';
+import 'material_4_config.dart';
 
 /// Next-Generation high-performance background effect renderer.
 ///
@@ -18,7 +18,7 @@ class ShapeBackgroundRenderer {
     required Canvas canvas,
     required Size size,
     required Path clipPath,
-    required DynamicShapeConfig config,
+    required Material4Config config,
     Color? baseColor,
     Gradient? baseGradient,
   }) {
@@ -97,7 +97,7 @@ class ShapeBackgroundRenderer {
   static void _drawMeshGradient(
     Canvas canvas,
     Size size,
-    DynamicShapeConfig config,
+    Material4Config config,
   ) {
     final colors = config.meshColors ??
         const [
@@ -224,7 +224,7 @@ class ShapeBackgroundRenderer {
   static void _drawAnimatedWaves(
     Canvas canvas,
     Size size,
-    DynamicShapeConfig config,
+    Material4Config config,
   ) {
     final w = size.width;
     final h = size.height;
@@ -277,7 +277,7 @@ class ShapeBackgroundRenderer {
   static void _drawParticles(
     Canvas canvas,
     Size size,
-    DynamicShapeConfig config,
+    Material4Config config,
   ) {
     final count = config.particleCount.clamp(4, 40);
     final progress = config.backgroundProgress;
@@ -362,7 +362,7 @@ class ShapeBackgroundRenderer {
   static void _drawFrostedGlass(
     Canvas canvas,
     Size size,
-    DynamicShapeConfig config,
+    Material4Config config,
   ) {
     final tint = config.glassTint ?? Colors.white.withValues(alpha: 0.18);
     final glassPaint = Paint()..color = tint;

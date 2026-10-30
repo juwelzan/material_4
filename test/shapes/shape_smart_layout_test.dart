@@ -1,4 +1,4 @@
-import 'package:dynamic_shape/dynamic_shape.dart';
+import 'package:material_4/material_4.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -10,8 +10,8 @@ void main() {
       const containerSize = Size(300, 150);
 
       // FolderTab with 24dp tabHeight
-      final folderConfig = DynamicShapeConfig(
-        type: DynamicShapeType.folderTab,
+      final folderConfig = Material4Config(
+        type: Material4Type.folderTab,
         tabHeight: 24.0,
       );
       final folderPadding = ShapeSmartLayout.computeSafePadding(
@@ -21,8 +21,8 @@ void main() {
       expect(folderPadding.top, greaterThanOrEqualTo(32.0));
 
       // ZigzagCut with 14dp toothHeight
-      final zigzagConfig = DynamicShapeConfig(
-        type: DynamicShapeType.zigzagCut,
+      final zigzagConfig = Material4Config(
+        type: Material4Type.zigzagCut,
         toothHeight: 14.0,
       );
       final zigzagPadding = ShapeSmartLayout.computeSafePadding(
@@ -32,8 +32,8 @@ void main() {
       expect(zigzagPadding.bottom, greaterThanOrEqualTo(26.0));
 
       // SpeechBubble with 18dp tailHeight
-      final bubbleConfig = DynamicShapeConfig(
-        type: DynamicShapeType.speechBubble,
+      final bubbleConfig = Material4Config(
+        type: Material4Type.speechBubble,
         anchor: ShapeAnchor.bottomRight,
         speechBubbleTailHeight: 18.0,
       );
@@ -44,8 +44,8 @@ void main() {
       expect(bubblePadding.bottom, greaterThanOrEqualTo(28.0));
 
       // Ribbon with 22dp fold depth
-      final ribbonConfig = DynamicShapeConfig(
-        type: DynamicShapeType.ribbon,
+      final ribbonConfig = Material4Config(
+        type: Material4Type.ribbon,
         ribbonFoldDepth: 22.0,
       );
       final ribbonPadding = ShapeSmartLayout.computeSafePadding(
@@ -61,8 +61,8 @@ void main() {
       () {
         const containerSize = Size(250, 120);
 
-        final sideTabConfig = DynamicShapeConfig(
-          type: DynamicShapeType.sideTab,
+        final sideTabConfig = Material4Config(
+          type: Material4Type.sideTab,
           anchor: ShapeAnchor.rightCenter,
           protrusionDepth: 20.0,
         );
@@ -87,7 +87,7 @@ void main() {
 
     test('Inscribed rect calculates collision-free inner bounds', () {
       const size = Size(200, 100);
-      const config = DynamicShapeConfig(type: DynamicShapeType.shield);
+      const config = Material4Config(type: Material4Type.shield);
 
       final rect = ShapeSmartLayout.computeInscribedRect(size, config);
       expect(rect.width, greaterThan(0.0));
@@ -120,8 +120,8 @@ void main() {
               width: 200,
               height: 100,
               child: ShapeSafeArea(
-                config: const DynamicShapeConfig(
-                  type: DynamicShapeType.folderTab,
+                config: const Material4Config(
+                  type: Material4Type.folderTab,
                   tabHeight: 20.0,
                 ),
                 child: const Text('Guaranteed Safe Text'),

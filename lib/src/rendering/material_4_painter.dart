@@ -4,12 +4,12 @@ import '../creative/borders/creative_border_painter.dart';
 import '../creative/paper/paper_texture_renderer.dart';
 import '../creative/paper/repeating_patterns.dart';
 import '../creative/paper/stationery_patterns.dart';
-import '../dynamic_shape_config.dart';
+import '../material_4_config.dart';
 import '../shape_background_renderer.dart';
 import '../shape_border_painter.dart';
 import '../shape_pattern.dart';
 
-/// Canvas drawing coordinator for [RenderDynamicShape].
+/// Canvas drawing coordinator for [RenderMaterial4].
 ///
 /// Encapsulates modular direct rendering routines for the complete 8-step painting pipeline:
 /// - Stage 2: Outer shadows (Neo-3D hard block, soft drop shadows, ambient glow halo)
@@ -18,8 +18,8 @@ import '../shape_pattern.dart';
 /// - Stage 5: Tactile inset inner shadows (claymorphic / sculpted depth)
 /// - Stage 6: Composite border profiles (all 20 border styles, stroke alignments, and reveals)
 /// - Stage 7: Foreground decorations (holographic shimmer light sweep)
-class DynamicShapePainter {
-  const DynamicShapePainter._();
+class Material4Painter {
+  const Material4Painter._();
 
   /// Stage 2: Outer Shadows.
   ///
@@ -29,7 +29,7 @@ class DynamicShapePainter {
     required Canvas canvas,
     required Size size,
     required Path path,
-    required DynamicShapeConfig config,
+    required Material4Config config,
     Color borderColor = const Color(0x18000000),
     double borderWidth = 1.0,
     List<BoxShadow>? shadows,
@@ -82,7 +82,7 @@ class DynamicShapePainter {
     required Canvas canvas,
     required Size size,
     required Path path,
-    required DynamicShapeConfig config,
+    required Material4Config config,
     Color? color,
     Gradient? gradient,
   }) {
@@ -126,7 +126,7 @@ class DynamicShapePainter {
     required Canvas canvas,
     required Size size,
     required Path path,
-    required DynamicShapeConfig config,
+    required Material4Config config,
     Color? color,
   }) {
     if (size.width <= 0 || size.height <= 0) return;
@@ -178,7 +178,7 @@ class DynamicShapePainter {
     required Canvas canvas,
     required Size size,
     required Path path,
-    required DynamicShapeConfig config,
+    required Material4Config config,
   }) {
     if (size.width <= 0 || size.height <= 0) return;
     if (config.innerShadows == null || config.innerShadows!.isEmpty) return;
@@ -196,7 +196,7 @@ class DynamicShapePainter {
     required Canvas canvas,
     required Size size,
     required Path path,
-    required DynamicShapeConfig config,
+    required Material4Config config,
     Color borderColor = const Color(0x18000000),
     double borderWidth = 1.0,
   }) {
@@ -230,7 +230,7 @@ class DynamicShapePainter {
     required Canvas canvas,
     required Size size,
     required Path path,
-    required DynamicShapeConfig config,
+    required Material4Config config,
   }) {
     if (size.width <= 0 || size.height <= 0) return;
     if (!config.isShimmering) return;
@@ -246,7 +246,7 @@ class DynamicShapePainter {
     required Canvas canvas,
     required Size size,
     required Path path,
-    required DynamicShapeConfig config,
+    required Material4Config config,
     Color? color,
     Gradient? gradient,
     Color borderColor = const Color(0x18000000),

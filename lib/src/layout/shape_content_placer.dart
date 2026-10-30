@@ -1,7 +1,7 @@
 import 'dart:math' as math;
 import 'package:flutter/rendering.dart';
 
-import '../dynamic_shape_config.dart';
+import '../material_4_config.dart';
 import 'shape_anchor_placer.dart';
 
 /// Layout specification for a horizontal slot containing leading, content, and trailing elements.
@@ -30,7 +30,7 @@ class HorizontalSlotLayoutResult {
 class ShapeContentPlacer {
   const ShapeContentPlacer._();
 
-  /// Default minimum spacing between adjacent child widgets inside dynamic shapes.
+  /// Default minimum spacing between adjacent child widgets inside Material 4 shapes.
   static const double defaultSpacing = 8.0;
 
   /// Computes placement offset for a docked badge or accessory of [accessorySize]
@@ -40,7 +40,7 @@ class ShapeContentPlacer {
     required Size accessorySize,
     required ShapeAnchor anchor,
     EdgeInsets padding = EdgeInsets.zero,
-    DynamicShapeConfig config = const DynamicShapeConfig(),
+    Material4Config config = const Material4Config(),
     TextDirection textDirection = TextDirection.ltr,
   }) {
     final anchorPoint = ShapeAnchorPlacer.resolveAnchorPoint(

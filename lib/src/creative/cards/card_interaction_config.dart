@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../dynamic_shape_config.dart';
+import '../../material_4_config.dart';
 
 /// Interaction state of a dynamic card.
 enum CardInteractionState {
@@ -65,11 +65,11 @@ class CardInteractionConfig {
   /// Animation curve.
   final Curve curve;
 
-  /// Dynamic shape morph target when hovered.
-  final DynamicShapeType? morphShapeOnHover;
+  /// Material 4 shape morph target when hovered.
+  final Material4Type? morphShapeOnHover;
 
-  /// Dynamic shape morph target when selected.
-  final DynamicShapeType? morphShapeOnSelect;
+  /// Material 4 shape morph target when selected.
+  final Material4Type? morphShapeOnSelect;
 
   /// Whether to trigger subtle haptic click on supported devices.
   final bool hapticFeedback;
@@ -104,8 +104,8 @@ class CardInteractionConfig {
 
   /// Factory: Expressive Spring Interaction.
   factory CardInteractionConfig.expressive({
-    DynamicShapeType? morphShapeOnHover,
-    DynamicShapeType? morphShapeOnSelect,
+    Material4Type? morphShapeOnHover,
+    Material4Type? morphShapeOnSelect,
   }) {
     return CardInteractionConfig(
       enablePressScale: true,
@@ -132,8 +132,8 @@ class CardInteractionConfig {
     Duration? expandDuration,
     Duration? transitionDuration,
     Curve? curve,
-    DynamicShapeType? morphShapeOnHover,
-    DynamicShapeType? morphShapeOnSelect,
+    Material4Type? morphShapeOnHover,
+    Material4Type? morphShapeOnSelect,
     bool? hapticFeedback,
   }) {
     return CardInteractionConfig(

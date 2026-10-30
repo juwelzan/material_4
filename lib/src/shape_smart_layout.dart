@@ -2,7 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-import 'dynamic_shape_config.dart';
+import 'material_4_config.dart';
 
 /// Next-Generation Geometry-Aware Smart Layout Engine.
 ///
@@ -21,7 +21,7 @@ class ShapeSmartLayout {
   /// borders, independent corner radii, and text directionality (RTL).
   static EdgeInsets computeSafePadding({
     required Size size,
-    required DynamicShapeConfig config,
+    required Material4Config config,
     double borderWidth = 1.0,
     TextDirection textDirection = TextDirection.ltr,
     EdgeInsets basePadding = const EdgeInsets.all(12.0),
@@ -74,7 +74,7 @@ class ShapeSmartLayout {
 
     // 2. Shape-Specific Dynamic Geometry Allowances
     switch (config.type) {
-      case DynamicShapeType.folderTab:
+      case Material4Type.folderTab:
         final effectiveAnchor = _resolveRtlAnchor(config.anchor, isRtl);
         if (effectiveAnchor == ShapeAnchor.topLeft ||
             effectiveAnchor == ShapeAnchor.topRight) {
@@ -84,7 +84,7 @@ class ShapeSmartLayout {
         }
         break;
 
-      case DynamicShapeType.notchedBadge:
+      case Material4Type.notchedBadge:
         final effectiveAnchor = _resolveRtlAnchor(config.anchor, isRtl);
         if (effectiveAnchor == ShapeAnchor.topRight ||
             effectiveAnchor == ShapeAnchor.topLeft) {
@@ -94,7 +94,7 @@ class ShapeSmartLayout {
         }
         break;
 
-      case DynamicShapeType.sideTab:
+      case Material4Type.sideTab:
         final effectiveAnchor = _resolveRtlAnchor(config.anchor, isRtl);
         if (effectiveAnchor == ShapeAnchor.rightCenter ||
             effectiveAnchor == ShapeAnchor.topRight) {
@@ -104,21 +104,21 @@ class ShapeSmartLayout {
         }
         break;
 
-      case DynamicShapeType.steppedCorner:
+      case Material4Type.steppedCorner:
         rightInset = math.max(rightInset, config.tabWidth * 0.28);
         bottomInset = math.max(bottomInset, config.tabHeight * 0.28);
         break;
 
-      case DynamicShapeType.ticketScallop:
+      case Material4Type.ticketScallop:
         leftInset = math.max(leftInset, config.scallopRadius + 10.0);
         rightInset = math.max(rightInset, config.scallopRadius + 10.0);
         break;
 
-      case DynamicShapeType.zigzagCut:
+      case Material4Type.zigzagCut:
         bottomInset = math.max(bottomInset, config.toothHeight + 12.0);
         break;
 
-      case DynamicShapeType.waveEdge:
+      case Material4Type.waveEdge:
         final waveAllowance = config.waveAmplitude + 10.0;
         if (config.anchor == ShapeAnchor.bottomCenter) {
           bottomInset = math.max(bottomInset, waveAllowance);
@@ -127,12 +127,12 @@ class ShapeSmartLayout {
         }
         break;
 
-      case DynamicShapeType.waveCut:
+      case Material4Type.waveCut:
         rightInset = math.max(rightInset, config.waveAmplitude + 14.0);
         bottomInset = math.max(bottomInset, config.waveAmplitude + 12.0);
         break;
 
-      case DynamicShapeType.speechBubble:
+      case Material4Type.speechBubble:
         final tailAllowance = config.speechBubbleTailHeight + 10.0;
         final effectiveAnchor = _resolveRtlAnchor(config.anchor, isRtl);
         if (effectiveAnchor.name.startsWith('bottom')) {
@@ -146,20 +146,20 @@ class ShapeSmartLayout {
         }
         break;
 
-      case DynamicShapeType.shield:
+      case Material4Type.shield:
         bottomInset = math.max(bottomInset, effectiveHeight * 0.16);
         leftInset = math.max(leftInset, 16.0);
         rightInset = math.max(rightInset, 16.0);
         break;
 
-      case DynamicShapeType.diamond:
+      case Material4Type.diamond:
         leftInset = math.max(leftInset, effectiveWidth * 0.18);
         rightInset = math.max(rightInset, effectiveWidth * 0.18);
         topInset = math.max(topInset, effectiveHeight * 0.18);
         bottomInset = math.max(bottomInset, effectiveHeight * 0.18);
         break;
 
-      case DynamicShapeType.parallelogram:
+      case Material4Type.parallelogram:
         final skewOffset = (math.tan(config.skewAngle * math.pi / 180.0).abs() *
             effectiveHeight *
             0.35);
@@ -167,30 +167,30 @@ class ShapeSmartLayout {
         rightInset = math.max(rightInset, skewOffset + 12.0);
         break;
 
-      case DynamicShapeType.ribbon:
+      case Material4Type.ribbon:
         final foldCut = config.ribbonFoldDepth + 8.0;
         leftInset = math.max(leftInset, foldCut);
         rightInset = math.max(rightInset, foldCut);
         break;
 
-      case DynamicShapeType.bookmark:
+      case Material4Type.bookmark:
         bottomInset = math.max(bottomInset, config.ribbonFoldDepth + 8.0);
         break;
 
-      case DynamicShapeType.capsule:
+      case Material4Type.capsule:
         final capRadius = math.min(effectiveWidth, effectiveHeight) * 0.32;
         leftInset = math.max(leftInset, capRadius);
         rightInset = math.max(rightInset, capRadius);
         break;
 
-      case DynamicShapeType.cloud:
+      case Material4Type.cloud:
         topInset = math.max(topInset, 18.0);
         bottomInset = math.max(bottomInset, 16.0);
         leftInset = math.max(leftInset, 18.0);
         rightInset = math.max(rightInset, 18.0);
         break;
 
-      case DynamicShapeType.concaveRounded:
+      case Material4Type.concaveRounded:
         final cut = config.cornerRadius * 0.55;
         leftInset = math.max(leftInset, cut);
         rightInset = math.max(rightInset, cut);
@@ -248,7 +248,7 @@ class ShapeSmartLayout {
   /// Calculates the largest guaranteed collision-free inscribed rectangular text/content box.
   static Rect computeInscribedRect(
     Size size,
-    DynamicShapeConfig config, {
+    Material4Config config, {
     TextDirection textDirection = TextDirection.ltr,
   }) {
     final padding = computeSafePadding(
@@ -290,16 +290,16 @@ class ShapeSmartLayout {
 }
 
 /// Geometry-Aware Safe Area widget that dynamically computes collision-free margins
-/// and padding for any child inside arbitrary dynamic shape containers.
+/// and padding for any child inside arbitrary Material 4 shape containers.
 class ShapeSafeArea extends StatelessWidget {
   final Widget child;
-  final DynamicShapeConfig config;
+  final Material4Config config;
   final EdgeInsets basePadding;
 
   const ShapeSafeArea({
     super.key,
     required this.child,
-    this.config = const DynamicShapeConfig(),
+    this.config = const Material4Config(),
     this.basePadding = const EdgeInsets.all(12.0),
   });
 

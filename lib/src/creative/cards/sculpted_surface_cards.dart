@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../dynamic_shape_config.dart';
-import '../../dynamic_shape_container.dart';
+import '../../material_4_config.dart';
+import '../../material_4_container.dart';
 import '../borders/creative_border_config.dart';
 import '../materials/dynamic_material.dart';
 import '../paper/paper_background_config.dart';
@@ -35,7 +35,7 @@ class EmbossedCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget card = DynamicShapeContainer(
+    Widget card = Material4Container(
       width: width,
       height: height,
       padding: padding,
@@ -53,8 +53,8 @@ class EmbossedCard extends StatelessWidget {
           blurRadius: 4,
         ),
       ],
-      config: const DynamicShapeConfig(
-        type: DynamicShapeType.smoothRounded,
+      config: const Material4Config(
+        type: Material4Type.smoothRounded,
         cornerRadius: 18.0,
         creativeBorder: CreativeBorderConfig(
           style: CreativeBorderStyle.outset,
@@ -98,14 +98,14 @@ class DebossedCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget card = DynamicShapeContainer(
+    Widget card = Material4Container(
       width: width,
       height: height,
       padding: padding,
       margin: margin,
       color: backgroundColor,
-      config: const DynamicShapeConfig(
-        type: DynamicShapeType.smoothRounded,
+      config: const Material4Config(
+        type: Material4Type.smoothRounded,
         cornerRadius: 18.0,
         innerShadows: [
           BoxShadow(
@@ -163,7 +163,7 @@ class NeumorphicCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget card = DynamicShapeContainer(
+    Widget card = Material4Container(
       width: width,
       height: height,
       padding: padding,
@@ -182,8 +182,8 @@ class NeumorphicCard extends StatelessWidget {
           offset: Offset(-depth, -depth),
         ),
       ],
-      config: const DynamicShapeConfig(
-        type: DynamicShapeType.smoothRounded,
+      config: const Material4Config(
+        type: Material4Type.smoothRounded,
         cornerRadius: 20.0,
       ),
       child: child,
@@ -223,7 +223,7 @@ class SoftRaisedCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget card = DynamicShapeContainer(
+    Widget card = Material4Container(
       width: width,
       height: height,
       padding: padding,
@@ -242,8 +242,8 @@ class SoftRaisedCard extends StatelessWidget {
           blurRadius: 10,
         ),
       ],
-      config: const DynamicShapeConfig(
-        type: DynamicShapeType.smoothRounded,
+      config: const Material4Config(
+        type: Material4Type.smoothRounded,
         cornerRadius: 24.0,
       ),
       child: child,
@@ -287,7 +287,7 @@ class HardRaisedCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget card = DynamicShapeContainer(
+    Widget card = Material4Container(
       width: width,
       height: height,
       padding: padding,
@@ -302,8 +302,8 @@ class HardRaisedCard extends StatelessWidget {
           blurRadius: 0.0,
         ),
       ],
-      config: const DynamicShapeConfig(
-        type: DynamicShapeType.smoothRounded,
+      config: const Material4Config(
+        type: Material4Type.smoothRounded,
         cornerRadius: 12.0,
       ),
       child: child,
@@ -343,14 +343,14 @@ class RecessedCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget card = DynamicShapeContainer(
+    Widget card = Material4Container(
       width: width,
       height: height,
       padding: padding,
       margin: margin,
       color: backgroundColor,
-      config: const DynamicShapeConfig(
-        type: DynamicShapeType.smoothRounded,
+      config: const Material4Config(
+        type: Material4Type.smoothRounded,
         cornerRadius: 16.0,
         innerShadows: [
           BoxShadow(
@@ -402,7 +402,7 @@ class FloatingSurfaceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget card = DynamicShapeContainer(
+    Widget card = Material4Container(
       width: width,
       height: height,
       padding: padding,
@@ -423,8 +423,8 @@ class FloatingSurfaceCard extends StatelessWidget {
           blurRadius: 10,
         ),
       ],
-      config: const DynamicShapeConfig(
-        type: DynamicShapeType.smoothRounded,
+      config: const Material4Config(
+        type: Material4Type.smoothRounded,
         cornerRadius: 20.0,
         borderStyle: BorderStyleType.solid,
       ),
@@ -480,7 +480,7 @@ class ClayCard extends StatelessWidget {
       );
     }
 
-    Widget card = DynamicShapeContainer(
+    Widget card = Material4Container(
       width: width,
       height: height,
       padding: padding,
@@ -498,8 +498,8 @@ class ClayCard extends StatelessWidget {
           blurRadius: 10,
         ),
       ],
-      config: const DynamicShapeConfig(
-        type: DynamicShapeType.smoothRounded,
+      config: const Material4Config(
+        type: Material4Type.smoothRounded,
         cornerRadius: 22.0,
         innerShadows: [
           BoxShadow(
@@ -553,11 +553,11 @@ class CeramicCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final matConfig = DynamicMaterialConfig.ceramic(color: backgroundColor);
     final shapeConfig = matConfig.toShapeConfig(
-      shapeType: DynamicShapeType.smoothRounded,
+      shapeType: Material4Type.smoothRounded,
       cornerRadius: 18.0,
     );
 
-    Widget card = DynamicShapeContainer(
+    Widget card = Material4Container(
       width: width,
       height: height,
       padding: padding,
@@ -604,14 +604,14 @@ class OrganicSurfaceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget card = DynamicShapeContainer(
+    Widget card = Material4Container(
       width: width,
       height: height,
       padding: padding,
       margin: margin,
       color: color,
-      config: const DynamicShapeConfig(
-        type: DynamicShapeType.organicBlob,
+      config: const Material4Config(
+        type: Material4Type.organicBlob,
         cornerRadius: 24.0,
         paperBackground: PaperBackgroundConfig(
           style: PaperBackgroundStyle.watercolor,
@@ -658,7 +658,7 @@ class LayeredMaterialCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget card = DynamicShapeContainer(
+    Widget card = Material4Container(
       width: width,
       height: height,
       padding: const EdgeInsets.all(6.0),
@@ -671,15 +671,15 @@ class LayeredMaterialCard extends StatelessWidget {
           blurRadius: 14,
         ),
       ],
-      config: const DynamicShapeConfig(
-        type: DynamicShapeType.smoothRounded,
+      config: const Material4Config(
+        type: Material4Type.smoothRounded,
         cornerRadius: 18.0,
         paperBackground: PaperBackgroundConfig(
           style: PaperBackgroundStyle.cardstock,
           grainOpacity: 0.08,
         ),
       ),
-      child: DynamicShapeContainer(
+      child: Material4Container(
         padding: padding,
         color: surfaceColor,
         shadows: const [
@@ -689,8 +689,8 @@ class LayeredMaterialCard extends StatelessWidget {
             blurRadius: 6,
           ),
         ],
-        config: const DynamicShapeConfig(
-          type: DynamicShapeType.smoothRounded,
+        config: const Material4Config(
+          type: Material4Type.smoothRounded,
           cornerRadius: 14.0,
           paperBackground: PaperBackgroundConfig(
             style: PaperBackgroundStyle.plainWhite,
@@ -838,14 +838,14 @@ class MaterialStackCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DynamicShapeContainer(
+    return Material4Container(
       width: width,
       height: height,
       padding: padding,
       margin: margin,
       color: const Color(0xFFFAF5ED),
-      config: const DynamicShapeConfig(
-        type: DynamicShapeType.smoothRounded,
+      config: const Material4Config(
+        type: Material4Type.smoothRounded,
         cornerRadius: 16.0,
         paperBackground: PaperBackgroundConfig(
           style: PaperBackgroundStyle.kraft,

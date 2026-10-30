@@ -1,11 +1,11 @@
 import 'package:flutter/rendering.dart';
 
-import '../dynamic_shape_config.dart';
-import 'dynamic_shape_interaction.dart';
+import '../material_4_config.dart';
+import 'material_4_interaction.dart';
 
-/// Interaction and hit-testing behavior modes for dynamic shapes.
+/// Interaction and hit-testing behavior modes for Material 4 shapes.
 enum ShapeHitTestBehavior {
-  /// Hit-testing follows the exact mathematical vector contour of the dynamic shape.
+  /// Hit-testing follows the exact mathematical vector contour of the Material 4 shape.
   ///
   /// Points outside the rendered shape geometry (e.g. in the transparent corners of an arch,
   /// diamond, or polygon) are not intercepted, allowing underlying gestures to trigger.
@@ -36,19 +36,19 @@ enum ShapeHitTestBehavior {
 }
 
 /// Helper utilities for shape-aware interaction, hit-testing, and coordinate translation.
-class DynamicShapeHitTester {
-  const DynamicShapeHitTester._();
+class Material4HitTester {
+  const Material4HitTester._();
 
-  /// Evaluates whether [position] hits the dynamic shape at [size],
+  /// Evaluates whether [position] hits the Material 4 shape at [size],
   /// taking into account shape geometry, [transform], [behavior], and [interaction] settings.
   static bool containsPoint({
     required Path path,
     required Size size,
     required Offset position,
     ShapeTransform transform = ShapeTransform.identity,
-    DynamicShapeConfig? config,
+    Material4Config? config,
     ShapeHitTestBehavior behavior = ShapeHitTestBehavior.shape,
-    DynamicShapeInteraction? interaction,
+    Material4Interaction? interaction,
     bool pathIsTransformed = true,
   }) {
     // 1. Guard against non-positive dimensions, NaN, and infinite positions

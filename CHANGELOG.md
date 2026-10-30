@@ -1,10 +1,10 @@
 # Changelog
 
-All notable changes to the `dynamic_shape` package will be documented in this file.
+All notable changes to the `material_4` package will be documented in this file.
 
 ## 1.0.0
 
-- Initial stable release of the Universal Dynamic Shape Engine for Flutter.
+- Initial stable release of the Universal Material 4 Engine for Flutter.
 - **28 Parameterized Geometries**:
   - `folderTab`, `notchedBadge`, `sideTab`, `steppedCorner`, `ticketScallop`, `postageStamp`, `zigzagCut`, `arch`, `hexagonSoft`, `chamferDiagonal`, `organicBlob`, `scallopedPetal`, `smoothRounded`, `asymmetricCard`, `capsule`, `waveEdge`, `cloud`, `speechBubble`, `shield`, `diamond`, `octagon`, `waveCut`, `concaveRounded`, `convexRounded`, `squircle`, `parallelogram`, `ribbon`, `bookmark`, and `customBezier`.
 - **20 Border Styles**:

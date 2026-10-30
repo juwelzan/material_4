@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../dynamic_shape_config.dart';
-import '../../dynamic_shape_container.dart';
+import '../../material_4_config.dart';
+import '../../material_4_container.dart';
 import '../borders/creative_border_config.dart';
 
 // =============================================================================
@@ -35,7 +35,7 @@ class GlassCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget card = DynamicShapeContainer(
+    Widget card = Material4Container(
       width: width,
       height: height,
       padding: padding,
@@ -50,8 +50,8 @@ class GlassCard extends StatelessWidget {
           blurRadius: 24,
         ),
       ],
-      config: DynamicShapeConfig(
-        type: DynamicShapeType.smoothRounded,
+      config: Material4Config(
+        type: Material4Type.smoothRounded,
         cornerRadius: 20.0,
         isGlassmorphic: true,
         glassBlur: blur,
@@ -100,7 +100,7 @@ class GradientCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget card = DynamicShapeContainer(
+    Widget card = Material4Container(
       width: width,
       height: height,
       padding: padding,
@@ -113,8 +113,8 @@ class GradientCard extends StatelessWidget {
           blurRadius: 20,
         ),
       ],
-      config: DynamicShapeConfig(
-        type: DynamicShapeType.smoothRounded,
+      config: Material4Config(
+        type: Material4Type.smoothRounded,
         cornerRadius: cornerRadius,
       ),
       child: child,
@@ -158,7 +158,7 @@ class GlowCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget card = DynamicShapeContainer(
+    Widget card = Material4Container(
       width: width,
       height: height,
       padding: padding,
@@ -171,8 +171,8 @@ class GlowCard extends StatelessWidget {
           spreadRadius: 1,
         ),
       ],
-      config: DynamicShapeConfig(
-        type: DynamicShapeType.smoothRounded,
+      config: Material4Config(
+        type: Material4Type.smoothRounded,
         cornerRadius: 18.0,
         creativeBorder: CreativeBorderConfig(
           style: CreativeBorderStyle.glow,
@@ -219,7 +219,7 @@ class NeonCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget card = DynamicShapeContainer(
+    Widget card = Material4Container(
       width: width,
       height: height,
       padding: padding,
@@ -232,8 +232,8 @@ class NeonCard extends StatelessWidget {
           spreadRadius: 1,
         ),
       ],
-      config: DynamicShapeConfig(
-        type: DynamicShapeType.smoothRounded,
+      config: Material4Config(
+        type: Material4Type.smoothRounded,
         cornerRadius: 16.0,
         creativeBorder: CreativeBorderConfig.neon(
           color: neonColor,
@@ -282,7 +282,7 @@ class MeshGradientCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget card = DynamicShapeContainer(
+    Widget card = Material4Container(
       width: width,
       height: height,
       padding: padding,
@@ -295,8 +295,8 @@ class MeshGradientCard extends StatelessWidget {
           blurRadius: 22,
         ),
       ],
-      config: DynamicShapeConfig(
-        type: DynamicShapeType.smoothRounded,
+      config: Material4Config(
+        type: Material4Type.smoothRounded,
         cornerRadius: 20.0,
         backgroundEffect: BackgroundEffectType.meshGradient,
         meshColors: colors,
@@ -340,7 +340,7 @@ class FloatingCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget card = DynamicShapeContainer(
+    Widget card = Material4Container(
       width: width,
       height: height,
       padding: padding,
@@ -359,8 +359,8 @@ class FloatingCard extends StatelessWidget {
           blurRadius: 6,
         ),
       ],
-      config: const DynamicShapeConfig(
-        type: DynamicShapeType.smoothRounded,
+      config: const Material4Config(
+        type: Material4Type.smoothRounded,
         cornerRadius: 22.0,
       ),
       child: child,
@@ -402,7 +402,7 @@ class OrganicBlobCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget card = DynamicShapeContainer(
+    Widget card = Material4Container(
       width: width,
       height: height,
       padding: padding,
@@ -416,8 +416,8 @@ class OrganicBlobCard extends StatelessWidget {
           blurRadius: 16,
         ),
       ],
-      config: const DynamicShapeConfig(
-        type: DynamicShapeType.organicBlob,
+      config: const Material4Config(
+        type: Material4Type.organicBlob,
         cornerRadius: 32.0,
       ),
       child: child,
@@ -464,7 +464,7 @@ class AsymmetricCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget card = DynamicShapeContainer(
+    Widget card = Material4Container(
       width: width,
       height: height,
       padding: padding,
@@ -477,8 +477,8 @@ class AsymmetricCard extends StatelessWidget {
           blurRadius: 12,
         ),
       ],
-      config: DynamicShapeConfig(
-        type: DynamicShapeType.asymmetricCard,
+      config: Material4Config(
+        type: Material4Type.asymmetricCard,
         corners: corners,
       ),
       child: child,
@@ -522,7 +522,7 @@ class CutCornerCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget card = DynamicShapeContainer(
+    Widget card = Material4Container(
       width: width,
       height: height,
       padding: padding,
@@ -537,8 +537,8 @@ class CutCornerCard extends StatelessWidget {
           blurRadius: 8,
         ),
       ],
-      config: DynamicShapeConfig(
-        type: DynamicShapeType.chamferDiagonal,
+      config: Material4Config(
+        type: Material4Type.chamferDiagonal,
         tabWidth: cutSize,
         tabHeight: cutSize,
       ),
@@ -585,7 +585,7 @@ class NotchedCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget card = DynamicShapeContainer(
+    Widget card = Material4Container(
       width: width,
       height: height,
       padding: padding,
@@ -598,8 +598,8 @@ class NotchedCard extends StatelessWidget {
           blurRadius: 10,
         ),
       ],
-      config: DynamicShapeConfig(
-        type: DynamicShapeType.notchedBadge,
+      config: Material4Config(
+        type: Material4Type.notchedBadge,
         anchor: notchPosition,
         tabWidth: notchWidth,
         tabHeight: notchHeight,
@@ -642,7 +642,7 @@ class TicketCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget card = DynamicShapeContainer(
+    Widget card = Material4Container(
       width: width,
       height: height,
       padding: padding,
@@ -655,8 +655,8 @@ class TicketCard extends StatelessWidget {
           blurRadius: 8,
         ),
       ],
-      config: const DynamicShapeConfig(
-        type: DynamicShapeType.ticketScallop,
+      config: const Material4Config(
+        type: Material4Type.ticketScallop,
         scallopRadius: 16.0,
         creativeBorder: CreativeBorderConfig(
           style: CreativeBorderStyle.perforated,
@@ -711,7 +711,7 @@ class MagazineCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget card = DynamicShapeContainer(
+    Widget card = Material4Container(
       width: width,
       height: height,
       padding: padding,
@@ -726,8 +726,8 @@ class MagazineCard extends StatelessWidget {
           blurRadius: 16,
         ),
       ],
-      config: const DynamicShapeConfig(
-        type: DynamicShapeType.smoothRounded,
+      config: const Material4Config(
+        type: Material4Type.smoothRounded,
         cornerRadius: 4.0,
       ),
       child: Column(
@@ -825,7 +825,7 @@ class EditorialCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget card = DynamicShapeContainer(
+    Widget card = Material4Container(
       width: width,
       height: height,
       padding: padding,
@@ -840,8 +840,8 @@ class EditorialCard extends StatelessWidget {
           blurRadius: 8,
         ),
       ],
-      config: const DynamicShapeConfig(
-        type: DynamicShapeType.smoothRounded,
+      config: const Material4Config(
+        type: Material4Type.smoothRounded,
         cornerRadius: 2.0,
       ),
       child: child,
@@ -885,7 +885,7 @@ class MinimalSurfaceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget card = DynamicShapeContainer(
+    Widget card = Material4Container(
       width: width,
       height: height,
       padding: padding,
@@ -893,8 +893,8 @@ class MinimalSurfaceCard extends StatelessWidget {
       color: backgroundColor,
       borderColor: borderColor,
       borderWidth: 0.5,
-      config: DynamicShapeConfig(
-        type: DynamicShapeType.smoothRounded,
+      config: Material4Config(
+        type: Material4Type.smoothRounded,
         cornerRadius: cornerRadius,
       ),
       child: child,

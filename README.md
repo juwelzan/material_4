@@ -1,10 +1,15 @@
-# dynamic_shape
+# Material 4
+
+**Material 4 — A Custom Flutter Design System**
+
+> [!NOTE]
+> This is our custom Flutter design system and not Google's official Material Design 4.
 
 [![pub package](https://img.shields.io/badge/pub-v1.0.0-blue.svg)](https://pub.dev)
 [![license](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Flutter](https://img.shields.io/badge/Flutter-%3E%3D3.10.0-02569B?logo=flutter)](https://flutter.dev)
 
-A next-generation, high-performance universal dynamic shape and contour engine for Flutter. Eliminate tedious `CustomPainter` and `CustomClipper` authoring with 28+ hardware-accelerated shapes, 20 advanced borders, physics-driven animations, procedural backgrounds, tactile haptics, and geometry-aware collision-free layouts.
+A next-generation, high-performance universal Flutter design system with 28+ hardware-accelerated shapes, 20 advanced borders, physics-driven animations, procedural backgrounds, tactile haptics, and geometry-aware collision-free layouts.
 
 ---
 
@@ -26,33 +31,33 @@ A next-generation, high-performance universal dynamic shape and contour engine f
 
 ## 🚀 Getting Started
 
-Add `dynamic_shape` to your `pubspec.yaml`:
+Add `material_4` to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  dynamic_shape: ^1.0.0
+  material_4: ^1.0.0
 ```
 
 Or run:
 
 ```bash
-flutter pub add dynamic_shape
+flutter pub add material_4
 ```
 
 Then import the package in your Dart code:
 
 ```dart
-import 'package:dynamic_shape/dynamic_shape.dart';
+import 'package:material_4/material_4.dart';
 ```
 
 ---
 
 ## 📖 Quick Examples
 
-### 1. Simple Dynamic Shape Container
+### 1. Simple Material 4 Container
 
 ```dart
-DynamicShapeContainer.folderTab(
+Material4Container.folderTab(
   tabWidth: 90,
   tabHeight: 22,
   cornerRadius: 18,
@@ -77,7 +82,7 @@ DynamicShapeContainer.folderTab(
 
 ```dart
 // Neon pulse border
-DynamicShapeContainer.neon(
+Material4Container.neon(
   width: 140,
   height: 60,
   borderColor: Colors.cyanAccent,
@@ -85,7 +90,7 @@ DynamicShapeContainer.neon(
 );
 
 // Metallic Gold finish
-DynamicShapeContainer.metallic(
+Material4Container.metallic(
   width: 160,
   height: 60,
   metallicType: MetallicType.gold,
@@ -140,7 +145,7 @@ NotebookCard(
 
 ```dart
 AdaptiveShapeCard(
-  type: DynamicShapeType.ticketScallop,
+  type: Material4Type.ticketScallop,
   scallopRadius: 18.0,
   child: const Text('Guaranteed unclipped text inside ticket cutouts'),
 )
@@ -194,7 +199,7 @@ AdaptiveShapeCard(
   title: 'Physics & Astronomy',
   subtitle: 'Room 304 • Prof. Sarah Connor',
   icon: Icons.auto_awesome,
-  shapeType: DynamicShapeType.ticketScallop,
+  shapeType: Material4Type.ticketScallop,
   color: const Color(0xFFF6F4FF),
   borderColor: const Color(0xFF5E43EE),
   borderWidth: 1.5,

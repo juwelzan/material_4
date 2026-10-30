@@ -1,29 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:dynamic_shape/dynamic_shape.dart';
+import 'package:material_4/material_4.dart';
 
 void main() {
   group('RenderBox Preset Compatibility Tests', () {
-    testWidgets(
-        'All 28 DynamicShapeType presets render inside RenderDynamicShape',
+    testWidgets('All 28 Material4Type presets render inside RenderMaterial4',
         (tester) async {
-      for (final shapeType in DynamicShapeType.values) {
+      for (final shapeType in Material4Type.values) {
         await tester.pumpWidget(
           Directionality(
             textDirection: TextDirection.ltr,
             child: Center(
-              child: DynamicShapeContainer(
+              child: Material4Container(
                 width: 160,
                 height: 100,
-                config: DynamicShapeConfig(type: shapeType),
+                config: Material4Config(type: shapeType),
                 child: Text('Preset: ${shapeType.name}'),
               ),
             ),
           ),
         );
 
-        final renderBox = tester.renderObject<RenderDynamicShape>(
-          find.byType(DynamicShapeRenderWidget),
+        final renderBox = tester.renderObject<RenderMaterial4>(
+          find.byType(Material4RenderWidget),
         );
         expect(renderBox.size.width, equals(160.0));
         expect(renderBox.size.height, equals(100.0));
@@ -32,7 +31,7 @@ void main() {
     });
 
     testWidgets(
-        'All 10 SchoolShapePresets render cleanly inside RenderDynamicShape',
+        'All 10 SchoolShapePresets render cleanly inside RenderMaterial4',
         (tester) async {
       final schoolCards = <Widget>[
         SchoolShapePresets.attendanceCard(
@@ -101,60 +100,57 @@ void main() {
           ),
         );
 
-        expect(find.byType(DynamicShapeRenderWidget), findsAtLeastNWidgets(1));
+        expect(find.byType(Material4RenderWidget), findsAtLeastNWidgets(1));
         expect(tester.takeException(), isNull);
       }
     });
 
     testWidgets(
-        'All 38 DynamicShapeContainer factory constructors render cleanly with RenderBox',
+        'All 38 Material4Container factory constructors render cleanly with RenderBox',
         (tester) async {
       final factories = <Widget>[
-        DynamicShapeContainer.glass(child: const Text('glass')),
-        DynamicShapeContainer.patterned(child: const Text('patterned')),
-        DynamicShapeContainer.innerShadow(child: const Text('innerShadow')),
-        DynamicShapeContainer.neon(child: const Text('neon')),
-        DynamicShapeContainer.metallic(child: const Text('metallic')),
-        DynamicShapeContainer.rainbow(child: const Text('rainbow')),
-        DynamicShapeContainer.multiLayer(
+        Material4Container.glass(child: const Text('glass')),
+        Material4Container.patterned(child: const Text('patterned')),
+        Material4Container.innerShadow(child: const Text('innerShadow')),
+        Material4Container.neon(child: const Text('neon')),
+        Material4Container.metallic(child: const Text('metallic')),
+        Material4Container.rainbow(child: const Text('rainbow')),
+        Material4Container.multiLayer(
           layers: const [BorderLayer(color: Colors.blue, width: 2)],
           child: const Text('multiLayer'),
         ),
-        DynamicShapeContainer.cornerOnly(child: const Text('cornerOnly')),
-        DynamicShapeContainer.handDrawn(child: const Text('handDrawn')),
-        DynamicShapeContainer.folderTab(child: const Text('folderTab')),
-        DynamicShapeContainer.notchedBadge(child: const Text('notchedBadge')),
-        DynamicShapeContainer.sideTab(child: const Text('sideTab')),
-        DynamicShapeContainer.steppedCorner(child: const Text('steppedCorner')),
-        DynamicShapeContainer.ticket(child: const Text('ticket')),
-        DynamicShapeContainer.postageStamp(child: const Text('postageStamp')),
-        DynamicShapeContainer.zigzagReceipt(child: const Text('zigzagReceipt')),
-        DynamicShapeContainer.arch(child: const Text('arch')),
-        DynamicShapeContainer.hexagon(child: const Text('hexagon')),
-        DynamicShapeContainer.chamferDiagonal(
+        Material4Container.cornerOnly(child: const Text('cornerOnly')),
+        Material4Container.handDrawn(child: const Text('handDrawn')),
+        Material4Container.folderTab(child: const Text('folderTab')),
+        Material4Container.notchedBadge(child: const Text('notchedBadge')),
+        Material4Container.sideTab(child: const Text('sideTab')),
+        Material4Container.steppedCorner(child: const Text('steppedCorner')),
+        Material4Container.ticket(child: const Text('ticket')),
+        Material4Container.postageStamp(child: const Text('postageStamp')),
+        Material4Container.zigzagReceipt(child: const Text('zigzagReceipt')),
+        Material4Container.arch(child: const Text('arch')),
+        Material4Container.hexagon(child: const Text('hexagon')),
+        Material4Container.chamferDiagonal(
             child: const Text('chamferDiagonal')),
-        DynamicShapeContainer.organicBlob(child: const Text('organicBlob')),
-        DynamicShapeContainer.scallopedPetal(
-            child: const Text('scallopedPetal')),
-        DynamicShapeContainer.neo3d(child: const Text('neo3d')),
-        DynamicShapeContainer.asymmetricCard(
-            child: const Text('asymmetricCard')),
-        DynamicShapeContainer.capsule(child: const Text('capsule')),
-        DynamicShapeContainer.waveEdge(child: const Text('waveEdge')),
-        DynamicShapeContainer.cloud(child: const Text('cloud')),
-        DynamicShapeContainer.speechBubble(child: const Text('speechBubble')),
-        DynamicShapeContainer.shield(child: const Text('shield')),
-        DynamicShapeContainer.diamond(child: const Text('diamond')),
-        DynamicShapeContainer.octagon(child: const Text('octagon')),
-        DynamicShapeContainer.waveCut(child: const Text('waveCut')),
-        DynamicShapeContainer.concaveRounded(
-            child: const Text('concaveRounded')),
-        DynamicShapeContainer.convexRounded(child: const Text('convexRounded')),
-        DynamicShapeContainer.squircle(child: const Text('squircle')),
-        DynamicShapeContainer.parallelogram(child: const Text('parallelogram')),
-        DynamicShapeContainer.ribbon(child: const Text('ribbon')),
-        DynamicShapeContainer.bookmark(child: const Text('bookmark')),
-        DynamicShapeContainer.customBezier(
+        Material4Container.organicBlob(child: const Text('organicBlob')),
+        Material4Container.scallopedPetal(child: const Text('scallopedPetal')),
+        Material4Container.neo3d(child: const Text('neo3d')),
+        Material4Container.asymmetricCard(child: const Text('asymmetricCard')),
+        Material4Container.capsule(child: const Text('capsule')),
+        Material4Container.waveEdge(child: const Text('waveEdge')),
+        Material4Container.cloud(child: const Text('cloud')),
+        Material4Container.speechBubble(child: const Text('speechBubble')),
+        Material4Container.shield(child: const Text('shield')),
+        Material4Container.diamond(child: const Text('diamond')),
+        Material4Container.octagon(child: const Text('octagon')),
+        Material4Container.waveCut(child: const Text('waveCut')),
+        Material4Container.concaveRounded(child: const Text('concaveRounded')),
+        Material4Container.convexRounded(child: const Text('convexRounded')),
+        Material4Container.squircle(child: const Text('squircle')),
+        Material4Container.parallelogram(child: const Text('parallelogram')),
+        Material4Container.ribbon(child: const Text('ribbon')),
+        Material4Container.bookmark(child: const Text('bookmark')),
+        Material4Container.customBezier(
           builder: (size) => Path()
             ..moveTo(0, 0)
             ..lineTo(size.width, 0)
@@ -180,7 +176,7 @@ void main() {
           ),
         );
 
-        expect(find.byType(DynamicShapeRenderWidget), findsOneWidget);
+        expect(find.byType(Material4RenderWidget), findsOneWidget);
         expect(tester.takeException(), isNull);
       }
     });
@@ -193,10 +189,10 @@ void main() {
         Directionality(
           textDirection: TextDirection.ltr,
           child: Center(
-            child: DynamicShapeContainer(
+            child: Material4Container(
               width: 200,
               height: 150,
-              config: DynamicShapeConfig.customBezier(
+              config: Material4Config.customBezier(
                 builder: (size) {
                   return Path()
                     ..moveTo(0, size.height / 2)
@@ -213,15 +209,15 @@ void main() {
         ),
       );
 
-      final renderBox = tester.renderObject<RenderDynamicShape>(
-        find.byType(DynamicShapeRenderWidget),
+      final renderBox = tester.renderObject<RenderMaterial4>(
+        find.byType(Material4RenderWidget),
       );
       expect(renderBox.size, equals(const Size(200, 150)));
       expect(renderBox.currentPath, isNotNull);
     });
 
     testWidgets(
-        'ShapeTransform (rotation, scale, skew) integrates with RenderDynamicShape hit testing',
+        'ShapeTransform (rotation, scale, skew) integrates with RenderMaterial4 hit testing',
         (tester) async {
       bool tapped = false;
 
@@ -229,11 +225,11 @@ void main() {
         Directionality(
           textDirection: TextDirection.ltr,
           child: Center(
-            child: DynamicShapeContainer(
+            child: Material4Container(
               width: 100,
               height: 100,
-              config: const DynamicShapeConfig(
-                type: DynamicShapeType.smoothRounded,
+              config: const Material4Config(
+                type: Material4Type.smoothRounded,
                 transform: ShapeTransform(
                   scaleX: 1.2,
                   scaleY: 1.2,
@@ -249,7 +245,7 @@ void main() {
         ),
       );
 
-      final shapeFinder = find.byType(DynamicShapeRenderWidget);
+      final shapeFinder = find.byType(Material4RenderWidget);
       await tester.tap(shapeFinder);
       await tester.pumpAndSettle();
 
@@ -257,16 +253,15 @@ void main() {
     });
 
     testWidgets(
-        'AnimatedDynamicShapeContainer drives RenderDynamicShape during animation transitions',
+        'AnimatedMaterial4Container drives RenderMaterial4 during animation transitions',
         (tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
             body: Center(
-              child: AnimatedDynamicShapeContainer(
+              child: AnimatedMaterial4Container(
                 duration: const Duration(milliseconds: 300),
-                config:
-                    const DynamicShapeConfig(type: DynamicShapeType.squircle),
+                config: const Material4Config(type: Material4Type.squircle),
                 width: 150,
                 height: 80,
                 color: Colors.blue,
@@ -277,17 +272,16 @@ void main() {
         ),
       );
 
-      expect(find.byType(DynamicShapeRenderWidget), findsOneWidget);
+      expect(find.byType(Material4RenderWidget), findsOneWidget);
 
       // Rebuild with different shape configuration to trigger animation
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
             body: Center(
-              child: AnimatedDynamicShapeContainer(
+              child: AnimatedMaterial4Container(
                 duration: const Duration(milliseconds: 300),
-                config:
-                    const DynamicShapeConfig(type: DynamicShapeType.capsule),
+                config: const Material4Config(type: Material4Type.capsule),
                 width: 200,
                 height: 100,
                 color: Colors.purple,
@@ -300,12 +294,12 @@ void main() {
 
       // Advance animation halfway
       await tester.pump(const Duration(milliseconds: 150));
-      expect(find.byType(DynamicShapeRenderWidget), findsOneWidget);
+      expect(find.byType(Material4RenderWidget), findsOneWidget);
       expect(tester.takeException(), isNull);
 
       // Settle animation
       await tester.pumpAndSettle();
-      expect(find.byType(DynamicShapeRenderWidget), findsOneWidget);
+      expect(find.byType(Material4RenderWidget), findsOneWidget);
     });
   });
 }

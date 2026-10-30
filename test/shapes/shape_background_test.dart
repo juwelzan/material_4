@@ -1,6 +1,6 @@
 import 'dart:ui';
 
-import 'package:dynamic_shape/dynamic_shape.dart';
+import 'package:material_4/material_4.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -19,7 +19,7 @@ void main() {
         final path = Path()..addRect(Offset.zero & testSize);
 
         for (final effect in BackgroundEffectType.values) {
-          final config = DynamicShapeConfig(
+          final config = Material4Config(
             backgroundEffect: effect,
             backgroundProgress: 0.45,
             waveLevel: 0.6,
@@ -55,7 +55,7 @@ void main() {
       final recorder = PictureRecorder();
       final canvas = Canvas(recorder);
       final path = Path();
-      const config = DynamicShapeConfig(
+      const config = Material4Config(
         backgroundEffect: BackgroundEffectType.animatedWaves,
       );
 

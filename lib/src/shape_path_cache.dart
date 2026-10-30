@@ -11,44 +11,62 @@ class ShapeCacheKey {
   final double width;
   final double height;
   final double cornerRadius;
-  final CornerRadii? cornerRadii;
+  final ShapeCorners corners;
+  final ShapeEdges? edges;
   final ShapeAnchor anchor;
   final double tabWidth;
   final double tabHeight;
   final double filletRadius;
   final double scallopRadius;
+  final int petalCount;
+  final double protrusionDepth;
+  final double toothWidth;
+  final double toothHeight;
+  final double speechBubbleTailWidth;
+  final double speechBubbleTailHeight;
   final double waveCount;
   final double waveAmplitude;
   final double skewAngle;
   final double ribbonFoldDepth;
-  final double rotation;
-  final double scaleX;
-  final double scaleY;
-  final Offset stretchOffset;
+  final ShapeTransform transform;
+  final ShapeConstraints constraints;
+  final CustomBezierConfig? bezierConfig;
   final int notchesHash;
 
   ShapeCacheKey({required Size size, required DynamicShapeConfig config})
-    : type = config.type,
-      width = size.width,
-      height = size.height,
-      cornerRadius = config.cornerRadius,
-      cornerRadii = config.cornerRadii,
-      anchor = config.anchor,
-      tabWidth = config.tabWidth,
-      tabHeight = config.tabHeight,
-      filletRadius = config.filletRadius,
-      scallopRadius = config.scallopRadius,
-      waveCount = config.waveCount,
-      waveAmplitude = config.waveAmplitude,
-      skewAngle = config.skewAngle,
-      ribbonFoldDepth = config.ribbonFoldDepth,
-      rotation = config.rotation,
-      scaleX = config.scaleX,
-      scaleY = config.scaleY,
-      stretchOffset = config.stretchOffset,
-      notchesHash = config.notches != null
-          ? Object.hashAll(config.notches!)
-          : 0;
+      : type = config.type,
+        width = size.width,
+        height = size.height,
+        cornerRadius = config.cornerRadius,
+        corners = config.resolvedCorners,
+        edges = config.edges,
+        anchor = config.anchor,
+        tabWidth = config.tabWidth,
+        tabHeight = config.tabHeight,
+        filletRadius = config.filletRadius,
+        scallopRadius = config.scallopRadius,
+        petalCount = config.petalCount,
+        protrusionDepth = config.protrusionDepth,
+        toothWidth = config.toothWidth,
+        toothHeight = config.toothHeight,
+        speechBubbleTailWidth = config.speechBubbleTailWidth,
+        speechBubbleTailHeight = config.speechBubbleTailHeight,
+        waveCount = config.waveCount,
+        waveAmplitude = config.waveAmplitude,
+        skewAngle = config.skewAngle,
+        ribbonFoldDepth = config.ribbonFoldDepth,
+        transform = config.resolvedTransform,
+        constraints = config.constraints,
+        bezierConfig = config.bezierConfig,
+        notchesHash =
+            config.notches != null ? Object.hashAll(config.notches!) : 0;
+
+  /// Backward compatibility getters for legacy properties.
+  CornerRadii get cornerRadii => corners.toCornerRadii();
+  double get rotation => transform.rotation;
+  double get scaleX => transform.scaleX;
+  double get scaleY => transform.scaleY;
+  Offset get stretchOffset => transform.stretchOffset;
 
   @override
   bool operator ==(Object other) =>
@@ -59,44 +77,56 @@ class ShapeCacheKey {
           width == other.width &&
           height == other.height &&
           cornerRadius == other.cornerRadius &&
-          cornerRadii == other.cornerRadii &&
+          corners == other.corners &&
+          edges == other.edges &&
           anchor == other.anchor &&
           tabWidth == other.tabWidth &&
           tabHeight == other.tabHeight &&
           filletRadius == other.filletRadius &&
           scallopRadius == other.scallopRadius &&
+          petalCount == other.petalCount &&
+          protrusionDepth == other.protrusionDepth &&
+          toothWidth == other.toothWidth &&
+          toothHeight == other.toothHeight &&
+          speechBubbleTailWidth == other.speechBubbleTailWidth &&
+          speechBubbleTailHeight == other.speechBubbleTailHeight &&
           waveCount == other.waveCount &&
           waveAmplitude == other.waveAmplitude &&
           skewAngle == other.skewAngle &&
           ribbonFoldDepth == other.ribbonFoldDepth &&
-          rotation == other.rotation &&
-          scaleX == other.scaleX &&
-          scaleY == other.scaleY &&
-          stretchOffset == other.stretchOffset &&
+          transform == other.transform &&
+          constraints == other.constraints &&
+          bezierConfig == other.bezierConfig &&
           notchesHash == other.notchesHash;
 
   @override
-  int get hashCode => Object.hash(
-    type,
-    width,
-    height,
-    cornerRadius,
-    cornerRadii,
-    anchor,
-    tabWidth,
-    tabHeight,
-    filletRadius,
-    scallopRadius,
-    waveCount,
-    waveAmplitude,
-    skewAngle,
-    ribbonFoldDepth,
-    rotation,
-    scaleX,
-    scaleY,
-    stretchOffset,
-    notchesHash,
-  );
+  int get hashCode => Object.hashAll([
+        type,
+        width,
+        height,
+        cornerRadius,
+        corners,
+        edges,
+        anchor,
+        tabWidth,
+        tabHeight,
+        filletRadius,
+        scallopRadius,
+        petalCount,
+        protrusionDepth,
+        toothWidth,
+        toothHeight,
+        speechBubbleTailWidth,
+        speechBubbleTailHeight,
+        waveCount,
+        waveAmplitude,
+        skewAngle,
+        ribbonFoldDepth,
+        transform,
+        constraints,
+        bezierConfig,
+        notchesHash,
+      ]);
 }
 
 /// High-performance Least-Recently-Used (LRU) cache for reusable vector Paths.
@@ -136,8 +166,9 @@ class ShapePathCache {
     required DynamicShapeConfig config,
     required Path Function() computePath,
   }) {
-    // Custom Bezier paths are not cached to prevent caching stale user closures
-    if (config.type == DynamicShapeType.customBezier) {
+    // Custom Bezier paths with callback closures are not cached to prevent caching stale closures
+    if (config.type == DynamicShapeType.customBezier &&
+        config.customBezierBuilder != null) {
       return computePath();
     }
 

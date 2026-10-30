@@ -83,11 +83,11 @@ class _ShapePlaygroundState extends State<ShapePlayground> {
   }
 
   DynamicShapeConfig get _activeConfig => DynamicShapeConfig(
-    type: _type,
-    borderStyle: _borderStyle,
-    backgroundEffect: _bgEffect,
-    cornerRadius: _cornerRadius,
-  );
+        type: _type,
+        borderStyle: _borderStyle,
+        backgroundEffect: _bgEffect,
+        cornerRadius: _cornerRadius,
+      );
 
   @override
   Widget build(BuildContext context) {
@@ -103,9 +103,8 @@ class _ShapePlaygroundState extends State<ShapePlayground> {
                 width: 260,
                 height: 160,
                 color: _isDark ? const Color(0xFF1E293B) : Colors.white,
-                borderColor: _isDark
-                    ? const Color(0xFF38BDF8)
-                    : const Color(0xFF6366F1),
+                borderColor:
+                    _isDark ? const Color(0xFF38BDF8) : const Color(0xFF6366F1),
                 borderWidth: _borderWidth,
                 child: ShapeSafeArea(
                   config: _activeConfig,
@@ -162,9 +161,8 @@ class _ShapePlaygroundState extends State<ShapePlayground> {
                       child: DropdownButton<DynamicShapeType>(
                         value: _type,
                         isExpanded: true,
-                        dropdownColor: _isDark
-                            ? const Color(0xFF1E293B)
-                            : Colors.white,
+                        dropdownColor:
+                            _isDark ? const Color(0xFF1E293B) : Colors.white,
                         style: TextStyle(
                           color: _isDark ? Colors.white : Colors.black87,
                         ),
@@ -184,9 +182,8 @@ class _ShapePlaygroundState extends State<ShapePlayground> {
                       child: DropdownButton<BorderStyleType>(
                         value: _borderStyle,
                         isExpanded: true,
-                        dropdownColor: _isDark
-                            ? const Color(0xFF1E293B)
-                            : Colors.white,
+                        dropdownColor:
+                            _isDark ? const Color(0xFF1E293B) : Colors.white,
                         style: TextStyle(
                           color: _isDark ? Colors.white : Colors.black87,
                         ),

@@ -416,8 +416,7 @@ class ShapeBorderPainter {
       final dx = math.cos(angle) * radius;
       final dy = math.sin(angle) * radius;
 
-      final gradient =
-          config.borderGradient ??
+      final gradient = config.borderGradient ??
           LinearGradient(
             colors: [
               borderColor,
@@ -428,8 +427,7 @@ class ShapeBorderPainter {
           );
 
       final colors = gradient.colors;
-      final stops =
-          gradient.stops ??
+      final stops = gradient.stops ??
           (colors.length == 2
               ? null
               : List.generate(colors.length, (i) => i / (colors.length - 1)));
@@ -533,47 +531,47 @@ class ShapeBorderPainter {
 
     final colors = switch (config.metallicType) {
       MetallicType.gold => const [
-        Color(0xFFFFD54F),
-        Color(0xFFFFB300),
-        Color(0xFFFFF9C4),
-        Color(0xFFFFA000),
-        Color(0xFFFFE082),
-      ],
+          Color(0xFFFFD54F),
+          Color(0xFFFFB300),
+          Color(0xFFFFF9C4),
+          Color(0xFFFFA000),
+          Color(0xFFFFE082),
+        ],
       MetallicType.chrome => const [
-        Color(0xFFECEFF1),
-        Color(0xFF90A4AE),
-        Color(0xFFFFFFFF),
-        Color(0xFF607D8B),
-        Color(0xFFCFD8DC),
-      ],
+          Color(0xFFECEFF1),
+          Color(0xFF90A4AE),
+          Color(0xFFFFFFFF),
+          Color(0xFF607D8B),
+          Color(0xFFCFD8DC),
+        ],
       MetallicType.roseGold => const [
-        Color(0xFFF8BBD0),
-        Color(0xFFE91E63),
-        Color(0xFFFCE4EC),
-        Color(0xFFC2185B),
-        Color(0xFFF8BBD0),
-      ],
+          Color(0xFFF8BBD0),
+          Color(0xFFE91E63),
+          Color(0xFFFCE4EC),
+          Color(0xFFC2185B),
+          Color(0xFFF8BBD0),
+        ],
       MetallicType.silver => const [
-        Color(0xFFECEFF1),
-        Color(0xFFB0BEC5),
-        Color(0xFFFFFFFF),
-        Color(0xFF78909C),
-        Color(0xFFECEFF1),
-      ],
+          Color(0xFFECEFF1),
+          Color(0xFFB0BEC5),
+          Color(0xFFFFFFFF),
+          Color(0xFF78909C),
+          Color(0xFFECEFF1),
+        ],
       MetallicType.bronze => const [
-        Color(0xFFD7CCC8),
-        Color(0xFF8D6E63),
-        Color(0xFFEFEBE9),
-        Color(0xFF5D4037),
-        Color(0xFFD7CCC8),
-      ],
+          Color(0xFFD7CCC8),
+          Color(0xFF8D6E63),
+          Color(0xFFEFEBE9),
+          Color(0xFF5D4037),
+          Color(0xFFD7CCC8),
+        ],
       MetallicType.titanium => const [
-        Color(0xFF78909C),
-        Color(0xFF37474F),
-        Color(0xFFB0BEC5),
-        Color(0xFF263238),
-        Color(0xFF78909C),
-      ],
+          Color(0xFF78909C),
+          Color(0xFF37474F),
+          Color(0xFFB0BEC5),
+          Color(0xFF263238),
+          Color(0xFF78909C),
+        ],
     };
 
     final gradient = LinearGradient(
@@ -595,8 +593,7 @@ class ShapeBorderPainter {
     Color borderColor,
     double borderWidth,
   ) {
-    final layers =
-        config.multiLayerBorders ??
+    final layers = config.multiLayerBorders ??
         [
           BorderLayer(color: borderColor, width: borderWidth, offset: 0.0),
           BorderLayer(
@@ -705,8 +702,7 @@ class ShapeBorderPainter {
     Color borderColor,
     double borderWidth,
   ) {
-    final gradient =
-        config.borderGradient ??
+    final gradient = config.borderGradient ??
         LinearGradient(
           colors: [
             borderColor,

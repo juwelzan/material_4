@@ -1,21 +1,12 @@
 import 'dart:ui';
 
+import 'package:flutter/foundation.dart' show listEquals;
 import 'package:flutter/material.dart' show BoxShadow, Gradient;
 
+import 'config/config.dart';
 import 'shape_pattern.dart';
 
-/// Defines the position of tabs, notches, or cutouts on a container.
-enum ShapeAnchor {
-  topLeft,
-  topRight,
-  bottomLeft,
-  bottomRight,
-  leftCenter,
-  rightCenter,
-  topCenter,
-  bottomCenter,
-  center,
-}
+export 'config/config.dart';
 
 /// Available dynamic shape presets that can be generated on the fly.
 enum DynamicShapeType {
@@ -109,138 +100,6 @@ enum DynamicShapeType {
   customBezier,
 }
 
-/// Independent corner radii specification for four distinct corners.
-class CornerRadii {
-  final double topLeft;
-  final double topRight;
-  final double bottomLeft;
-  final double bottomRight;
-
-  const CornerRadii({
-    this.topLeft = 0.0,
-    this.topRight = 0.0,
-    this.bottomLeft = 0.0,
-    this.bottomRight = 0.0,
-  });
-
-  const CornerRadii.all(double radius)
-    : topLeft = radius,
-      topRight = radius,
-      bottomLeft = radius,
-      bottomRight = radius;
-
-  const CornerRadii.only({
-    this.topLeft = 0.0,
-    this.topRight = 0.0,
-    this.bottomLeft = 0.0,
-    this.bottomRight = 0.0,
-  });
-
-  const CornerRadii.asymmetric({
-    this.topLeft = 32.0,
-    this.topRight = 8.0,
-    this.bottomRight = 24.0,
-    this.bottomLeft = 4.0,
-  });
-
-  CornerRadii copyWith({
-    double? topLeft,
-    double? topRight,
-    double? bottomLeft,
-    double? bottomRight,
-  }) {
-    return CornerRadii(
-      topLeft: topLeft ?? this.topLeft,
-      topRight: topRight ?? this.topRight,
-      bottomLeft: bottomLeft ?? this.bottomLeft,
-      bottomRight: bottomRight ?? this.bottomRight,
-    );
-  }
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is CornerRadii &&
-          runtimeType == other.runtimeType &&
-          topLeft == other.topLeft &&
-          topRight == other.topRight &&
-          bottomLeft == other.bottomLeft &&
-          bottomRight == other.bottomRight;
-
-  @override
-  int get hashCode => Object.hash(topLeft, topRight, bottomLeft, bottomRight);
-
-  Map<String, dynamic> toJson() => {
-    'topLeft': topLeft,
-    'topRight': topRight,
-    'bottomLeft': bottomLeft,
-    'bottomRight': bottomRight,
-  };
-
-  factory CornerRadii.fromJson(Map<String, dynamic> json) => CornerRadii(
-    topLeft: (json['topLeft'] as num?)?.toDouble() ?? 0.0,
-    topRight: (json['topRight'] as num?)?.toDouble() ?? 0.0,
-    bottomLeft: (json['bottomLeft'] as num?)?.toDouble() ?? 0.0,
-    bottomRight: (json['bottomRight'] as num?)?.toDouble() ?? 0.0,
-  );
-}
-
-/// Multi-notch specification for embedding multiple slots/cavities into a shape contour.
-class ShapeNotch {
-  final ShapeAnchor position;
-  final double width;
-  final double height;
-  final double filletRadius;
-  final double offset;
-  final bool isInward;
-
-  const ShapeNotch({
-    this.position = ShapeAnchor.topRight,
-    this.width = 80.0,
-    this.height = 24.0,
-    this.filletRadius = 12.0,
-    this.offset = 0.0,
-    this.isInward = true,
-  });
-
-  Map<String, dynamic> toJson() => {
-    'position': position.name,
-    'width': width,
-    'height': height,
-    'filletRadius': filletRadius,
-    'offset': offset,
-    'isInward': isInward,
-  };
-
-  factory ShapeNotch.fromJson(Map<String, dynamic> json) => ShapeNotch(
-    position: ShapeAnchor.values.firstWhere(
-      (e) => e.name == json['position'],
-      orElse: () => ShapeAnchor.topRight,
-    ),
-    width: (json['width'] as num?)?.toDouble() ?? 80.0,
-    height: (json['height'] as num?)?.toDouble() ?? 24.0,
-    filletRadius: (json['filletRadius'] as num?)?.toDouble() ?? 12.0,
-    offset: (json['offset'] as num?)?.toDouble() ?? 0.0,
-    isInward: json['isInward'] as bool? ?? true,
-  );
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is ShapeNotch &&
-          runtimeType == other.runtimeType &&
-          position == other.position &&
-          width == other.width &&
-          height == other.height &&
-          filletRadius == other.filletRadius &&
-          offset == other.offset &&
-          isInward == other.isInward;
-
-  @override
-  int get hashCode =>
-      Object.hash(position, width, height, filletRadius, offset, isInward);
-}
-
 /// Metallic reflection lustres for metallic borders and backgrounds.
 enum MetallicType { gold, chrome, bronze, silver, roseGold, titanium }
 
@@ -262,7 +121,7 @@ class BorderLayer {
   final Gradient? gradient;
   final double width;
   final double
-  offset; // Inset (positive) or outset (negative) from base contour
+      offset; // Inset (positive) or outset (negative) from base contour
   final double dashLength;
   final double dashGap;
   final double blurRadius;
@@ -295,15 +154,15 @@ class BorderLayer {
 
   @override
   int get hashCode => Object.hash(
-    color,
-    gradient,
-    width,
-    offset,
-    dashLength,
-    dashGap,
-    blurRadius,
-    isDashed,
-  );
+        color,
+        gradient,
+        width,
+        offset,
+        dashLength,
+        dashGap,
+        blurRadius,
+        isDashed,
+      );
 }
 
 /// Unique border rendering styles to give containers striking visual identities.
@@ -419,7 +278,13 @@ class DynamicShapeConfig {
   final double cornerRadius;
 
   /// Independent corner radii specification (takes precedence over cornerRadius if provided).
-  final CornerRadii? cornerRadii;
+  final CornerRadii? _cornerRadii;
+
+  /// Modern corner configuration supporting elliptical radii and proportional scaling.
+  final ShapeCorners? corners;
+
+  /// Contour configuration for the four boundary edges.
+  final ShapeEdges? edges;
 
   /// Anchor position for tabs, notches, steps, bubbles, or tails.
   final ShapeAnchor anchor;
@@ -503,17 +368,21 @@ class DynamicShapeConfig {
   /// Inward swallowtail cut depth for ribbon and bookmark shapes.
   final double ribbonFoldDepth;
 
-  /// Rotation applied to the shape in radians.
-  final double rotation;
+  /// Geometric transformation configuration.
+  final ShapeTransform? transform;
 
-  /// Horizontal and vertical scaling factor (1.0 = 100%).
-  final double scaleX;
-  final double scaleY;
+  final double _rotation;
+  final double _scaleX;
+  final double _scaleY;
+  final Offset _stretchOffset;
 
-  /// Directional stretch distortion offset.
-  final Offset stretchOffset;
+  /// Geometric and accessibility boundary constraints.
+  final ShapeConstraints constraints;
 
-  /// Custom Bézier path builder callback for customBezier shape type.
+  /// Declarative parametric Bézier geometry configuration.
+  final CustomBezierConfig? bezierConfig;
+
+  /// Custom Bézier path builder callback for customBezier shape type (legacy).
   final Path Function(Size size)? customBezierBuilder;
 
   // --- Next-Gen Border Parameters (Phase 2 Expansion) ---
@@ -570,7 +439,9 @@ class DynamicShapeConfig {
     this.type = DynamicShapeType.smoothRounded,
     this.borderStyle = BorderStyleType.solid,
     this.cornerRadius = 24.0,
-    this.cornerRadii,
+    CornerRadii? cornerRadii,
+    this.corners,
+    this.edges,
     this.anchor = ShapeAnchor.topRight,
     this.customAnchorOffset,
     this.tabWidth = 80.0,
@@ -608,10 +479,13 @@ class DynamicShapeConfig {
     this.waveAmplitude = 8.0,
     this.skewAngle = 14.0,
     this.ribbonFoldDepth = 18.0,
-    this.rotation = 0.0,
-    this.scaleX = 1.0,
-    this.scaleY = 1.0,
-    this.stretchOffset = Offset.zero,
+    double rotation = 0.0,
+    double scaleX = 1.0,
+    double scaleY = 1.0,
+    Offset stretchOffset = Offset.zero,
+    this.transform,
+    this.constraints = const ShapeConstraints(),
+    this.bezierConfig,
     this.customBezierBuilder,
     this.borderProgress = 0.0,
     this.dashPhase = 0.0,
@@ -629,7 +503,50 @@ class DynamicShapeConfig {
     this.noiseOpacity = 0.05,
     this.waveLevel = 0.5,
     this.particleCount = 12,
-  });
+  })  : _cornerRadii = cornerRadii,
+        _rotation = rotation,
+        _scaleX = scaleX,
+        _scaleY = scaleY,
+        _stretchOffset = stretchOffset;
+
+  /// Independent corner radii specification (takes precedence over cornerRadius if provided).
+  CornerRadii? get cornerRadii => _cornerRadii ?? corners?.toCornerRadii();
+
+  /// Rotation applied to the shape in radians.
+  double get rotation => (transform?.rotation) ?? _rotation;
+
+  /// Horizontal scaling factor (1.0 = 100%).
+  double get scaleX => (transform?.scaleX) ?? _scaleX;
+
+  /// Vertical scaling factor (1.0 = 100%).
+  double get scaleY => (transform?.scaleY) ?? _scaleY;
+
+  /// Directional stretch distortion offset.
+  Offset get stretchOffset => (transform?.stretchOffset) ?? _stretchOffset;
+
+  /// Resolved four-corner radii configuration with CSS proportional downscaling support.
+  ShapeCorners get resolvedCorners {
+    if (corners != null) return corners!;
+    if (_cornerRadii != null) return _cornerRadii!.toShapeCorners();
+    return ShapeCorners.all(Radius.circular(cornerRadius));
+  }
+
+  /// Resolved geometric transformation configuration.
+  ShapeTransform get resolvedTransform {
+    if (transform != null) return transform!;
+    if (_rotation != 0.0 ||
+        _scaleX != 1.0 ||
+        _scaleY != 1.0 ||
+        _stretchOffset != Offset.zero) {
+      return ShapeTransform(
+        rotation: _rotation,
+        scaleX: _scaleX,
+        scaleY: _scaleY,
+        stretchOffset: _stretchOffset,
+      );
+    }
+    return ShapeTransform.identity;
+  }
 
   // --- Factory Presets (Existing preserved 100%) ---
 
@@ -820,12 +737,14 @@ class DynamicShapeConfig {
   /// Preset for an Asymmetric Card with 4 independent corner radii.
   factory DynamicShapeConfig.asymmetricCard({
     CornerRadii cornerRadii = const CornerRadii.asymmetric(),
+    ShapeCorners? corners,
     BorderStyleType borderStyle = BorderStyleType.solid,
   }) {
     return DynamicShapeConfig(
       type: DynamicShapeType.asymmetricCard,
       borderStyle: borderStyle,
       cornerRadii: cornerRadii,
+      corners: corners,
     );
   }
 
@@ -1017,12 +936,14 @@ class DynamicShapeConfig {
 
   /// Preset for fully custom Bézier path geometry.
   factory DynamicShapeConfig.customBezier({
-    required Path Function(Size size) builder,
+    Path Function(Size size)? builder,
+    CustomBezierConfig? config,
     BorderStyleType borderStyle = BorderStyleType.solid,
   }) {
     return DynamicShapeConfig(
       type: DynamicShapeType.customBezier,
       customBezierBuilder: builder,
+      bezierConfig: config,
       borderStyle: borderStyle,
     );
   }
@@ -1180,6 +1101,8 @@ class DynamicShapeConfig {
     BorderStyleType? borderStyle,
     double? cornerRadius,
     CornerRadii? cornerRadii,
+    ShapeCorners? corners,
+    ShapeEdges? edges,
     ShapeAnchor? anchor,
     Offset? customAnchorOffset,
     double? tabWidth,
@@ -1221,6 +1144,9 @@ class DynamicShapeConfig {
     double? scaleX,
     double? scaleY,
     Offset? stretchOffset,
+    ShapeTransform? transform,
+    ShapeConstraints? constraints,
+    CustomBezierConfig? bezierConfig,
     Path Function(Size size)? customBezierBuilder,
     double? borderProgress,
     double? dashPhase,
@@ -1243,7 +1169,9 @@ class DynamicShapeConfig {
       type: type ?? this.type,
       borderStyle: borderStyle ?? this.borderStyle,
       cornerRadius: cornerRadius ?? this.cornerRadius,
-      cornerRadii: cornerRadii ?? this.cornerRadii,
+      cornerRadii: cornerRadii ?? _cornerRadii,
+      corners: corners ?? this.corners,
+      edges: edges ?? this.edges,
       anchor: anchor ?? this.anchor,
       customAnchorOffset: customAnchorOffset ?? this.customAnchorOffset,
       tabWidth: tabWidth ?? this.tabWidth,
@@ -1283,10 +1211,13 @@ class DynamicShapeConfig {
       waveAmplitude: waveAmplitude ?? this.waveAmplitude,
       skewAngle: skewAngle ?? this.skewAngle,
       ribbonFoldDepth: ribbonFoldDepth ?? this.ribbonFoldDepth,
-      rotation: rotation ?? this.rotation,
-      scaleX: scaleX ?? this.scaleX,
-      scaleY: scaleY ?? this.scaleY,
-      stretchOffset: stretchOffset ?? this.stretchOffset,
+      rotation: rotation ?? _rotation,
+      scaleX: scaleX ?? _scaleX,
+      scaleY: scaleY ?? _scaleY,
+      stretchOffset: stretchOffset ?? _stretchOffset,
+      transform: transform ?? this.transform,
+      constraints: constraints ?? this.constraints,
+      bezierConfig: bezierConfig ?? this.bezierConfig,
       customBezierBuilder: customBezierBuilder ?? this.customBezierBuilder,
       borderProgress: borderProgress ?? this.borderProgress,
       dashPhase: dashPhase ?? this.dashPhase,
@@ -1309,109 +1240,278 @@ class DynamicShapeConfig {
 
   /// Serializes this configuration into a JSON-compatible map for persistence or network transport.
   Map<String, dynamic> toJson() => {
-    'type': type.name,
-    'borderStyle': borderStyle.name,
-    'cornerRadius': cornerRadius,
-    'cornerRadii': cornerRadii?.toJson(),
-    'anchor': anchor.name,
-    'tabWidth': tabWidth,
-    'tabHeight': tabHeight,
-    'filletRadius': filletRadius,
-    'scallopRadius': scallopRadius,
-    'petalCount': petalCount,
-    'protrusionDepth': protrusionDepth,
-    'toothWidth': toothWidth,
-    'toothHeight': toothHeight,
-    'dashLength': dashLength,
-    'dashGap': dashGap,
-    'innerBorderGap': innerBorderGap,
-    'innerBorderWidth': innerBorderWidth,
-    'rotation': rotation,
-    'scaleX': scaleX,
-    'scaleY': scaleY,
-    'stretchOffsetX': stretchOffset.dx,
-    'stretchOffsetY': stretchOffset.dy,
-    'speechBubbleTailWidth': speechBubbleTailWidth,
-    'speechBubbleTailHeight': speechBubbleTailHeight,
-    'waveCount': waveCount,
-    'waveAmplitude': waveAmplitude,
-    'skewAngle': skewAngle,
-    'ribbonFoldDepth': ribbonFoldDepth,
-    'backgroundEffect': backgroundEffect.name,
-    'noiseOpacity': noiseOpacity,
-    'waveLevel': waveLevel,
-    'particleCount': particleCount,
-    'cornerBorderLength': cornerBorderLength,
-    'metallicType': metallicType.name,
-    'handDrawnRoughness': handDrawnRoughness,
-    'neonPulseIntensity': neonPulseIntensity,
-    'notches': notches?.map((n) => n.toJson()).toList(),
-  };
+        'type': type.name,
+        'borderStyle': borderStyle.name,
+        'cornerRadius': cornerRadius,
+        'cornerRadii': _cornerRadii?.toJson(),
+        'corners': corners?.toJson(),
+        'edges': edges?.toJson(),
+        'anchor': anchor.name,
+        'tabWidth': tabWidth,
+        'tabHeight': tabHeight,
+        'filletRadius': filletRadius,
+        'scallopRadius': scallopRadius,
+        'petalCount': petalCount,
+        'protrusionDepth': protrusionDepth,
+        'toothWidth': toothWidth,
+        'toothHeight': toothHeight,
+        'dashLength': dashLength,
+        'dashGap': dashGap,
+        'innerBorderGap': innerBorderGap,
+        'innerBorderWidth': innerBorderWidth,
+        'rotation': rotation,
+        'scaleX': scaleX,
+        'scaleY': scaleY,
+        'stretchOffsetX': stretchOffset.dx,
+        'stretchOffsetY': stretchOffset.dy,
+        'transform': transform?.toJson(),
+        'constraints': constraints.toJson(),
+        'bezierConfig': bezierConfig?.toJson(),
+        'speechBubbleTailWidth': speechBubbleTailWidth,
+        'speechBubbleTailHeight': speechBubbleTailHeight,
+        'waveCount': waveCount,
+        'waveAmplitude': waveAmplitude,
+        'skewAngle': skewAngle,
+        'ribbonFoldDepth': ribbonFoldDepth,
+        'backgroundEffect': backgroundEffect.name,
+        'noiseOpacity': noiseOpacity,
+        'waveLevel': waveLevel,
+        'particleCount': particleCount,
+        'cornerBorderLength': cornerBorderLength,
+        'metallicType': metallicType.name,
+        'handDrawnRoughness': handDrawnRoughness,
+        'neonPulseIntensity': neonPulseIntensity,
+        'notches': notches?.map((n) => n.toJson()).toList(),
+      };
 
   /// Constructs a [DynamicShapeConfig] from serialized JSON data.
   factory DynamicShapeConfig.fromJson(
     Map<String, dynamic> json,
-  ) => DynamicShapeConfig(
-    type: DynamicShapeType.values.firstWhere(
-      (e) => e.name == json['type'],
-      orElse: () => DynamicShapeType.smoothRounded,
-    ),
-    borderStyle: BorderStyleType.values.firstWhere(
-      (e) => e.name == json['borderStyle'],
-      orElse: () => BorderStyleType.solid,
-    ),
-    cornerRadius: (json['cornerRadius'] as num?)?.toDouble() ?? 24.0,
-    cornerRadii: json['cornerRadii'] != null
-        ? CornerRadii.fromJson(json['cornerRadii'] as Map<String, dynamic>)
-        : null,
-    anchor: ShapeAnchor.values.firstWhere(
-      (e) => e.name == json['anchor'],
-      orElse: () => ShapeAnchor.topRight,
-    ),
-    tabWidth: (json['tabWidth'] as num?)?.toDouble() ?? 80.0,
-    tabHeight: (json['tabHeight'] as num?)?.toDouble() ?? 24.0,
-    filletRadius: (json['filletRadius'] as num?)?.toDouble() ?? 12.0,
-    scallopRadius: (json['scallopRadius'] as num?)?.toDouble() ?? 12.0,
-    petalCount: (json['petalCount'] as num?)?.toInt() ?? 10,
-    protrusionDepth: (json['protrusionDepth'] as num?)?.toDouble() ?? 16.0,
-    toothWidth: (json['toothWidth'] as num?)?.toDouble() ?? 14.0,
-    toothHeight: (json['toothHeight'] as num?)?.toDouble() ?? 8.0,
-    dashLength: (json['dashLength'] as num?)?.toDouble() ?? 7.0,
-    dashGap: (json['dashGap'] as num?)?.toDouble() ?? 4.0,
-    innerBorderGap: (json['innerBorderGap'] as num?)?.toDouble() ?? 4.0,
-    innerBorderWidth: (json['innerBorderWidth'] as num?)?.toDouble() ?? 1.0,
-    rotation: (json['rotation'] as num?)?.toDouble() ?? 0.0,
-    scaleX: (json['scaleX'] as num?)?.toDouble() ?? 1.0,
-    scaleY: (json['scaleY'] as num?)?.toDouble() ?? 1.0,
-    stretchOffset: Offset(
-      (json['stretchOffsetX'] as num?)?.toDouble() ?? 0.0,
-      (json['stretchOffsetY'] as num?)?.toDouble() ?? 0.0,
-    ),
-    speechBubbleTailWidth:
-        (json['speechBubbleTailWidth'] as num?)?.toDouble() ?? 18.0,
-    speechBubbleTailHeight:
-        (json['speechBubbleTailHeight'] as num?)?.toDouble() ?? 14.0,
-    waveCount: (json['waveCount'] as num?)?.toDouble() ?? 3.0,
-    waveAmplitude: (json['waveAmplitude'] as num?)?.toDouble() ?? 8.0,
-    skewAngle: (json['skewAngle'] as num?)?.toDouble() ?? 14.0,
-    ribbonFoldDepth: (json['ribbonFoldDepth'] as num?)?.toDouble() ?? 18.0,
-    backgroundEffect: BackgroundEffectType.values.firstWhere(
-      (e) => e.name == json['backgroundEffect'],
-      orElse: () => BackgroundEffectType.none,
-    ),
-    noiseOpacity: (json['noiseOpacity'] as num?)?.toDouble() ?? 0.05,
-    waveLevel: (json['waveLevel'] as num?)?.toDouble() ?? 0.5,
-    particleCount: (json['particleCount'] as num?)?.toInt() ?? 12,
-    cornerBorderLength:
-        (json['cornerBorderLength'] as num?)?.toDouble() ?? 24.0,
-    metallicType: MetallicType.values.firstWhere(
-      (e) => e.name == json['metallicType'],
-      orElse: () => MetallicType.gold,
-    ),
-    handDrawnRoughness: (json['handDrawnRoughness'] as num?)?.toDouble() ?? 1.6,
-    neonPulseIntensity: (json['neonPulseIntensity'] as num?)?.toDouble() ?? 1.0,
-    notches: (json['notches'] as List?)
-        ?.map((n) => ShapeNotch.fromJson(n as Map<String, dynamic>))
-        .toList(),
-  );
+  ) =>
+      DynamicShapeConfig(
+        type: DynamicShapeType.values.firstWhere(
+          (e) => e.name == json['type'],
+          orElse: () => DynamicShapeType.smoothRounded,
+        ),
+        borderStyle: BorderStyleType.values.firstWhere(
+          (e) => e.name == json['borderStyle'],
+          orElse: () => BorderStyleType.solid,
+        ),
+        cornerRadius: (json['cornerRadius'] as num?)?.toDouble() ?? 24.0,
+        cornerRadii: json['cornerRadii'] != null
+            ? CornerRadii.fromJson(json['cornerRadii'] as Map<String, dynamic>)
+            : null,
+        corners: json['corners'] != null
+            ? ShapeCorners.fromJson(json['corners'] as Map<String, dynamic>)
+            : null,
+        edges: json['edges'] != null
+            ? ShapeEdges.fromJson(json['edges'] as Map<String, dynamic>)
+            : null,
+        anchor: ShapeAnchor.values.firstWhere(
+          (e) => e.name == json['anchor'],
+          orElse: () => ShapeAnchor.topRight,
+        ),
+        tabWidth: (json['tabWidth'] as num?)?.toDouble() ?? 80.0,
+        tabHeight: (json['tabHeight'] as num?)?.toDouble() ?? 24.0,
+        filletRadius: (json['filletRadius'] as num?)?.toDouble() ?? 12.0,
+        scallopRadius: (json['scallopRadius'] as num?)?.toDouble() ?? 12.0,
+        petalCount: (json['petalCount'] as num?)?.toInt() ?? 10,
+        protrusionDepth: (json['protrusionDepth'] as num?)?.toDouble() ?? 16.0,
+        toothWidth: (json['toothWidth'] as num?)?.toDouble() ?? 14.0,
+        toothHeight: (json['toothHeight'] as num?)?.toDouble() ?? 8.0,
+        dashLength: (json['dashLength'] as num?)?.toDouble() ?? 7.0,
+        dashGap: (json['dashGap'] as num?)?.toDouble() ?? 4.0,
+        innerBorderGap: (json['innerBorderGap'] as num?)?.toDouble() ?? 4.0,
+        innerBorderWidth: (json['innerBorderWidth'] as num?)?.toDouble() ?? 1.0,
+        rotation: (json['rotation'] as num?)?.toDouble() ?? 0.0,
+        scaleX: (json['scaleX'] as num?)?.toDouble() ?? 1.0,
+        scaleY: (json['scaleY'] as num?)?.toDouble() ?? 1.0,
+        stretchOffset: Offset(
+          (json['stretchOffsetX'] as num?)?.toDouble() ?? 0.0,
+          (json['stretchOffsetY'] as num?)?.toDouble() ?? 0.0,
+        ),
+        transform: json['transform'] != null
+            ? ShapeTransform.fromJson(json['transform'] as Map<String, dynamic>)
+            : null,
+        constraints: json['constraints'] != null
+            ? ShapeConstraints.fromJson(
+                json['constraints'] as Map<String, dynamic>)
+            : const ShapeConstraints(),
+        bezierConfig: json['bezierConfig'] != null
+            ? CustomBezierConfig.fromJson(
+                json['bezierConfig'] as Map<String, dynamic>)
+            : null,
+        speechBubbleTailWidth:
+            (json['speechBubbleTailWidth'] as num?)?.toDouble() ?? 18.0,
+        speechBubbleTailHeight:
+            (json['speechBubbleTailHeight'] as num?)?.toDouble() ?? 14.0,
+        waveCount: (json['waveCount'] as num?)?.toDouble() ?? 3.0,
+        waveAmplitude: (json['waveAmplitude'] as num?)?.toDouble() ?? 8.0,
+        skewAngle: (json['skewAngle'] as num?)?.toDouble() ?? 14.0,
+        ribbonFoldDepth: (json['ribbonFoldDepth'] as num?)?.toDouble() ?? 18.0,
+        backgroundEffect: BackgroundEffectType.values.firstWhere(
+          (e) => e.name == json['backgroundEffect'],
+          orElse: () => BackgroundEffectType.none,
+        ),
+        noiseOpacity: (json['noiseOpacity'] as num?)?.toDouble() ?? 0.05,
+        waveLevel: (json['waveLevel'] as num?)?.toDouble() ?? 0.5,
+        particleCount: (json['particleCount'] as num?)?.toInt() ?? 12,
+        cornerBorderLength:
+            (json['cornerBorderLength'] as num?)?.toDouble() ?? 24.0,
+        metallicType: MetallicType.values.firstWhere(
+          (e) => e.name == json['metallicType'],
+          orElse: () => MetallicType.gold,
+        ),
+        handDrawnRoughness:
+            (json['handDrawnRoughness'] as num?)?.toDouble() ?? 1.6,
+        neonPulseIntensity:
+            (json['neonPulseIntensity'] as num?)?.toDouble() ?? 1.0,
+        notches: (json['notches'] as List?)
+            ?.map((n) => ShapeNotch.fromJson(n as Map<String, dynamic>))
+            .toList(),
+      );
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is DynamicShapeConfig &&
+          runtimeType == other.runtimeType &&
+          type == other.type &&
+          borderStyle == other.borderStyle &&
+          cornerRadius == other.cornerRadius &&
+          _cornerRadii == other._cornerRadii &&
+          corners == other.corners &&
+          edges == other.edges &&
+          anchor == other.anchor &&
+          customAnchorOffset == other.customAnchorOffset &&
+          tabWidth == other.tabWidth &&
+          tabHeight == other.tabHeight &&
+          filletRadius == other.filletRadius &&
+          scallopRadius == other.scallopRadius &&
+          petalCount == other.petalCount &&
+          protrusionDepth == other.protrusionDepth &&
+          toothWidth == other.toothWidth &&
+          toothHeight == other.toothHeight &&
+          dashLength == other.dashLength &&
+          dashGap == other.dashGap &&
+          innerBorderGap == other.innerBorderGap &&
+          innerBorderWidth == other.innerBorderWidth &&
+          innerBorderColor == other.innerBorderColor &&
+          borderGradient == other.borderGradient &&
+          neoOffset == other.neoOffset &&
+          neoColor == other.neoColor &&
+          glowBlurRadius == other.glowBlurRadius &&
+          glowColor == other.glowColor &&
+          pattern == other.pattern &&
+          patternColor == other.patternColor &&
+          patternSpacing == other.patternSpacing &&
+          patternStrokeWidth == other.patternStrokeWidth &&
+          listEquals(innerShadows, other.innerShadows) &&
+          isGlassmorphic == other.isGlassmorphic &&
+          glassBlur == other.glassBlur &&
+          glassTint == other.glassTint &&
+          isShimmering == other.isShimmering &&
+          shimmerProgress == other.shimmerProgress &&
+          listEquals(notches, other.notches) &&
+          speechBubbleTailWidth == other.speechBubbleTailWidth &&
+          speechBubbleTailHeight == other.speechBubbleTailHeight &&
+          waveCount == other.waveCount &&
+          waveAmplitude == other.waveAmplitude &&
+          skewAngle == other.skewAngle &&
+          ribbonFoldDepth == other.ribbonFoldDepth &&
+          _rotation == other._rotation &&
+          _scaleX == other._scaleX &&
+          _scaleY == other._scaleY &&
+          _stretchOffset == other._stretchOffset &&
+          transform == other.transform &&
+          constraints == other.constraints &&
+          bezierConfig == other.bezierConfig &&
+          customBezierBuilder == other.customBezierBuilder &&
+          borderProgress == other.borderProgress &&
+          dashPhase == other.dashPhase &&
+          listEquals(multiLayerBorders, other.multiLayerBorders) &&
+          cornerBorderLength == other.cornerBorderLength &&
+          metallicType == other.metallicType &&
+          embossLightAngle == other.embossLightAngle &&
+          handDrawnRoughness == other.handDrawnRoughness &&
+          neonPulseIntensity == other.neonPulseIntensity &&
+          neonGlowColor == other.neonGlowColor &&
+          strokeAlign == other.strokeAlign &&
+          backgroundEffect == other.backgroundEffect &&
+          listEquals(meshColors, other.meshColors) &&
+          backgroundProgress == other.backgroundProgress &&
+          noiseOpacity == other.noiseOpacity &&
+          waveLevel == other.waveLevel &&
+          particleCount == other.particleCount;
+
+  @override
+  int get hashCode => Object.hashAll([
+        type,
+        borderStyle,
+        cornerRadius,
+        _cornerRadii,
+        corners,
+        edges,
+        anchor,
+        customAnchorOffset,
+        tabWidth,
+        tabHeight,
+        filletRadius,
+        scallopRadius,
+        petalCount,
+        protrusionDepth,
+        toothWidth,
+        toothHeight,
+        dashLength,
+        dashGap,
+        innerBorderGap,
+        innerBorderWidth,
+        innerBorderColor,
+        borderGradient,
+        neoOffset,
+        neoColor,
+        glowBlurRadius,
+        glowColor,
+        pattern,
+        patternColor,
+        patternSpacing,
+        patternStrokeWidth,
+        innerShadows == null ? null : Object.hashAll(innerShadows!),
+        isGlassmorphic,
+        glassBlur,
+        glassTint,
+        isShimmering,
+        shimmerProgress,
+        notches == null ? null : Object.hashAll(notches!),
+        speechBubbleTailWidth,
+        speechBubbleTailHeight,
+        waveCount,
+        waveAmplitude,
+        skewAngle,
+        ribbonFoldDepth,
+        _rotation,
+        _scaleX,
+        _scaleY,
+        _stretchOffset,
+        transform,
+        constraints,
+        bezierConfig,
+        customBezierBuilder,
+        borderProgress,
+        dashPhase,
+        multiLayerBorders == null ? null : Object.hashAll(multiLayerBorders!),
+        cornerBorderLength,
+        metallicType,
+        embossLightAngle,
+        handDrawnRoughness,
+        neonPulseIntensity,
+        neonGlowColor,
+        strokeAlign,
+        backgroundEffect,
+        meshColors == null ? null : Object.hashAll(meshColors!),
+        backgroundProgress,
+        noiseOpacity,
+        waveLevel,
+        particleCount,
+      ]);
 }

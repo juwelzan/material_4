@@ -58,6 +58,21 @@ class ShapeCorners {
     this.bottomRight = Radius.zero,
   });
 
+  /// Constructs a [ShapeCorners] by converting a legacy [CornerRadii] object.
+  ShapeCorners.fromCornerRadii(CornerRadii radii)
+      : topLeft = Radius.circular(radii.topLeft),
+        topRight = Radius.circular(radii.topRight),
+        bottomLeft = Radius.circular(radii.bottomLeft),
+        bottomRight = Radius.circular(radii.bottomRight);
+
+  /// Converts this [ShapeCorners] to a legacy [CornerRadii] object.
+  CornerRadii toCornerRadii() => CornerRadii(
+        topLeft: topLeft.x,
+        topRight: topRight.x,
+        bottomLeft: bottomLeft.x,
+        bottomRight: bottomRight.x,
+      );
+
   /// Asymmetric default aesthetic preset.
   const ShapeCorners.asymmetric({
     this.topLeft = const Radius.circular(32.0),
@@ -84,8 +99,12 @@ class ShapeCorners {
       _isInvalidRadius(bottomRight);
 
   static bool _isInvalidRadius(Radius r) {
-    return r.x.isNaN || r.x.isInfinite || r.x < 0 ||
-        r.y.isNaN || r.y.isInfinite || r.y < 0;
+    return r.x.isNaN ||
+        r.x.isInfinite ||
+        r.x < 0 ||
+        r.y.isNaN ||
+        r.y.isInfinite ||
+        r.y < 0;
   }
 
   /// Validates whether the corner radii comfortably fit within [size]
@@ -175,6 +194,17 @@ class ShapeCorners {
     );
   }
 
+  /// Converts these corners to a Flutter [RRect] bounding the given [rect].
+  RRect toRRect(Rect rect) {
+    return RRect.fromRectAndCorners(
+      rect,
+      topLeft: topLeft,
+      topRight: topRight,
+      bottomLeft: bottomLeft,
+      bottomRight: bottomRight,
+    );
+  }
+
   /// Creates a copy with the given fields replaced by the new values.
   ShapeCorners copyWith({
     Radius? topLeft,
@@ -192,11 +222,11 @@ class ShapeCorners {
 
   /// Converts this [ShapeCorners] to a JSON-compatible map.
   Map<String, dynamic> toJson() => {
-    'topLeft': {'x': topLeft.x, 'y': topLeft.y},
-    'topRight': {'x': topRight.x, 'y': topRight.y},
-    'bottomLeft': {'x': bottomLeft.x, 'y': bottomLeft.y},
-    'bottomRight': {'x': bottomRight.x, 'y': bottomRight.y},
-  };
+        'topLeft': {'x': topLeft.x, 'y': topLeft.y},
+        'topRight': {'x': topRight.x, 'y': topRight.y},
+        'bottomLeft': {'x': bottomLeft.x, 'y': bottomLeft.y},
+        'bottomRight': {'x': bottomRight.x, 'y': bottomRight.y},
+      };
 
   /// Constructs a [ShapeCorners] from serialized JSON data.
   factory ShapeCorners.fromJson(Map<String, dynamic> json) {
@@ -235,4 +265,91 @@ class ShapeCorners {
   @override
   String toString() =>
       'ShapeCorners(tl: $topLeft, tr: $topRight, bl: $bottomLeft, br: $bottomRight)';
+}
+
+/// Legacy independent corner radii specification for four distinct corners.
+///
+/// Preserved for 100% backward compatibility with existing tests and presets.
+@immutable
+class CornerRadii {
+  final double topLeft;
+  final double topRight;
+  final double bottomLeft;
+  final double bottomRight;
+
+  const CornerRadii({
+    this.topLeft = 0.0,
+    this.topRight = 0.0,
+    this.bottomLeft = 0.0,
+    this.bottomRight = 0.0,
+  });
+
+  const CornerRadii.all(double radius)
+      : topLeft = radius,
+        topRight = radius,
+        bottomLeft = radius,
+        bottomRight = radius;
+
+  const CornerRadii.only({
+    this.topLeft = 0.0,
+    this.topRight = 0.0,
+    this.bottomLeft = 0.0,
+    this.bottomRight = 0.0,
+  });
+
+  const CornerRadii.asymmetric({
+    this.topLeft = 32.0,
+    this.topRight = 8.0,
+    this.bottomRight = 24.0,
+    this.bottomLeft = 4.0,
+  });
+
+  /// Converts this [CornerRadii] to modern [ShapeCorners].
+  ShapeCorners toShapeCorners() => ShapeCorners(
+        topLeft: Radius.circular(topLeft),
+        topRight: Radius.circular(topRight),
+        bottomLeft: Radius.circular(bottomLeft),
+        bottomRight: Radius.circular(bottomRight),
+      );
+
+  CornerRadii copyWith({
+    double? topLeft,
+    double? topRight,
+    double? bottomLeft,
+    double? bottomRight,
+  }) {
+    return CornerRadii(
+      topLeft: topLeft ?? this.topLeft,
+      topRight: topRight ?? this.topRight,
+      bottomLeft: bottomLeft ?? this.bottomLeft,
+      bottomRight: bottomRight ?? this.bottomRight,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is CornerRadii &&
+          runtimeType == other.runtimeType &&
+          topLeft == other.topLeft &&
+          topRight == other.topRight &&
+          bottomLeft == other.bottomLeft &&
+          bottomRight == other.bottomRight;
+
+  @override
+  int get hashCode => Object.hash(topLeft, topRight, bottomLeft, bottomRight);
+
+  Map<String, dynamic> toJson() => {
+        'topLeft': topLeft,
+        'topRight': topRight,
+        'bottomLeft': bottomLeft,
+        'bottomRight': bottomRight,
+      };
+
+  factory CornerRadii.fromJson(Map<String, dynamic> json) => CornerRadii(
+        topLeft: (json['topLeft'] as num?)?.toDouble() ?? 0.0,
+        topRight: (json['topRight'] as num?)?.toDouble() ?? 0.0,
+        bottomLeft: (json['bottomLeft'] as num?)?.toDouble() ?? 0.0,
+        bottomRight: (json['bottomRight'] as num?)?.toDouble() ?? 0.0,
+      );
 }

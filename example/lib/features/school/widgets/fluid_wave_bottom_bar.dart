@@ -135,9 +135,8 @@ class _FluidWaveBottomBarState extends State<FluidWaveBottomBar>
                           item.label,
                           style: GoogleFonts.plusJakartaSans(
                             fontSize: 11,
-                            fontWeight: isSelected
-                                ? FontWeight.w700
-                                : FontWeight.w500,
+                            fontWeight:
+                                isSelected ? FontWeight.w700 : FontWeight.w500,
                             color: isSelected
                                 ? const Color(0xFF222222)
                                 : const Color(0xFF9E9EA7),

@@ -228,9 +228,9 @@ class ShapeSwipeMorph extends StatefulWidget {
     this.borderWidth = 1.0,
     this.onShapeChanged,
   }) : assert(
-         shapes.length >= 2,
-         'At least 2 shapes required for swipe morphing',
-       );
+          shapes.length >= 2,
+          'At least 2 shapes required for swipe morphing',
+        );
 
   @override
   State<ShapeSwipeMorph> createState() => _ShapeSwipeMorphState();
@@ -265,14 +265,13 @@ class _ShapeSwipeMorphState extends State<ShapeSwipeMorph> {
   Widget build(BuildContext context) {
     final nextIndex =
         (_dragProgress < 0 ? _currentIndex + 1 : _currentIndex - 1).clamp(
-          0,
-          widget.shapes.length - 1,
-        );
+      0,
+      widget.shapes.length - 1,
+    );
 
     final t = _dragProgress.abs();
-    final activeConfig = t > 0.5
-        ? widget.shapes[nextIndex]
-        : widget.shapes[_currentIndex];
+    final activeConfig =
+        t > 0.5 ? widget.shapes[nextIndex] : widget.shapes[_currentIndex];
 
     return GestureDetector(
       onHorizontalDragUpdate: _onHorizontalDragUpdate,

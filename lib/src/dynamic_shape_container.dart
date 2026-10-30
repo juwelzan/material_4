@@ -100,12 +100,11 @@ class DynamicShapePainter extends CustomPainter {
 
     // 5. Procedural Pattern Textures (Stripes, Dots, Grid, Waves)
     if (config.pattern != ShapePattern.none) {
-      final patternColor =
-          config.patternColor ??
+      final patternColor = config.patternColor ??
           (color != null
               ? (color!.computeLuminance() > 0.5
-                    ? Colors.black.withValues(alpha: 0.06)
-                    : Colors.white.withValues(alpha: 0.12))
+                  ? Colors.black.withValues(alpha: 0.06)
+                  : Colors.white.withValues(alpha: 0.12))
               : const Color(0x0F000000));
 
       ShapePatternRenderer.drawPattern(
@@ -481,9 +480,8 @@ class DynamicShapeContainer extends StatelessWidget {
       padding: padding,
       margin: margin,
       color: color,
-      borderColor: layers.isNotEmpty
-          ? layers.first.color
-          : const Color(0xFF000000),
+      borderColor:
+          layers.isNotEmpty ? layers.first.color : const Color(0xFF000000),
       borderWidth: layers.isNotEmpty ? layers.first.width : 1.5,
       onTap: onTap,
       child: child,
@@ -645,8 +643,8 @@ class DynamicShapeContainer extends StatelessWidget {
       badgeAlignment: anchor == ShapeAnchor.topRight
           ? Alignment.topRight
           : (anchor == ShapeAnchor.bottomRight
-                ? Alignment.bottomRight
-                : Alignment.topLeft),
+              ? Alignment.bottomRight
+              : Alignment.topLeft),
       child: child,
     );
   }

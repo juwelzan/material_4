@@ -47,19 +47,18 @@ class ShapeAnimationController extends ChangeNotifier {
     DynamicShapeConfig initialConfig = const DynamicShapeConfig(),
     this.respectReducedMotion = true,
   }) : _currentConfig = initialConfig {
-    _morphController =
-        AnimationController(
-            vsync: vsync,
-            duration: const Duration(milliseconds: 400),
-          )
-          ..addListener(_onTick)
-          ..addStatusListener((status) {
-            if (status == AnimationStatus.completed && _targetConfig != null) {
-              _currentConfig = _targetConfig!;
-              _previousConfig = null;
-              _targetConfig = null;
-            }
-          });
+    _morphController = AnimationController(
+      vsync: vsync,
+      duration: const Duration(milliseconds: 400),
+    )
+      ..addListener(_onTick)
+      ..addStatusListener((status) {
+        if (status == AnimationStatus.completed && _targetConfig != null) {
+          _currentConfig = _targetConfig!;
+          _previousConfig = null;
+          _targetConfig = null;
+        }
+      });
 
     _pulseController = AnimationController(
       vsync: vsync,
@@ -122,8 +121,7 @@ class ShapeAnimationController extends ChangeNotifier {
   /// Release tactile press with spring physics rebound.
   void release({SpringDescription? spring}) {
     if (_isDisposed) return;
-    final effectiveSpring =
-        spring ??
+    final effectiveSpring = spring ??
         const SpringDescription(mass: 1.0, stiffness: 400.0, damping: 18.0);
 
     final simulation = SpringSimulation(

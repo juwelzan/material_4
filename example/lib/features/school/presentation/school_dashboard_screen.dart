@@ -530,9 +530,8 @@ class _SchoolDashboardScreenState extends State<SchoolDashboardScreen> {
         style: GoogleFonts.plusJakartaSans(
           fontSize: 12.5,
           fontWeight: FontWeight.w600,
-          color: isCompleted
-              ? const Color(0xFF6B6B75)
-              : const Color(0xFF222228),
+          color:
+              isCompleted ? const Color(0xFF6B6B75) : const Color(0xFF222228),
         ),
       ),
     );
@@ -1566,29 +1565,28 @@ class _ShapePlaygroundModalState extends State<_ShapePlaygroundModal> {
                 const SizedBox(height: 6),
                 Wrap(
                   spacing: 6,
-                  children:
-                      [
-                        ShapeAnchor.topRight,
-                        ShapeAnchor.topLeft,
-                        ShapeAnchor.bottomRight,
-                        ShapeAnchor.bottomLeft,
-                      ].map((anchor) {
-                        final isSelected = _selectedAnchor == anchor;
-                        return ChoiceChip(
-                          label: Text(anchor.name),
-                          selected: isSelected,
-                          selectedColor: const Color(0xFF5E43EE),
-                          labelStyle: TextStyle(
-                            color: isSelected ? Colors.white : Colors.black87,
-                            fontSize: 11,
-                          ),
-                          onSelected: (selected) {
-                            if (selected) {
-                              setState(() => _selectedAnchor = anchor);
-                            }
-                          },
-                        );
-                      }).toList(),
+                  children: [
+                    ShapeAnchor.topRight,
+                    ShapeAnchor.topLeft,
+                    ShapeAnchor.bottomRight,
+                    ShapeAnchor.bottomLeft,
+                  ].map((anchor) {
+                    final isSelected = _selectedAnchor == anchor;
+                    return ChoiceChip(
+                      label: Text(anchor.name),
+                      selected: isSelected,
+                      selectedColor: const Color(0xFF5E43EE),
+                      labelStyle: TextStyle(
+                        color: isSelected ? Colors.white : Colors.black87,
+                        fontSize: 11,
+                      ),
+                      onSelected: (selected) {
+                        if (selected) {
+                          setState(() => _selectedAnchor = anchor);
+                        }
+                      },
+                    );
+                  }).toList(),
                 ),
                 const SizedBox(height: 12),
               ],

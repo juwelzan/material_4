@@ -26,10 +26,19 @@ class BezierSegmentConfig {
   const BezierSegmentConfig({
     required this.start,
     required this.end,
-    required this.controlPoint1,
-    this.controlPoint2,
-    this.isNormalized = false,
-  });
+    Offset? controlPoint1,
+    Offset? control1,
+    Offset? controlPoint2,
+    Offset? control2,
+    this.isNormalized = true,
+  })  : controlPoint1 = controlPoint1 ?? control1 ?? Offset.zero,
+        controlPoint2 = controlPoint2 ?? control2;
+
+  /// Shorthand alias for [controlPoint1].
+  Offset get control1 => controlPoint1;
+
+  /// Shorthand alias for [controlPoint2].
+  Offset? get control2 => controlPoint2;
 
   /// Whether this segment is a cubic curve with two distinct control points.
   bool get isCubic => controlPoint2 != null;
@@ -51,8 +60,8 @@ class BezierSegmentConfig {
     if (!isFinite) return true;
     final isEndpointsEqual = (start - end).distanceSquared < 1e-9;
     final isCp1Equal = (start - controlPoint1).distanceSquared < 1e-9;
-    final isCp2Equal =
-        controlPoint2 == null || (start - controlPoint2!).distanceSquared < 1e-9;
+    final isCp2Equal = controlPoint2 == null ||
+        (start - controlPoint2!).distanceSquared < 1e-9;
     return isEndpointsEqual && isCp1Equal && isCp2Equal;
   }
 
@@ -67,6 +76,11 @@ class BezierSegmentConfig {
     final s = resolvePoint(start, size);
     final e = resolvePoint(end, size);
     final cp1 = resolvePoint(controlPoint1, size);
+
+    final bounds = path.getBounds();
+    if (bounds.isEmpty) {
+      path.moveTo(s.dx, s.dy);
+    }
 
     if (isCubic) {
       final cp2 = resolvePoint(controlPoint2!, size);
@@ -94,24 +108,26 @@ class BezierSegmentConfig {
     final b = (p2 - p1 * 2.0 + p0) * 3.0;
     final c = (p1 - p0) * 3.0;
 
-    // A planar cubic has a loop if and only if:
-    // d_x = a.dx * b.dy - a.dy * b.dx
-    // d_y = a.dx * c.dy - a.dy * c.dx
-    // d_z = b.dx * c.dy - b.dy * c.dx
-    // discriminant: Delta = 4 * d_x * d_z - d_y^2 > 0
+    // d0 = a x b, d1 = a x c, d2 = b x c
     final d0 = a.dx * b.dy - a.dy * b.dx;
     final d1 = a.dx * c.dy - a.dy * c.dx;
     final d2 = b.dx * c.dy - b.dy * c.dx;
 
-    final discriminant = 4.0 * d0 * d2 - d1 * d1;
+    // Parameter quadratic discriminant: Delta = 4 * d0 * d2 - 3 * d1^2
+    final delta = 4.0 * d0 * d2 - 3.0 * d1 * d1;
 
-    // When discriminant > 0, the curve has real self-intersection parameters
-    if (discriminant > 1e-9 && d0.abs() > 1e-9) {
-      final sqrtD = math.sqrt(discriminant);
-      final r1 = (-d1 - sqrtD) / (2.0 * d0);
-      final r2 = (-d1 + sqrtD) / (2.0 * d0);
-      // Valid loop if both parameter values are strictly within (0, 1) and distinct
-      return r1 > 0.0 && r1 < 1.0 && r2 > 0.0 && r2 < 1.0 && (r1 - r2).abs() > 1e-4;
+    // A real loop exists if delta > 0 and d0 != 0
+    if (delta > 1e-9 && d0.abs() > 1e-9) {
+      final s = -d1 / d0;
+      final sqrtDeltaOverD0 = math.sqrt(delta) / d0.abs();
+      final r1 = (s - sqrtDeltaOverD0) / 2.0;
+      final r2 = (s + sqrtDeltaOverD0) / 2.0;
+      // Valid loop if both parameter values are within [0, 1] and distinct
+      return r1 >= 0.0 &&
+          r1 <= 1.0 &&
+          r2 >= 0.0 &&
+          r2 <= 1.0 &&
+          (r1 - r2).abs() > 1e-4;
     }
     return false;
   }
@@ -135,21 +151,21 @@ class BezierSegmentConfig {
 
   /// Converts this [BezierSegmentConfig] to a JSON-compatible map.
   Map<String, dynamic> toJson() => {
-    'start': {'dx': start.dx, 'dy': start.dy},
-    'end': {'dx': end.dx, 'dy': end.dy},
-    'cp1': {'dx': controlPoint1.dx, 'dy': controlPoint1.dy},
-    'cp2': controlPoint2 != null
-        ? {'dx': controlPoint2!.dx, 'dy': controlPoint2!.dy}
-        : null,
-    'isNormalized': isNormalized,
-  };
+        'start': {'dx': start.dx, 'dy': start.dy},
+        'end': {'dx': end.dx, 'dy': end.dy},
+        'cp1': {'dx': controlPoint1.dx, 'dy': controlPoint1.dy},
+        'cp2': controlPoint2 != null
+            ? {'dx': controlPoint2!.dx, 'dy': controlPoint2!.dy}
+            : null,
+        'isNormalized': isNormalized,
+      };
 
   /// Constructs a [BezierSegmentConfig] from serialized JSON data.
   factory BezierSegmentConfig.fromJson(Map<String, dynamic> json) {
     Offset parseOffset(Map<String, dynamic> map) => Offset(
-      (map['dx'] as num).toDouble(),
-      (map['dy'] as num).toDouble(),
-    );
+          (map['dx'] as num).toDouble(),
+          (map['dy'] as num).toDouble(),
+        );
 
     return BezierSegmentConfig(
       start: parseOffset(json['start'] as Map<String, dynamic>),
@@ -175,12 +191,12 @@ class BezierSegmentConfig {
 
   @override
   int get hashCode => Object.hash(
-    start,
-    end,
-    controlPoint1,
-    controlPoint2,
-    isNormalized,
-  );
+        start,
+        end,
+        controlPoint1,
+        controlPoint2,
+        isNormalized,
+      );
 }
 
 /// Immutable multi-segment Bézier contour path configuration.
@@ -242,15 +258,16 @@ class CustomBezierConfig {
 
   /// Converts this [CustomBezierConfig] to a JSON-compatible map.
   Map<String, dynamic> toJson() => {
-    'segments': segments.map((s) => s.toJson()).toList(),
-    'autoClose': autoClose,
-  };
+        'segments': segments.map((s) => s.toJson()).toList(),
+        'autoClose': autoClose,
+      };
 
   /// Constructs a [CustomBezierConfig] from serialized JSON data.
   factory CustomBezierConfig.fromJson(Map<String, dynamic> json) {
     return CustomBezierConfig(
       segments: (json['segments'] as List?)
-              ?.map((e) => BezierSegmentConfig.fromJson(e as Map<String, dynamic>))
+              ?.map((e) =>
+                  BezierSegmentConfig.fromJson(e as Map<String, dynamic>))
               .toList() ??
           const [],
       autoClose: json['autoClose'] as bool? ?? true,

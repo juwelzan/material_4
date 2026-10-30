@@ -26,12 +26,10 @@ class ShapeSmartLayout {
     TextDirection textDirection = TextDirection.ltr,
     EdgeInsets basePadding = const EdgeInsets.all(12.0),
   }) {
-    final effectiveWidth = (size.width.isFinite && size.width > 0)
-        ? size.width
-        : 300.0;
-    final effectiveHeight = (size.height.isFinite && size.height > 0)
-        ? size.height
-        : 150.0;
+    final effectiveWidth =
+        (size.width.isFinite && size.width > 0) ? size.width : 300.0;
+    final effectiveHeight =
+        (size.height.isFinite && size.height > 0) ? size.height : 150.0;
 
     final isRtl = textDirection == TextDirection.rtl;
     final strokeAllowance = (borderWidth > 0 ? borderWidth : 1.0);
@@ -162,8 +160,7 @@ class ShapeSmartLayout {
         break;
 
       case DynamicShapeType.parallelogram:
-        final skewOffset =
-            (math.tan(config.skewAngle * math.pi / 180.0).abs() *
+        final skewOffset = (math.tan(config.skewAngle * math.pi / 180.0).abs() *
             effectiveHeight *
             0.35);
         leftInset = math.max(leftInset, skewOffset + 12.0);
@@ -314,12 +311,12 @@ class ShapeSafeArea extends StatelessWidget {
       builder: (context, constraints) {
         final w =
             constraints.hasBoundedWidth && !constraints.maxWidth.isInfinite
-            ? constraints.maxWidth
-            : 300.0;
+                ? constraints.maxWidth
+                : 300.0;
         final h =
             constraints.hasBoundedHeight && !constraints.maxHeight.isInfinite
-            ? constraints.maxHeight
-            : 150.0;
+                ? constraints.maxHeight
+                : 150.0;
         final size = Size(w, h);
         final safePadding = ShapeSmartLayout.computeSafePadding(
           size: size,

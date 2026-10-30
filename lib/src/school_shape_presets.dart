@@ -18,14 +18,15 @@ class SchoolShapePresets {
   // =========================================================================
   static DynamicShapeConfig attendanceConfig({
     ShapeAnchor anchor = ShapeAnchor.topRight,
-  }) => DynamicShapeConfig(
-    type: DynamicShapeType.folderTab,
-    anchor: anchor,
-    cornerRadius: 22.0,
-    tabWidth: 80.0,
-    tabHeight: 18.0,
-    borderStyle: BorderStyleType.solid,
-  );
+  }) =>
+      DynamicShapeConfig(
+        type: DynamicShapeType.folderTab,
+        anchor: anchor,
+        cornerRadius: 22.0,
+        tabWidth: 80.0,
+        tabHeight: 18.0,
+        borderStyle: BorderStyleType.solid,
+      );
 
   static Widget attendanceCard({
     required String title,
@@ -98,15 +99,15 @@ class SchoolShapePresets {
   // 2. Academic Records Preset
   // =========================================================================
   static DynamicShapeConfig academicConfig() => const DynamicShapeConfig(
-    type: DynamicShapeType.asymmetricCard,
-    cornerRadii: CornerRadii(
-      topLeft: 28,
-      topRight: 10,
-      bottomLeft: 10,
-      bottomRight: 28,
-    ),
-    borderStyle: BorderStyleType.solid,
-  );
+        type: DynamicShapeType.asymmetricCard,
+        cornerRadii: CornerRadii(
+          topLeft: 28,
+          topRight: 10,
+          bottomLeft: 10,
+          bottomRight: 28,
+        ),
+        borderStyle: BorderStyleType.solid,
+      );
 
   static Widget academicCard({
     required String subject,
@@ -182,13 +183,13 @@ class SchoolShapePresets {
   // 3. Student ID Card Preset
   // =========================================================================
   static DynamicShapeConfig studentIdConfig() => const DynamicShapeConfig(
-    type: DynamicShapeType.smoothRounded,
-    cornerRadius: 24.0,
-    borderStyle: BorderStyleType.metallic,
-    metallicType: MetallicType.silver,
-    isShimmering: true,
-    shimmerProgress: 0.5,
-  );
+        type: DynamicShapeType.smoothRounded,
+        cornerRadius: 24.0,
+        borderStyle: BorderStyleType.metallic,
+        metallicType: MetallicType.silver,
+        isShimmering: true,
+        shimmerProgress: 0.5,
+      );
 
   static Widget studentIdCard({
     required String studentName,
@@ -257,11 +258,11 @@ class SchoolShapePresets {
   // 4. Achievement Certificate Card Preset
   // =========================================================================
   static DynamicShapeConfig achievementConfig() => const DynamicShapeConfig(
-    type: DynamicShapeType.shield,
-    cornerRadius: 20.0,
-    borderStyle: BorderStyleType.metallic,
-    metallicType: MetallicType.gold,
-  );
+        type: DynamicShapeType.shield,
+        cornerRadius: 20.0,
+        borderStyle: BorderStyleType.metallic,
+        metallicType: MetallicType.gold,
+      );
 
   static Widget achievementCard({
     required String title,
@@ -307,12 +308,12 @@ class SchoolShapePresets {
   // 5. Fee Receipt Preset
   // =========================================================================
   static DynamicShapeConfig feeReceiptConfig() => const DynamicShapeConfig(
-    type: DynamicShapeType.ticketScallop,
-    scallopRadius: 12.0,
-    borderStyle: BorderStyleType.dashed,
-    dashLength: 6.0,
-    dashGap: 4.0,
-  );
+        type: DynamicShapeType.ticketScallop,
+        scallopRadius: 12.0,
+        borderStyle: BorderStyleType.dashed,
+        dashLength: 6.0,
+        dashGap: 4.0,
+      );
 
   static Widget feeReceiptCard({
     required String invoiceNo,
@@ -390,12 +391,12 @@ class SchoolShapePresets {
   // 6. Notice Board Preset
   // =========================================================================
   static DynamicShapeConfig noticeBoardConfig() => const DynamicShapeConfig(
-    type: DynamicShapeType.folderTab,
-    anchor: ShapeAnchor.topLeft,
-    tabWidth: 70.0,
-    tabHeight: 16.0,
-    borderStyle: BorderStyleType.solid,
-  );
+        type: DynamicShapeType.folderTab,
+        anchor: ShapeAnchor.topLeft,
+        tabWidth: 70.0,
+        tabHeight: 16.0,
+        borderStyle: BorderStyleType.solid,
+      );
 
   static Widget noticeBoardCard({
     required String headline,
@@ -463,11 +464,11 @@ class SchoolShapePresets {
   // 7. Examination Schedule Preset
   // =========================================================================
   static DynamicShapeConfig examScheduleConfig() => const DynamicShapeConfig(
-    type: DynamicShapeType.chamferDiagonal,
-    anchor: ShapeAnchor.topRight,
-    filletRadius: 14.0,
-    borderStyle: BorderStyleType.solid,
-  );
+        type: DynamicShapeType.chamferDiagonal,
+        anchor: ShapeAnchor.topRight,
+        filletRadius: 14.0,
+        borderStyle: BorderStyleType.solid,
+      );
 
   static Widget examinationCard({
     required String examTitle,
@@ -531,10 +532,10 @@ class SchoolShapePresets {
   // 8. Result Card Preset
   // =========================================================================
   static DynamicShapeConfig resultConfig() => const DynamicShapeConfig(
-    type: DynamicShapeType.squircle,
-    cornerRadius: 22.0,
-    borderStyle: BorderStyleType.rainbow,
-  );
+        type: DynamicShapeType.squircle,
+        cornerRadius: 22.0,
+        borderStyle: BorderStyleType.rainbow,
+      );
 
   static Widget resultCard({
     required String examSession,
@@ -605,9 +606,9 @@ class SchoolShapePresets {
   // 9. Timetable Slot Preset
   // =========================================================================
   static DynamicShapeConfig timetableConfig() => const DynamicShapeConfig(
-    type: DynamicShapeType.capsule,
-    borderStyle: BorderStyleType.solid,
-  );
+        type: DynamicShapeType.capsule,
+        borderStyle: BorderStyleType.solid,
+      );
 
   static Widget timetableSlot({
     required String time,
@@ -618,9 +619,8 @@ class SchoolShapePresets {
     return DynamicShapeContainer(
       config: timetableConfig(),
       color: isCurrent ? const Color(0xFF6366F1) : const Color(0xFFF1F5F9),
-      borderColor: isCurrent
-          ? const Color(0xFF4338CA)
-          : const Color(0xFFE2E8F0),
+      borderColor:
+          isCurrent ? const Color(0xFF4338CA) : const Color(0xFFE2E8F0),
       borderWidth: 1.0,
       child: ShapeSafeArea(
         config: timetableConfig(),
@@ -665,11 +665,11 @@ class SchoolShapePresets {
   // 10. Teacher Profile Preset
   // =========================================================================
   static DynamicShapeConfig teacherProfileConfig() => const DynamicShapeConfig(
-    type: DynamicShapeType.concaveRounded,
-    cornerRadius: 18.0,
-    borderStyle: BorderStyleType.neonPulse,
-    neonPulseIntensity: 0.9,
-  );
+        type: DynamicShapeType.concaveRounded,
+        cornerRadius: 18.0,
+        borderStyle: BorderStyleType.neonPulse,
+        neonPulseIntensity: 0.9,
+      );
 
   static Widget teacherProfileCard({
     required String teacherName,

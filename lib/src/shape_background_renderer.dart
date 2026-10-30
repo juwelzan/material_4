@@ -99,8 +99,7 @@ class ShapeBackgroundRenderer {
     Size size,
     DynamicShapeConfig config,
   ) {
-    final colors =
-        config.meshColors ??
+    final colors = config.meshColors ??
         const [
           Color(0xFF6C5CE7), // Top-Left
           Color(0xFFFF7675), // Top-Right
@@ -255,8 +254,7 @@ class ShapeBackgroundRenderer {
     // Wave Layer 2 (Front Crest)
     final frontWavePath = Path()..moveTo(0, h);
     for (double x = 0; x <= w; x += 4) {
-      final y =
-          baseLevel +
+      final y = baseLevel +
           math.sin((x / w * 2 * math.pi * 2.0) - phase + 1.2) * 6.0 +
           4.0;
       frontWavePath.lineTo(x, y);
@@ -390,47 +388,47 @@ class ShapeBackgroundRenderer {
   static void _drawMetallic(Canvas canvas, Size size, MetallicType type) {
     final colors = switch (type) {
       MetallicType.gold => const [
-        Color(0xFFFFECB3),
-        Color(0xFFFFD54F),
-        Color(0xFFFFF8E1),
-        Color(0xFFFFC107),
-        Color(0xFFFFECB3),
-      ],
+          Color(0xFFFFECB3),
+          Color(0xFFFFD54F),
+          Color(0xFFFFF8E1),
+          Color(0xFFFFC107),
+          Color(0xFFFFECB3),
+        ],
       MetallicType.chrome => const [
-        Color(0xFFFFFFFF),
-        Color(0xFFCFD8DC),
-        Color(0xFFFFFFFF),
-        Color(0xFF90A4AE),
-        Color(0xFFFFFFFF),
-      ],
+          Color(0xFFFFFFFF),
+          Color(0xFFCFD8DC),
+          Color(0xFFFFFFFF),
+          Color(0xFF90A4AE),
+          Color(0xFFFFFFFF),
+        ],
       MetallicType.silver => const [
-        Color(0xFFECEFF1),
-        Color(0xFFCFD8DC),
-        Color(0xFFFFFFFF),
-        Color(0xFFB0BEC5),
-        Color(0xFFECEFF1),
-      ],
+          Color(0xFFECEFF1),
+          Color(0xFFCFD8DC),
+          Color(0xFFFFFFFF),
+          Color(0xFFB0BEC5),
+          Color(0xFFECEFF1),
+        ],
       MetallicType.roseGold => const [
-        Color(0xFFFCE4EC),
-        Color(0xFFF48FB1),
-        Color(0xFFFFFFFF),
-        Color(0xFFE91E63),
-        Color(0xFFFCE4EC),
-      ],
+          Color(0xFFFCE4EC),
+          Color(0xFFF48FB1),
+          Color(0xFFFFFFFF),
+          Color(0xFFE91E63),
+          Color(0xFFFCE4EC),
+        ],
       MetallicType.bronze => const [
-        Color(0xFFEFEBE9),
-        Color(0xFFBCAAA4),
-        Color(0xFFFFFFFF),
-        Color(0xFF8D6E63),
-        Color(0xFFEFEBE9),
-      ],
+          Color(0xFFEFEBE9),
+          Color(0xFFBCAAA4),
+          Color(0xFFFFFFFF),
+          Color(0xFF8D6E63),
+          Color(0xFFEFEBE9),
+        ],
       MetallicType.titanium => const [
-        Color(0xFFB0BEC5),
-        Color(0xFF78909C),
-        Color(0xFFCFD8DC),
-        Color(0xFF455A64),
-        Color(0xFFB0BEC5),
-      ],
+          Color(0xFFB0BEC5),
+          Color(0xFF78909C),
+          Color(0xFFCFD8DC),
+          Color(0xFF455A64),
+          Color(0xFFB0BEC5),
+        ],
     };
 
     final paint = Paint()

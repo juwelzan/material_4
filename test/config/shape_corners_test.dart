@@ -44,8 +44,10 @@ void main() {
     test('isSatisfiedBy checks bounds correctly', () {
       final corners = ShapeCorners.circular(20);
       expect(corners.isSatisfiedBy(const Size(50, 50)), isTrue);
-      expect(corners.isSatisfiedBy(const Size(30, 50)), isFalse); // 20 + 20 > 30
-      expect(corners.isSatisfiedBy(const Size(50, 30)), isFalse); // 20 + 20 > 30
+      expect(
+          corners.isSatisfiedBy(const Size(30, 50)), isFalse); // 20 + 20 > 30
+      expect(
+          corners.isSatisfiedBy(const Size(50, 30)), isFalse); // 20 + 20 > 30
     });
 
     test('CSS-style proportional radius down-scaling', () {

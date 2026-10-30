@@ -4,7 +4,9 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('Phase 5: Smart Layout Engine Tests', () {
-    test('Calculates geometry-aware safe padding dynamically based on shape parameters', () {
+    test(
+        'Calculates geometry-aware safe padding dynamically based on shape parameters',
+        () {
       const containerSize = Size(300, 150);
 
       // FolderTab with 24dp tabHeight

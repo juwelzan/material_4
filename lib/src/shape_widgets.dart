@@ -491,9 +491,8 @@ class ShapeNavigationBar extends StatelessWidget {
                       dest.label,
                       style: TextStyle(
                         fontSize: 12,
-                        fontWeight: isSelected
-                            ? FontWeight.w700
-                            : FontWeight.w500,
+                        fontWeight:
+                            isSelected ? FontWeight.w700 : FontWeight.w500,
                         color: isSelected
                             ? Theme.of(context).primaryColor
                             : Colors.grey,

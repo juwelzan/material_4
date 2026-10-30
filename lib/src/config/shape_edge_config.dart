@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/foundation.dart';
 
 import 'bezier_config.dart';
@@ -161,15 +160,15 @@ class ShapeEdgeConfig {
 
   /// Converts this [ShapeEdgeConfig] to a JSON-compatible map.
   Map<String, dynamic> toJson() => {
-    'style': style.name,
-    'depth': depth,
-    'waveCount': waveCount,
-    'waveAmplitude': waveAmplitude,
-    'wavePhase': wavePhase,
-    'toothWidth': toothWidth,
-    'customBezier': customBezier?.toJson(),
-    'isMirrored': isMirrored,
-  };
+        'style': style.name,
+        'depth': depth,
+        'waveCount': waveCount,
+        'waveAmplitude': waveAmplitude,
+        'wavePhase': wavePhase,
+        'toothWidth': toothWidth,
+        'customBezier': customBezier?.toJson(),
+        'isMirrored': isMirrored,
+      };
 
   /// Constructs a [ShapeEdgeConfig] from serialized JSON data.
   factory ShapeEdgeConfig.fromJson(Map<String, dynamic> json) {
@@ -184,7 +183,8 @@ class ShapeEdgeConfig {
       wavePhase: (json['wavePhase'] as num?)?.toDouble() ?? 0.0,
       toothWidth: (json['toothWidth'] as num?)?.toDouble() ?? 0.0,
       customBezier: json['customBezier'] != null
-          ? BezierSegmentConfig.fromJson(json['customBezier'] as Map<String, dynamic>)
+          ? BezierSegmentConfig.fromJson(
+              json['customBezier'] as Map<String, dynamic>)
           : null,
       isMirrored: json['isMirrored'] as bool? ?? false,
     );
@@ -206,15 +206,15 @@ class ShapeEdgeConfig {
 
   @override
   int get hashCode => Object.hash(
-    style,
-    depth,
-    waveCount,
-    waveAmplitude,
-    wavePhase,
-    toothWidth,
-    customBezier,
-    isMirrored,
-  );
+        style,
+        depth,
+        waveCount,
+        waveAmplitude,
+        wavePhase,
+        toothWidth,
+        customBezier,
+        isMirrored,
+      );
 }
 
 /// Composite container defining contour edge configs for all four boundary edges.
@@ -269,7 +269,10 @@ class ShapeEdges {
 
   /// Whether all four edges are standard flat straight edges.
   bool get isAllStraight =>
-      top.isStraight && right.isStraight && bottom.isStraight && left.isStraight;
+      top.isStraight &&
+      right.isStraight &&
+      bottom.isStraight &&
+      left.isStraight;
 
   /// Creates a copy with the given edges replaced.
   ShapeEdges copyWith({
@@ -288,11 +291,11 @@ class ShapeEdges {
 
   /// Converts this [ShapeEdges] to a JSON-compatible map.
   Map<String, dynamic> toJson() => {
-    'top': top.toJson(),
-    'right': right.toJson(),
-    'bottom': bottom.toJson(),
-    'left': left.toJson(),
-  };
+        'top': top.toJson(),
+        'right': right.toJson(),
+        'bottom': bottom.toJson(),
+        'left': left.toJson(),
+      };
 
   /// Constructs a [ShapeEdges] from serialized JSON data.
   factory ShapeEdges.fromJson(Map<String, dynamic> json) {

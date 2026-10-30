@@ -16,7 +16,9 @@ class DynamicShapePathBuilder {
     DynamicShapeConfig config, {
     bool useCache = true,
   }) {
-    if (!useCache || config.type == DynamicShapeType.customBezier) {
+    if (!useCache ||
+        (config.type == DynamicShapeType.customBezier &&
+            config.customBezierBuilder != null)) {
       return _buildPathDirect(size, config);
     }
     return defaultCache.getOrCreate(
@@ -37,125 +39,121 @@ class DynamicShapePathBuilder {
       return Path();
     }
 
+    final effectiveSize = config.constraints.clampSize(size);
+    if (effectiveSize.width <= 0 || effectiveSize.height <= 0) {
+      return Path();
+    }
+
     Path path;
 
     // 2. Build Base Geometry
-    switch (config.type) {
-      // --- Original 13 Shapes ---
-      case DynamicShapeType.folderTab:
-        path = _buildFolderTabPath(size, config);
-        break;
-      case DynamicShapeType.notchedBadge:
-        path = _buildNotchedBadgePath(size, config);
-        break;
-      case DynamicShapeType.sideTab:
-        path = _buildSideTabPath(size, config);
-        break;
-      case DynamicShapeType.steppedCorner:
-        path = _buildSteppedCornerPath(size, config);
-        break;
-      case DynamicShapeType.ticketScallop:
-        path = _buildTicketScallopPath(size, config);
-        break;
-      case DynamicShapeType.postageStamp:
-        path = _buildPostageStampPath(size, config);
-        break;
-      case DynamicShapeType.zigzagCut:
-        path = _buildZigzagCutPath(size, config);
-        break;
-      case DynamicShapeType.arch:
-        path = _buildArchPath(size, config);
-        break;
-      case DynamicShapeType.hexagonSoft:
-        path = _buildHexagonSoftPath(size, config);
-        break;
-      case DynamicShapeType.chamferDiagonal:
-        path = _buildChamferDiagonalPath(size, config);
-        break;
-      case DynamicShapeType.organicBlob:
-        path = _buildOrganicBlobPath(size, config);
-        break;
-      case DynamicShapeType.scallopedPetal:
-        path = _buildScallopedPetalPath(size, config);
-        break;
-      case DynamicShapeType.smoothRounded:
-        path = _buildSmoothRoundedPath(size, config);
-        break;
+    if (config.edges != null && !config.edges!.isAllStraight) {
+      path = _buildCustomEdgesPath(effectiveSize, config);
+    } else {
+      switch (config.type) {
+        // --- Original 13 Shapes ---
+        case DynamicShapeType.folderTab:
+          path = _buildFolderTabPath(effectiveSize, config);
+          break;
+        case DynamicShapeType.notchedBadge:
+          path = _buildNotchedBadgePath(effectiveSize, config);
+          break;
+        case DynamicShapeType.sideTab:
+          path = _buildSideTabPath(effectiveSize, config);
+          break;
+        case DynamicShapeType.steppedCorner:
+          path = _buildSteppedCornerPath(effectiveSize, config);
+          break;
+        case DynamicShapeType.ticketScallop:
+          path = _buildTicketScallopPath(effectiveSize, config);
+          break;
+        case DynamicShapeType.postageStamp:
+          path = _buildPostageStampPath(effectiveSize, config);
+          break;
+        case DynamicShapeType.zigzagCut:
+          path = _buildZigzagCutPath(effectiveSize, config);
+          break;
+        case DynamicShapeType.arch:
+          path = _buildArchPath(effectiveSize, config);
+          break;
+        case DynamicShapeType.hexagonSoft:
+          path = _buildHexagonSoftPath(effectiveSize, config);
+          break;
+        case DynamicShapeType.chamferDiagonal:
+          path = _buildChamferDiagonalPath(effectiveSize, config);
+          break;
+        case DynamicShapeType.organicBlob:
+          path = _buildOrganicBlobPath(effectiveSize, config);
+          break;
+        case DynamicShapeType.scallopedPetal:
+          path = _buildScallopedPetalPath(effectiveSize, config);
+          break;
+        case DynamicShapeType.smoothRounded:
+          path = _buildSmoothRoundedPath(effectiveSize, config);
+          break;
 
-      // --- Next-Gen Geometry Additions ---
-      case DynamicShapeType.asymmetricCard:
-        path = _buildAsymmetricCardPath(size, config);
-        break;
-      case DynamicShapeType.capsule:
-        path = _buildCapsulePath(size, config);
-        break;
-      case DynamicShapeType.waveEdge:
-        path = _buildWaveEdgePath(size, config);
-        break;
-      case DynamicShapeType.cloud:
-        path = _buildCloudPath(size, config);
-        break;
-      case DynamicShapeType.speechBubble:
-        path = _buildSpeechBubblePath(size, config);
-        break;
-      case DynamicShapeType.shield:
-        path = _buildShieldPath(size, config);
-        break;
-      case DynamicShapeType.diamond:
-        path = _buildDiamondPath(size, config);
-        break;
-      case DynamicShapeType.octagon:
-        path = _buildOctagonPath(size, config);
-        break;
-      case DynamicShapeType.waveCut:
-        path = _buildWaveCutPath(size, config);
-        break;
-      case DynamicShapeType.concaveRounded:
-        path = _buildConcaveRoundedPath(size, config);
-        break;
-      case DynamicShapeType.convexRounded:
-        path = _buildConvexRoundedPath(size, config);
-        break;
-      case DynamicShapeType.squircle:
-        path = _buildSquirclePath(size, config);
-        break;
-      case DynamicShapeType.parallelogram:
-        path = _buildParallelogramPath(size, config);
-        break;
-      case DynamicShapeType.ribbon:
-        path = _buildRibbonPath(size, config);
-        break;
-      case DynamicShapeType.bookmark:
-        path = _buildBookmarkPath(size, config);
-        break;
-      case DynamicShapeType.customBezier:
-        path = _buildCustomBezierPath(size, config);
-        break;
+        // --- Next-Gen Geometry Additions ---
+        case DynamicShapeType.asymmetricCard:
+          path = _buildAsymmetricCardPath(effectiveSize, config);
+          break;
+        case DynamicShapeType.capsule:
+          path = _buildCapsulePath(effectiveSize, config);
+          break;
+        case DynamicShapeType.waveEdge:
+          path = _buildWaveEdgePath(effectiveSize, config);
+          break;
+        case DynamicShapeType.cloud:
+          path = _buildCloudPath(effectiveSize, config);
+          break;
+        case DynamicShapeType.speechBubble:
+          path = _buildSpeechBubblePath(effectiveSize, config);
+          break;
+        case DynamicShapeType.shield:
+          path = _buildShieldPath(effectiveSize, config);
+          break;
+        case DynamicShapeType.diamond:
+          path = _buildDiamondPath(effectiveSize, config);
+          break;
+        case DynamicShapeType.octagon:
+          path = _buildOctagonPath(effectiveSize, config);
+          break;
+        case DynamicShapeType.waveCut:
+          path = _buildWaveCutPath(effectiveSize, config);
+          break;
+        case DynamicShapeType.concaveRounded:
+          path = _buildConcaveRoundedPath(effectiveSize, config);
+          break;
+        case DynamicShapeType.convexRounded:
+          path = _buildConvexRoundedPath(effectiveSize, config);
+          break;
+        case DynamicShapeType.squircle:
+          path = _buildSquirclePath(effectiveSize, config);
+          break;
+        case DynamicShapeType.parallelogram:
+          path = _buildParallelogramPath(effectiveSize, config);
+          break;
+        case DynamicShapeType.ribbon:
+          path = _buildRibbonPath(effectiveSize, config);
+          break;
+        case DynamicShapeType.bookmark:
+          path = _buildBookmarkPath(effectiveSize, config);
+          break;
+        case DynamicShapeType.customBezier:
+          path = _buildCustomBezierPath(effectiveSize, config);
+          break;
+      }
     }
 
     // 3. Multi-Notch Processing
     if (config.notches != null && config.notches!.isNotEmpty) {
-      path = _applyMultiNotches(path, size, config.notches!);
+      path = _applyMultiNotches(
+          path, effectiveSize, config.notches!, config.resolvedCorners);
     }
 
-    // 4. Transform Post-Processing (Rotation, Scale, Stretch Offset around Shape Center)
-    if (config.rotation != 0.0 ||
-        config.scaleX != 1.0 ||
-        config.scaleY != 1.0 ||
-        config.stretchOffset != Offset.zero) {
-      final cx = size.width / 2;
-      final cy = size.height / 2;
-      final matrix = Matrix4.identity()
-        ..translateByDouble(
-          cx + config.stretchOffset.dx,
-          cy + config.stretchOffset.dy,
-          0.0,
-          1.0,
-        )
-        ..rotateZ(config.rotation)
-        ..scaleByDouble(config.scaleX, config.scaleY, 1.0, 1.0)
-        ..translateByDouble(-cx, -cy, 0.0, 1.0);
-      path = path.transform(matrix.storage);
+    // 4. Transform Post-Processing
+    final transform = config.resolvedTransform;
+    if (transform.hasTransform) {
+      path = transform.apply(path, effectiveSize);
     }
 
     return path;
@@ -653,67 +651,30 @@ class DynamicShapePathBuilder {
       config.cornerRadius,
       math.min(size.width, size.height) / 2,
     );
-    return Path()..addRRect(
-      RRect.fromRectAndRadius(Offset.zero & size, Radius.circular(r)),
-    );
+    return Path()
+      ..addRRect(
+        RRect.fromRectAndRadius(Offset.zero & size, Radius.circular(r)),
+      );
   }
 
   // =========================================================================
   // --- NEXT-GEN SHAPE GEOMETRY BUILDERS (15 New Additions) ---
   // =========================================================================
 
-  /// 1. Asymmetric Card with 4 independent corner radii.
+  /// 1. Asymmetric Card with 4 independent corner radii and CSS proportional downscaling.
   static Path _buildAsymmetricCardPath(Size size, DynamicShapeConfig config) {
-    final w = size.width;
-    final h = size.height;
-    final cr = config.cornerRadii ?? const CornerRadii.asymmetric();
-
-    // Clamp radii so opposing corners do not overlap
-    final maxR = math.min(w, h) / 2;
-    final tl = math.min(cr.topLeft, maxR);
-    final tr = math.min(cr.topRight, maxR);
-    final br = math.min(cr.bottomRight, maxR);
-    final bl = math.min(cr.bottomLeft, maxR);
-
-    final path = Path();
-    path.moveTo(0, tl);
-    if (tl > 0) {
-      path.arcToPoint(Offset(tl, 0), radius: Radius.circular(tl));
-    } else {
-      path.lineTo(0, 0);
-    }
-
-    path.lineTo(w - tr, 0);
-    if (tr > 0) {
-      path.arcToPoint(Offset(w, tr), radius: Radius.circular(tr));
-    } else {
-      path.lineTo(w, 0);
-    }
-
-    path.lineTo(w, h - br);
-    if (br > 0) {
-      path.arcToPoint(Offset(w - br, h), radius: Radius.circular(br));
-    } else {
-      path.lineTo(w, h);
-    }
-
-    path.lineTo(bl, h);
-    if (bl > 0) {
-      path.arcToPoint(Offset(0, h - bl), radius: Radius.circular(bl));
-    } else {
-      path.lineTo(0, h);
-    }
-
-    path.close();
-    return path;
+    final sanitizedCorners = config.resolvedCorners.sanitize(size);
+    final rrect = sanitizedCorners.toRRect(Offset.zero & size);
+    return Path()..addRRect(rrect);
   }
 
   /// 2. Capsule / Pill shape with semicircular rounded ends.
   static Path _buildCapsulePath(Size size, DynamicShapeConfig config) {
     final radius = math.min(size.width, size.height) / 2;
-    return Path()..addRRect(
-      RRect.fromRectAndRadius(Offset.zero & size, Radius.circular(radius)),
-    );
+    return Path()
+      ..addRRect(
+        RRect.fromRectAndRadius(Offset.zero & size, Radius.circular(radius)),
+      );
   }
 
   /// 3. Wave Edge container with a flowing sine wave along the anchor edge.
@@ -1111,12 +1072,188 @@ class DynamicShapePathBuilder {
     return path;
   }
 
-  /// 16. Custom Bézier path builder callback.
+  /// 16. Custom Bézier path builder (supporting declarative CustomBezierConfig and legacy callback).
   static Path _buildCustomBezierPath(Size size, DynamicShapeConfig config) {
+    if (config.bezierConfig != null) {
+      return config.bezierConfig!.toPath(size);
+    }
     if (config.customBezierBuilder != null) {
       return config.customBezierBuilder!(size);
     }
     return _buildSmoothRoundedPath(size, config);
+  }
+
+  // =========================================================================
+  // --- INDEPENDENT 4-EDGE GEOMETRY BUILDER ---
+  // =========================================================================
+
+  static Path _buildCustomEdgesPath(Size size, DynamicShapeConfig config) {
+    final corners = config.resolvedCorners.sanitize(size);
+    final edges = config.edges!;
+    final w = size.width;
+    final h = size.height;
+    final path = Path();
+
+    // Start at top-left corner end: (tl.x, 0)
+    path.moveTo(corners.topLeft.x, 0.0);
+
+    // 1. Top Edge: (tl.x, 0) -> (w - tr.x, 0)
+    final topStart = Offset(corners.topLeft.x, 0.0);
+    final topEnd = Offset(w - corners.topRight.x, 0.0);
+    _traceEdge(path, topStart, topEnd, edges.top, ShapeEdge.top);
+
+    // Top-right corner arc
+    if (corners.topRight.x > 0 && corners.topRight.y > 0) {
+      path.arcToPoint(
+        Offset(w, corners.topRight.y),
+        radius: corners.topRight,
+      );
+    } else {
+      path.lineTo(w, 0.0);
+    }
+
+    // 2. Right Edge: (w, tr.y) -> (w, h - br.y)
+    final rightStart = Offset(w, corners.topRight.y);
+    final rightEnd = Offset(w, h - corners.bottomRight.y);
+    _traceEdge(path, rightStart, rightEnd, edges.right, ShapeEdge.right);
+
+    // Bottom-right corner arc
+    if (corners.bottomRight.x > 0 && corners.bottomRight.y > 0) {
+      path.arcToPoint(
+        Offset(w - corners.bottomRight.x, h),
+        radius: corners.bottomRight,
+      );
+    } else {
+      path.lineTo(w, h);
+    }
+
+    // 3. Bottom Edge: (w - br.x, h) -> (bl.x, h)
+    final bottomStart = Offset(w - corners.bottomRight.x, h);
+    final bottomEnd = Offset(corners.bottomLeft.x, h);
+    _traceEdge(path, bottomStart, bottomEnd, edges.bottom, ShapeEdge.bottom);
+
+    // Bottom-left corner arc
+    if (corners.bottomLeft.x > 0 && corners.bottomLeft.y > 0) {
+      path.arcToPoint(
+        Offset(0.0, h - corners.bottomLeft.y),
+        radius: corners.bottomLeft,
+      );
+    } else {
+      path.lineTo(0.0, h);
+    }
+
+    // 4. Left Edge: (0, h - bl.y) -> (0, tl.y)
+    final leftStart = Offset(0.0, h - corners.bottomLeft.y);
+    final leftEnd = Offset(0.0, corners.topLeft.y);
+    _traceEdge(path, leftStart, leftEnd, edges.left, ShapeEdge.left);
+
+    // Top-left corner arc
+    if (corners.topLeft.x > 0 && corners.topLeft.y > 0) {
+      path.arcToPoint(
+        Offset(corners.topLeft.x, 0.0),
+        radius: corners.topLeft,
+      );
+    } else {
+      path.lineTo(0.0, 0.0);
+    }
+
+    path.close();
+    return path;
+  }
+
+  static void _traceEdge(
+    Path path,
+    Offset p1,
+    Offset p2,
+    ShapeEdgeConfig edge,
+    ShapeEdge shapeEdge,
+  ) {
+    final diff = p2 - p1;
+    final length = diff.distance;
+    if (length < 1e-4 || edge.isStraight) {
+      path.lineTo(p2.dx, p2.dy);
+      return;
+    }
+
+    final tangent = diff / length;
+    // Outward clockwise normal: for tangent (tx, ty), normal is (ty, -tx)
+    final normal = Offset(tangent.dy, -tangent.dx);
+
+    switch (edge.style) {
+      case ShapeEdgeStyle.straight:
+        path.lineTo(p2.dx, p2.dy);
+        break;
+
+      case ShapeEdgeStyle.convex:
+      case ShapeEdgeStyle.concave:
+        final isConvex = edge.style == ShapeEdgeStyle.convex;
+        final dir = (isConvex ? 1.0 : -1.0) * (edge.isMirrored ? -1.0 : 1.0);
+        final depth = edge.depth;
+        final mid = (p1 + p2) * 0.5;
+        final ctrl = mid + normal * (depth * dir * 2.0);
+        path.quadraticBezierTo(ctrl.dx, ctrl.dy, p2.dx, p2.dy);
+        break;
+
+      case ShapeEdgeStyle.wave:
+        final waves = math.max(1.0, edge.waveCount);
+        final halfWaves = (waves * 2).round();
+        final step = length / halfWaves;
+        final amp = edge.waveAmplitude;
+        final mirrorSign = edge.isMirrored ? -1.0 : 1.0;
+
+        for (int i = 0; i < halfWaves; i++) {
+          final segEnd = p1 + tangent * ((i + 1) * step);
+          final segMid = (p1 + tangent * (i * step) + segEnd) * 0.5;
+          final waveDir = ((i % 2 == 0) ? 1.0 : -1.0) * mirrorSign;
+          final ctrl = segMid + normal * (amp * waveDir * 2.0);
+          path.quadraticBezierTo(ctrl.dx, ctrl.dy, segEnd.dx, segEnd.dy);
+        }
+        break;
+
+      case ShapeEdgeStyle.zigzag:
+        final tW = math.max(4.0, edge.toothWidth);
+        final count = math.max(1, (length / tW).floor());
+        final actualTW = length / count;
+        final depth = edge.depth;
+        final mirrorSign = edge.isMirrored ? -1.0 : 1.0;
+
+        for (int i = 0; i < count; i++) {
+          final peakOffset = p1 +
+              tangent * ((i + 0.5) * actualTW) +
+              normal * (depth * mirrorSign);
+          final valleyOffset = p1 + tangent * ((i + 1) * actualTW);
+          path.lineTo(peakOffset.dx, peakOffset.dy);
+          path.lineTo(valleyOffset.dx, valleyOffset.dy);
+        }
+        break;
+
+      case ShapeEdgeStyle.customBezier:
+        if (edge.customBezier != null) {
+          final bz = edge.customBezier!;
+          final bzDepth = edge.depth != 0.0 ? edge.depth : length;
+          final mirrorSign = edge.isMirrored ? -1.0 : 1.0;
+
+          Offset mapLocal(Offset pt) {
+            final u = bz.isNormalized ? pt.dx * length : pt.dx;
+            final v = (bz.isNormalized ? pt.dy * bzDepth : pt.dy) * mirrorSign;
+            return p1 + tangent * u + normal * v;
+          }
+
+          final cp1 = mapLocal(bz.controlPoint1);
+          if (bz.isCubic) {
+            final cp2 = mapLocal(bz.controlPoint2!);
+            final targetEnd = mapLocal(bz.end);
+            path.cubicTo(
+                cp1.dx, cp1.dy, cp2.dx, cp2.dy, targetEnd.dx, targetEnd.dy);
+          } else {
+            final targetEnd = mapLocal(bz.end);
+            path.quadraticBezierTo(cp1.dx, cp1.dy, targetEnd.dx, targetEnd.dy);
+          }
+        } else {
+          path.lineTo(p2.dx, p2.dy);
+        }
+        break;
+    }
   }
 
   // =========================================================================
@@ -1127,34 +1264,37 @@ class DynamicShapePathBuilder {
     Path basePath,
     Size size,
     List<ShapeNotch> notches,
+    ShapeCorners corners,
   ) {
+    final report = ShapeNotch.evaluateNotches(
+      notches: notches,
+      size: size,
+      corners: corners,
+    );
+
     Path result = basePath;
-    for (final notch in notches) {
+    for (final notch in report.sanitizedNotches) {
       final nW = notch.width;
-      final nH = notch.height;
-      final fillet = math.min(notch.filletRadius, math.min(nW, nH) / 2);
+      final nD = notch.depth;
+      final fillet = math.min(notch.cornerRadius, math.min(nW, nD) / 2);
 
       Rect notchRect;
-      switch (notch.position) {
-        case ShapeAnchor.topRight:
-          notchRect = Rect.fromLTWH(size.width - nW - notch.offset, 0, nW, nH);
+      switch (notch.edge) {
+        case ShapeEdge.top:
+          final start = notch.resolveEdgeOffset(size.width);
+          notchRect = Rect.fromLTWH(start, 0, nW, nD);
           break;
-        case ShapeAnchor.topLeft:
-          notchRect = Rect.fromLTWH(notch.offset, 0, nW, nH);
+        case ShapeEdge.bottom:
+          final start = notch.resolveEdgeOffset(size.width);
+          notchRect = Rect.fromLTWH(start, size.height - nD, nW, nD);
           break;
-        case ShapeAnchor.bottomRight:
-          notchRect = Rect.fromLTWH(
-            size.width - nW - notch.offset,
-            size.height - nH,
-            nW,
-            nH,
-          );
+        case ShapeEdge.left:
+          final start = notch.resolveEdgeOffset(size.height);
+          notchRect = Rect.fromLTWH(0, start, nD, nW);
           break;
-        case ShapeAnchor.bottomLeft:
-          notchRect = Rect.fromLTWH(notch.offset, size.height - nH, nW, nH);
-          break;
-        default:
-          notchRect = Rect.zero;
+        case ShapeEdge.right:
+          final start = notch.resolveEdgeOffset(size.height);
+          notchRect = Rect.fromLTWH(size.width - nD, start, nD, nW);
           break;
       }
 

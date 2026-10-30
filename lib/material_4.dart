@@ -11,6 +11,7 @@ library;
 export 'src/adaptive_shape_card.dart';
 export 'src/animated_material_4.dart';
 export 'src/animation/animation.dart';
+export 'src/avatar/avatar.dart';
 export 'src/config/config.dart';
 export 'src/creative/creative.dart';
 export 'src/layout/layout.dart';

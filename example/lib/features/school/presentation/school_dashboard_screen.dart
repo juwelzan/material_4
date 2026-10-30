@@ -4,6 +4,7 @@ import 'package:material_4/material_4.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../avatar/avatar_showcase_screen.dart';
 import '../../creative_gallery/creative_showcase_screen.dart';
 import '../../showcase/material_4_showcase_screen.dart';
 import '../widgets/fluid_wave_bottom_bar.dart';
@@ -99,6 +100,8 @@ class _SchoolDashboardScreenState extends State<SchoolDashboardScreen> {
                   _buildFrostedLibraryCard(),
                   const SizedBox(height: 16),
                   _buildCompleteShowcaseLauncherButton(),
+                  const SizedBox(height: 16),
+                  _buildAvatarShowcaseLauncherButton(),
                   const SizedBox(height: 16),
                   _buildInteractiveShapePlaygroundButton(),
                   const SizedBox(height: 16),
@@ -213,28 +216,24 @@ class _SchoolDashboardScreenState extends State<SchoolDashboardScreen> {
           ),
         ),
         const SizedBox(width: 4),
-        Material4Container.scallopedPetal(
-          width: 44,
-          height: 44,
-          petalCount: 10,
-          color: const Color(0xFFFFE0EC),
-          borderColor: const Color(0x33B388FF),
-          borderWidth: 1.5,
-          onTap: () => _showShapePlayground(context),
-          child: Container(
-            margin: const EdgeInsets.all(4),
-            decoration: const BoxDecoration(
-              shape: BoxShape.circle,
-              color: Color(0xFFFFD5E5),
-            ),
-            child: const Center(
-              child: Icon(
-                Icons.face_retouching_natural_rounded,
-                size: 24,
-                color: Color(0xFF703352),
-              ),
-            ),
+        Material4Avatar.icon(
+          icon: Icons.face_retouching_natural_rounded,
+          size: 44,
+          shape: Material4AvatarShape.flower(petals: 10),
+          backgroundColor: const Color(0xFFFFD5E5),
+          iconColor: const Color(0xFF703352),
+          border: const Material4AvatarBorder.solid(
+            color: Color(0x33B388FF),
+            width: 1.5,
           ),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const AvatarShowcaseScreen(),
+              ),
+            );
+          },
         ),
       ],
     );
@@ -434,15 +433,17 @@ class _SchoolDashboardScreenState extends State<SchoolDashboardScreen> {
             ),
             const SizedBox(width: 14),
             Expanded(
-              child: AdaptiveShapeCard(
+              child: Material4Card.noticeBoard(
                 title: 'Notice\nBoard',
                 icon: Icons.campaign_outlined,
-                shapeType: Material4Type.sideTab,
-                color: const Color(0xFFEADBFF),
-                borderColor: const Color(0x28BFA9DD),
-                textColor: const Color(0xFF221631),
-                iconColor: const Color(0xFF563583),
+                backgroundColor: const Color(0xFFDDBCFB),
+                border: const Material4CardBorder.thin(
+                  color: Color(0xFF1E1E24),
+                  width: 1.2,
+                ),
                 height: 86,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 onTap: () => _showFeedback('Opening Notice Board...'),
               ),
             ),
@@ -1044,6 +1045,93 @@ class _SchoolDashboardScreenState extends State<SchoolDashboardScreen> {
                       const SizedBox(height: 2),
                       Text(
                         '10 Interactive Sections: Shapes, Borders, Paper, Cards & Morphing',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white.withValues(alpha: 0.85),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Icon(
+                  Icons.arrow_forward_ios_rounded,
+                  size: 14,
+                  color: Colors.white,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// 9b. Dynamic Profile Avatar Gallery Launcher
+  Widget _buildAvatarShowcaseLauncherButton() {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFFE91E63), Color(0xFFFF4081)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x33E91E63),
+            blurRadius: 14,
+            offset: Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(20),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const AvatarShowcaseScreen(),
+              ),
+            );
+          },
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: const Icon(
+                    Icons.account_circle_outlined,
+                    color: Colors.white,
+                    size: 22,
+                  ),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Material 4 Avatar Gallery',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        '13 Presets: 24+ Shapes, Vector Borders, Status Pulse & Badges',
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: GoogleFonts.plusJakartaSans(

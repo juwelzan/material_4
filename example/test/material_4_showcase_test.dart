@@ -4,7 +4,7 @@ import 'package:material_4_example/features/showcase/material_4_showcase_screen.
 
 void main() {
   testWidgets(
-      'Material4ShowcaseScreen renders all 10 tabs and switches cleanly',
+      'Material4ShowcaseScreen renders all 11 tabs and switches cleanly',
       (WidgetTester tester) async {
     tester.view.physicalSize = const Size(1600, 1000);
     tester.view.devicePixelRatio = 1.0;
@@ -32,6 +32,7 @@ void main() {
     expect(find.text('8. Shape Morphing'), findsOneWidget);
     expect(find.text('9. Interactive Components'), findsOneWidget);
     expect(find.text('10. Custom Configuration'), findsOneWidget);
+    expect(find.text('11. Dynamic Avatars'), findsOneWidget);
 
     // Verify Tab 1 contents
     expect(find.text('1. Basic Geometries'), findsOneWidget);
@@ -59,5 +60,11 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('10. Custom Configuration Studio'), findsOneWidget);
     expect(find.text('Live Config Preview'), findsOneWidget);
+
+    // Switch to Tab 11: Dynamic Avatars
+    await tester.tap(find.text('11. Dynamic Avatars'));
+    await tester.pumpAndSettle();
+    expect(find.text('01. Basic Circle Avatar'), findsOneWidget);
+    expect(find.text('Material 4 Avatar System'), findsOneWidget);
   });
 }

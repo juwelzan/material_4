@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:material_4/material_4.dart';
 
-/// Complete showcase screen organizing Material 4 into 10 structured sections:
+import '../avatar/avatar_showcase_screen.dart';
+
+/// Complete showcase screen organizing Material 4 into 11 structured sections:
 /// 1. Basic Shapes
 /// 2. Advanced Shapes
 /// 3. Creative Borders
@@ -14,6 +16,7 @@ import 'package:material_4/material_4.dart';
 /// 8. Shape Morphing
 /// 9. Interactive Components
 /// 10. Custom Configuration
+/// 11. Dynamic Avatars
 class Material4ShowcaseScreen extends StatefulWidget {
   final int initialSectionIndex;
 
@@ -42,6 +45,9 @@ class _Material4ShowcaseScreenState extends State<Material4ShowcaseScreen>
     Material4Type.organicBlob,
   ];
 
+  // State for Section 7: Organic Card Morphing
+  int _organicMorphIndex = 0;
+
   // State for Section 10: Custom Configuration Studio
   Material4Type _customType = Material4Type.ticketScallop;
   double _customCornerRadius = 16.0;
@@ -52,9 +58,9 @@ class _Material4ShowcaseScreenState extends State<Material4ShowcaseScreen>
   void initState() {
     super.initState();
     _tabController = TabController(
-      length: 10,
+      length: 11,
       vsync: this,
-      initialIndex: widget.initialSectionIndex.clamp(0, 9),
+      initialIndex: widget.initialSectionIndex.clamp(0, 10),
     );
   }
 
@@ -105,6 +111,7 @@ class _Material4ShowcaseScreenState extends State<Material4ShowcaseScreen>
             Tab(text: '8. Shape Morphing'),
             Tab(text: '9. Interactive Components'),
             Tab(text: '10. Custom Configuration'),
+            Tab(text: '11. Dynamic Avatars'),
           ],
         ),
       ),
@@ -121,6 +128,7 @@ class _Material4ShowcaseScreenState extends State<Material4ShowcaseScreen>
           _buildShapeMorphingTab(),
           _buildInteractiveComponentsTab(),
           _buildCustomConfigurationTab(),
+          const AvatarShowcaseScreen(isEmbedded: true),
         ],
       ),
     );
@@ -848,7 +856,7 @@ class _Material4ShowcaseScreenState extends State<Material4ShowcaseScreen>
   }
 
   // =========================================================================
-  // 7. Material Cards
+  // 7. Material Cards (Organic Shape Gallery & Substrates)
   // =========================================================================
   Widget _buildMaterialCardsTab() {
     const materials = [
@@ -864,7 +872,122 @@ class _Material4ShowcaseScreenState extends State<Material4ShowcaseScreen>
       padding: const EdgeInsets.all(16),
       children: [
         _buildSectionHeader(
-          '7. MaterialDynamicCard Substrates',
+          '7. Dynamic Material Card — Organic Shape Gallery',
+          'Sculpted asymmetric geometries inspired by authentic physical stationery and organic contours.',
+        ),
+        const SizedBox(height: 16),
+
+        // 1. Notice Board Card (Primary Reference Design)
+        _buildOrganicGalleryCard(
+          presetName: '1. Notice Board Card (Primary Reference Design)',
+          geometryDescription:
+              'Organic asymmetric silhouette featuring a smooth concave indentation scooped on the lower-right edge (depth: 18dp, width: 54dp, pos: 68%), subtle dark outline (1.2dp), soft pastel finish (#DDBCFB), and right-aligned speaker icon.',
+          card: Material4Card.noticeBoard(
+            title: 'Notice Board',
+            subtitle: 'Important update & announcements',
+            icon: Icons.campaign_outlined,
+            backgroundColor: const Color(0xFFDDBCFB),
+            border: const Material4CardBorder.thin(
+              color: Color(0xFF1E1E24),
+              width: 1.2,
+            ),
+            onTap: () {},
+          ),
+        ),
+
+        // 2. Asymmetric Organic Card
+        _buildOrganicGalleryCard(
+          presetName: '2. Asymmetric Organic Card',
+          geometryDescription:
+              'Diagonal contrasting corner radii (major: 38dp, minor: 12dp) with a smooth convex bulge (height: 10dp) along the top boundary and soft pastel rose hue.',
+          card: Material4Card.asymmetricFeature(
+            title: 'Asymmetric Organic',
+            subtitle: 'Contrasting diagonal corner radii & top crest',
+            icon: Icons.star_border_rounded,
+            backgroundColor: const Color(0xFFFFD8D8),
+            onTap: () {},
+          ),
+        ),
+
+        // 3. Concave Notch Card
+        _buildOrganicGalleryCard(
+          presetName: '3. Concave Notch Card',
+          geometryDescription:
+              'Parabolic inward indentation (depth: 16dp, width: 64dp) scooped on the top boundary with geometry-aware safe insets protecting child text and notification bell icon.',
+          card: Material4Card.softNotch(
+            title: 'Concave Notch',
+            subtitle: 'Top edge parabolic scoop with safe insets',
+            icon: Icons.notifications_none_rounded,
+            backgroundColor: const Color(0xFFD5F2E3),
+            onTap: () {},
+          ),
+        ),
+
+        // 4. Curved Edge Card
+        _buildOrganicGalleryCard(
+          presetName: '4. Curved Edge Card',
+          geometryDescription:
+              'Dual harmonic curvature: an outward convex arch (14dp) along the top boundary balanced by a concave scoop (12dp) along the bottom edge.',
+          card: Material4Card.curvedEdge(
+            title: 'Curved Dynamic Edge',
+            subtitle: 'Top convex arch & bottom concave scoop',
+            icon: Icons.insights_rounded,
+            backgroundColor: const Color(0xFFE2F0D9),
+            onTap: () {},
+          ),
+        ),
+
+        // 5. Sculpted Surface Card
+        _buildOrganicGalleryCard(
+          presetName: '5. Sculpted Surface Card',
+          geometryDescription:
+              'Sculpted architectural silhouette: sweeping dome corner on top-left (36dp) transitioning into bilateral waist indentations (14dp depth) along the side boundaries.',
+          card: Material4Card.sculptedInfo(
+            title: 'Sculpted Info Surface',
+            subtitle: 'Top-left dome corner & dual waist indentations',
+            icon: Icons.info_outline_rounded,
+            backgroundColor: const Color(0xFFD0E6FF),
+            onTap: () {},
+          ),
+        ),
+
+        // 6. Pastel Dashboard Card
+        _buildOrganicGalleryCard(
+          presetName: '6. Pastel Dashboard Card',
+          geometryDescription:
+              'Stepped chamfered corners paired with a top tab protrusion, perfectly designed for analytical dashboards, stats, and metric widgets.',
+          card: Material4Card.creativeDashboard(
+            title: 'Creative Dashboard',
+            subtitle: 'Stepped chamfers & tab protrusion structure',
+            icon: Icons.dashboard_customize_outlined,
+            backgroundColor: const Color(0xFFE0F7FA),
+            onTap: () {},
+          ),
+        ),
+
+        // 7. Fluid Blob Surface Card
+        _buildOrganicGalleryCard(
+          presetName: '7. Fluid Blob Surface Card',
+          geometryDescription:
+              'Smooth organic pebble/blob silhouette with continuous varying Bézier curvature rendered with a tactile clay material finish.',
+          card: Material4Card.blobSurface(
+            title: 'Fluid Pebble Blob',
+            subtitle: 'Tactile clay finish & organic silhouette',
+            icon: Icons.palette_outlined,
+            backgroundColor: const Color(0xFFF0E5FF),
+            onTap: () {},
+          ),
+        ),
+
+        // 8. Animated Morphing Organic Card
+        _buildAnimatedOrganicCardShowcase(),
+
+        const SizedBox(height: 12),
+        const Divider(height: 32, thickness: 1, color: Color(0xFFE9ECEF)),
+        const SizedBox(height: 12),
+
+        _buildSectionHeader(
+          'Physical Substrates & Lighting',
           'Master cards orchestrating 12 physical substrates with directional lighting.',
         ),
         const SizedBox(height: 16),
@@ -890,6 +1013,163 @@ class _Material4ShowcaseScreenState extends State<Material4ShowcaseScreen>
           );
         }),
       ],
+    );
+  }
+
+  Widget _buildOrganicGalleryCard({
+    required String presetName,
+    required String geometryDescription,
+    required Widget card,
+  }) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 20),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFE9ECEF), width: 1),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x06000000),
+            blurRadius: 10,
+            offset: Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF5E43EE).withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Text(
+                  presetName,
+                  style: GoogleFonts.plusJakartaSans(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 12,
+                    color: const Color(0xFF5E43EE),
+                  ),
+                ),
+              ),
+              const Spacer(),
+              const Icon(Icons.touch_app_outlined,
+                  size: 16, color: Color(0xFFADB5BD)),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            geometryDescription,
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 12,
+              color: const Color(0xFF6C757D),
+              height: 1.45,
+            ),
+          ),
+          const SizedBox(height: 14),
+          card,
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAnimatedOrganicCardShowcase() {
+    final shapes = [
+      (
+        'Notice Board Shape',
+        Material4CardShape.noticeBoard(),
+        const Color(0xFFDDBCFB),
+        'Lower-right concave scoop with asymmetric corners',
+      ),
+      (
+        'Asymmetric Feature Shape',
+        Material4CardShape.asymmetricFeature(),
+        const Color(0xFFFFD8D8),
+        'Diagonal major & minor radii with convex bulge',
+      ),
+      (
+        'Soft Concave Notch Shape',
+        Material4CardShape.softNotch(),
+        const Color(0xFFD5F2E3),
+        'Parabolic scoop along the top boundary',
+      ),
+      (
+        'Sculpted Info Shape',
+        Material4CardShape.sculptedInfo(),
+        const Color(0xFFD0E6FF),
+        'Top-left dome corner with dual waist indentations',
+      ),
+      (
+        'Signature Shape',
+        Material4CardShape.signature(),
+        const Color(0xFFEADBFF),
+        'Sculpted bottom scoop with primary asymmetric corner',
+      ),
+    ];
+
+    final current = shapes[_organicMorphIndex % shapes.length];
+
+    return _buildOrganicGalleryCard(
+      presetName: '8. Animated Organic Card (Tap to Morph)',
+      geometryDescription:
+          'Tap anywhere on the card to smoothly interpolate geometry! Currently displaying: ${current.$1} (${current.$4}). Seamless cubic Bézier morphing.',
+      card: AnimatedMaterial4Card(
+        duration: const Duration(milliseconds: 400),
+        curve: Curves.easeInOutCubic,
+        shape: current.$2,
+        backgroundColor: current.$3,
+        border: const Material4CardBorder.thin(
+          color: Color(0xFF1E1E24),
+          width: 1.2,
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
+        onTap: () {
+          setState(() {
+            _organicMorphIndex++;
+          });
+        },
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    current.$1,
+                    style: GoogleFonts.plusJakartaSans(
+                      fontWeight: FontWeight.w800,
+                      fontSize: 16,
+                      color: const Color(0xFF1E1E24),
+                    ),
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    'Tap to cycle through organic presets',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontWeight: FontWeight.w500,
+                      fontSize: 12,
+                      color: const Color(0xFF1E1E24).withValues(alpha: 0.72),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 12),
+            const Icon(
+              Icons.auto_awesome_rounded,
+              color: Color(0xFF1E1E24),
+              size: 28,
+            ),
+          ],
+        ),
+      ),
     );
   }
 

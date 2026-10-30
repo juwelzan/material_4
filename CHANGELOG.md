@@ -19,3 +19,4 @@ All notable changes to the `dynamic_shape` package will be documented in this fi
   - `AnimatedShapeCard`, `ShapeProgress`, `ShapeDivider`, `ShapeAppBar`, `ShapeNavigationBar`, `ShapeBottomSheet`, `ShapeDialog`, `ShapeTooltip`, and `ShapeContainerGroup`.
 - **Interactive Developer Tools & Presets**:
   - `ShapePlayground` interactive live studio, code generation, and 10 production-ready presets.
+

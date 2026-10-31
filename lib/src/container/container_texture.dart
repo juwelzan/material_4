@@ -173,6 +173,18 @@ class Material4Texture {
           color: color,
         );
 
+  /// Preset for specular metallic foil texture.
+  const Material4Texture.metallicFoil({
+    double opacity = 0.25,
+    double scale = 1.0,
+    Color? color,
+  }) : this(
+          type: Material4TextureType.metallicFoil,
+          opacity: opacity,
+          scale: scale,
+          color: color,
+        );
+
   Material4Texture copyWith({
     Material4TextureType? type,
     double? opacity,

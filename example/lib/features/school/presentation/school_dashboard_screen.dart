@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../app_bar/app_bar_showcase_screen.dart';
 import '../../avatar/avatar_showcase_screen.dart';
+import '../../button/universal_button_showcase_screen.dart';
 import '../../container/universal_container_showcase_screen.dart';
 import '../../creative_gallery/creative_showcase_screen.dart';
 import '../../progress/progress_showcase_screen.dart';
@@ -112,6 +113,8 @@ class _SchoolDashboardScreenState extends State<SchoolDashboardScreen> {
                   _buildWaveLineShowcaseLauncherButton(),
                   const SizedBox(height: 16),
                   _buildUniversalContainerShowcaseLauncherButton(),
+                  const SizedBox(height: 16),
+                  _buildUniversalButtonShowcaseLauncherButton(),
                   const SizedBox(height: 16),
                   _buildInteractiveShapePlaygroundButton(),
                   const SizedBox(height: 16),
@@ -1421,6 +1424,94 @@ class _SchoolDashboardScreenState extends State<SchoolDashboardScreen> {
                   Icons.arrow_forward_ios_rounded,
                   size: 14,
                   color: Color(0xFF38BDF8),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// 9f. Universal Dynamic Button Studio Launcher
+  Widget _buildUniversalButtonShowcaseLauncherButton() {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFF0F172A), Color(0xFF1E293B)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: const Color(0xFF818CF8), width: 1.5),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x33818CF8),
+            blurRadius: 16,
+            offset: Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(20),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const UniversalButtonShowcaseScreen(),
+              ),
+            );
+          },
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF818CF8).withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: const Icon(
+                    Icons.smart_button_rounded,
+                    color: Color(0xFF818CF8),
+                    size: 22,
+                  ),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Universal Button Studio',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        '13 Paradigms, 18 Presets, Matrix Animations & Controller',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w500,
+                          color: const Color(0xFF94A3B8),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Icon(
+                  Icons.arrow_forward_ios_rounded,
+                  size: 14,
+                  color: Color(0xFF818CF8),
                 ),
               ],
             ),

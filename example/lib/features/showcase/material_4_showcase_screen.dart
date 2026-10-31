@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:material_4/material_4.dart';
 
 import '../avatar/avatar_showcase_screen.dart';
+import '../button/universal_button_showcase_screen.dart';
 import '../container/universal_container_showcase_screen.dart';
 import '../progress/progress_showcase_screen.dart';
 import '../progress/wave_line_showcase_screen.dart';
@@ -63,9 +64,9 @@ class _Material4ShowcaseScreenState extends State<Material4ShowcaseScreen>
   void initState() {
     super.initState();
     _tabController = TabController(
-      length: 14,
+      length: 15,
       vsync: this,
-      initialIndex: widget.initialSectionIndex.clamp(0, 13),
+      initialIndex: widget.initialSectionIndex.clamp(0, 14),
     );
   }
 
@@ -120,6 +121,7 @@ class _Material4ShowcaseScreenState extends State<Material4ShowcaseScreen>
             Tab(text: '12. Dynamic Progress'),
             Tab(text: '13. Animated Wave Lines'),
             Tab(text: '14. Universal Containers'),
+            Tab(text: '15. Universal Buttons'),
           ],
         ),
       ),
@@ -140,6 +142,7 @@ class _Material4ShowcaseScreenState extends State<Material4ShowcaseScreen>
           const ProgressBarShowcaseScreen(isEmbedded: true),
           const WaveLineShowcaseScreen(isEmbedded: true),
           const UniversalContainerShowcaseScreen(isEmbedded: true),
+          const UniversalButtonShowcaseScreen(isEmbedded: true),
         ],
       ),
     );

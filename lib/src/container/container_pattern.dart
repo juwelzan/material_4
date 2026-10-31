@@ -223,6 +223,22 @@ class Material4Pattern {
           animated: animated,
         );
 
+  /// Preset for diagonal hazard stripes.
+  const Material4Pattern.stripes({
+    double spacing = 16.0,
+    double strokeWidth = 2.0,
+    Color? color,
+    double opacity = 0.18,
+    bool animated = false,
+  }) : this(
+          type: Material4PatternType.diagonalStripes,
+          spacing: spacing,
+          strokeWidth: strokeWidth,
+          color: color,
+          opacity: opacity,
+          animated: animated,
+        );
+
   Material4Pattern copyWith({
     Material4PatternType? type,
     double? spacing,

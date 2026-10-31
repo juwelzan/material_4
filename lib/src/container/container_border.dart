@@ -73,6 +73,14 @@ class Material4Border {
     this.animationCurve = Curves.linear,
   });
 
+  /// Preset representing no border stroke.
+  static const Material4Border none = Material4Border(
+    style: BorderStyleType.solid,
+    width: 0.0,
+    color: Color(0x00000000),
+    opacity: 0.0,
+  );
+
   /// Preset for a crisp solid border.
   const Material4Border.solid({
     double width = 1.0,

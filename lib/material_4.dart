@@ -13,6 +13,7 @@ export 'src/animated_material_4.dart';
 export 'src/animation/animation.dart';
 export 'src/app_bar/app_bar.dart';
 export 'src/avatar/avatar.dart';
+export 'src/button/button.dart';
 export 'src/config/config.dart';
 export 'src/container/container.dart';
 export 'src/creative/creative.dart';

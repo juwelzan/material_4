@@ -9,7 +9,7 @@ import 'package:material_4/material_4.dart';
 /// 1. Universal Shapes Gallery (12 new vector geometries)
 /// 2. Procedural Texture Explorer (24 GPU procedural textures)
 /// 3. Procedural Background Patterns (17 clipped patterns)
-/// 4. Animated Vector Borders (12 next-gen border styles)
+/// 4. Animated & Decorative Vector Borders (20 next-gen border styles)
 /// 5. Topological Vector Shape Morphing & Physics Studio
 /// 6. Predefined Composition Presets (Glass, Neon, Carbon, Liquid, Paper, etc.)
 /// 7. Live Code Generator with copy-to-clipboard
@@ -674,6 +674,14 @@ class _UniversalContainerShowcaseScreenState
       (BorderStyleType.shimmerBorder, 'Specular Shimmer', 'Sweeping linear highlight bar refracting over contour'),
       (BorderStyleType.conicGradientBorder, 'Conic Gradient', '360-degree continuous spectrum chromatic sweep'),
       (BorderStyleType.energyBorder, 'Pulse Energy Ring', 'Double-pulse cardiac rhythm with ambient bloom'),
+      (BorderStyleType.gradientGlow, 'Gradient Glow', 'Luminous gradient stroke wrapped in a soft bloom halo'),
+      (BorderStyleType.railroad, 'Railroad Track', 'Twin parallel rails joined by perpendicular cross-ties'),
+      (BorderStyleType.beadChain, 'Bead Chain', 'Alternating large and small pearl beads along the contour'),
+      (BorderStyleType.tapered, 'Calligraphic Taper', 'Stroke width swells and thins like a brush pen'),
+      (BorderStyleType.tickMarks, 'Ruler Ticks', 'Perpendicular gauge tick marks repeated around the edge'),
+      (BorderStyleType.ropeTwist, 'Rope Twist', 'Braided two-strand rope wound around the perimeter'),
+      (BorderStyleType.comicInk, 'Comic Ink', 'Bold ink outline with an offset depth line'),
+      (BorderStyleType.segmentedGlow, 'Runway Glow', 'Glowing dashed segments like landing-strip lights'),
     ];
 
     return ListView(

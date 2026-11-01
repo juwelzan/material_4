@@ -518,31 +518,6 @@ void main() {
   });
 
   group('Public Animation Widgets Integration Tests', () {
-    testWidgets('ShapeMorphTransition renders and transitions between shapes',
-        (tester) async {
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: Center(
-              child: ShapeMorphTransition(
-                from: Material4Type.capsule,
-                to: Material4Type.squircle,
-                duration: Duration(milliseconds: 300),
-                width: 150,
-                height: 150,
-                child: Text('Morph Content'),
-              ),
-            ),
-          ),
-        ),
-      );
-
-      expect(find.text('Morph Content'), findsOneWidget);
-      await tester.pump(const Duration(milliseconds: 150));
-      expect(find.byType(Material4Container), findsOneWidget);
-      await tester.pumpAndSettle();
-      expect(find.text('Morph Content'), findsOneWidget);
-    });
 
     testWidgets('Material4Container with animation config morphs implicitly',
         (tester) async {

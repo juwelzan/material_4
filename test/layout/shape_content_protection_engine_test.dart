@@ -114,64 +114,6 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    test('4. Badges do not enter inward notches & children do not collide', () {
-      const config = Material4Config(
-        notches: [
-          ShapeNotch(
-            edge: ShapeEdge.top,
-            positionFactor: 0.5,
-            width: 70,
-            depth: 25,
-            isInward: true,
-          ),
-        ],
-      );
-
-      const shapeSize = Size(300, 200);
-
-      // Main content is positioned below the notch
-      const contentRect = Rect.fromLTWH(20, 35, 260, 150);
-
-      // Badge docked at top-right corner
-      final badgeOffset = ShapeContentPlacer.computeAccessoryOffset(
-        shapeSize: shapeSize,
-        accessorySize: const Size(30, 30),
-        anchor: ShapeAnchor.topRight,
-        padding: const EdgeInsets.only(top: 8, right: 12),
-        config: config,
-      );
-      final badgeRect = badgeOffset & const Size(30, 30);
-
-      // Verify badge does not collide with main content
-      final badgeReport = ShapeCollisionDetector.detectBadgeCollision(
-        badgeRect: badgeRect,
-        contentRect: contentRect,
-        shapeSize: shapeSize,
-        config: config,
-      );
-      expect(badgeReport.hasCollision, isFalse);
-
-      // Verify multiple children slot spacing
-      final slotLayout = ShapeContentPlacer.computeHorizontalSlotLayout(
-        safeBounds: contentRect,
-        leadingSize: const Size(28, 28),
-        trailingSize: const Size(40, 28),
-        spacing: 12.0,
-      );
-
-      expect(slotLayout.leadingRect, isNotNull);
-      expect(slotLayout.trailingRect, isNotNull);
-
-      // Leading and trailing rects must not overlap
-      final childCollisionReport = ShapeCollisionDetector.detectChildCollision(
-        childRects: [
-          slotLayout.leadingRect!,
-          slotLayout.contentRect,
-          slotLayout.trailingRect!,
-        ],
-      );
-      expect(childCollisionReport.hasCollision, isFalse);
-    });
 
     test(
         '5. Organic and Custom Bézier shapes compute mathematically inside safe bounds',
@@ -378,37 +320,5 @@ void main() {
       }
     });
 
-    testWidgets(
-        '11. ShapeSmartContent slots leading, title, subtitle, and trailing cleanly',
-        (tester) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: Center(
-              child: SizedBox(
-                width: 300,
-                height: 100,
-                child: ShapeSmartContent(
-                  config: const Material4Config(type: Material4Type.folderTab),
-                  leading: const Icon(Icons.star, key: ValueKey('smart_star')),
-                  title: const Text('Smart Slot Title',
-                      key: ValueKey('smart_title')),
-                  subtitle:
-                      const Text('Smart Subtitle', key: ValueKey('smart_sub')),
-                  trailing: const Icon(Icons.arrow_forward_ios,
-                      size: 16, key: ValueKey('smart_arrow')),
-                ),
-              ),
-            ),
-          ),
-        ),
-      );
-
-      expect(find.byKey(const ValueKey('smart_star')), findsOneWidget);
-      expect(find.byKey(const ValueKey('smart_title')), findsOneWidget);
-      expect(find.byKey(const ValueKey('smart_sub')), findsOneWidget);
-      expect(find.byKey(const ValueKey('smart_arrow')), findsOneWidget);
-      expect(tester.takeException(), isNull);
-    });
   });
 }

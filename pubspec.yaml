@@ -1,5 +1,5 @@
 name: material_4
-description: "Material 4 — A Custom Flutter Design System with 28+ adaptive shapes, borders, physics animations, background effects, and collision-free layouts."
+description: "Material 4 — a single universal Flutter shape container: built-in and custom shapes, unified backgrounds, and a 40-style shape-following border engine."
 version: 1.0.0
 homepage: https://github.com/juwelzan/material_4
 repository: https://github.com/juwelzan/material_4

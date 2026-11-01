@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'features/school/presentation/school_dashboard_screen.dart';
+import 'features/container/universal_container_showcase_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -13,16 +13,16 @@ void main() {
       statusBarIconBrightness: Brightness.dark,
     ),
   );
-  runApp(const SchoolMateApp());
+  runApp(const Material4ContainerApp());
 }
 
-class SchoolMateApp extends StatelessWidget {
-  const SchoolMateApp({super.key});
+class Material4ContainerApp extends StatelessWidget {
+  const Material4ContainerApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'SchoolMate - School Management',
+      title: 'Material 4 — Universal Container',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,
@@ -33,7 +33,7 @@ class SchoolMateApp extends StatelessWidget {
         ),
         fontFamily: GoogleFonts.plusJakartaSans().fontFamily,
       ),
-      home: const SchoolDashboardScreen(),
+      home: const UniversalContainerShowcaseScreen(),
     );
   }
 }

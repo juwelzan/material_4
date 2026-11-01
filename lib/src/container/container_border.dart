@@ -193,6 +193,170 @@ class Material4Border {
           animated: animated,
         );
 
+  /// Generic preset: render any [BorderStyleType] with full control.
+  ///
+  /// Use this when one of the named presets does not match; it forwards every
+  /// field straight through so any of the built-in styles can be driven.
+  const Material4Border.styled(
+    BorderStyleType style, {
+    double width = 2.0,
+    Color? color,
+    List<Color>? colors,
+    Gradient? gradient,
+    double dashLength = 8.0,
+    double dashGap = 4.0,
+    double glowIntensity = 1.0,
+    double blurRadius = 0.0,
+    bool animated = false,
+    double animationSpeed = 1.0,
+    double progress = 0.0,
+    ShapeStrokeAlign strokeAlign = ShapeStrokeAlign.center,
+  }) : this(
+          style: style,
+          width: width,
+          color: color,
+          colors: colors,
+          gradient: gradient,
+          dashLength: dashLength,
+          dashGap: dashGap,
+          glowIntensity: glowIntensity,
+          blurRadius: blurRadius,
+          animated: animated,
+          animationSpeed: animationSpeed,
+          progress: progress,
+          strokeAlign: strokeAlign,
+        );
+
+  /// Preset for a luminous gradient stroke wrapped in a soft outer bloom.
+  const Material4Border.gradientGlow({
+    double width = 2.0,
+    Gradient? gradient,
+    double blurRadius = 10.0,
+    double progress = 0.0,
+    bool animated = false,
+  }) : this(
+          style: BorderStyleType.gradientGlow,
+          width: width,
+          gradient: gradient,
+          blurRadius: blurRadius,
+          progress: progress,
+          animated: animated,
+        );
+
+  /// Preset for twin parallel rails joined by perpendicular cross-ties.
+  const Material4Border.railroad({
+    double width = 3.0,
+    Color color = const Color(0xFF475569),
+    double dashLength = 10.0,
+    double dashGap = 6.0,
+    bool animated = false,
+    double animationSpeed = 1.0,
+    double progress = 0.0,
+  }) : this(
+          style: BorderStyleType.railroad,
+          width: width,
+          color: color,
+          dashLength: dashLength,
+          dashGap: dashGap,
+          animated: animated,
+          animationSpeed: animationSpeed,
+          progress: progress,
+        );
+
+  /// Preset for alternating pearl beads threaded along the contour.
+  const Material4Border.beadChain({
+    double width = 3.0,
+    Color color = const Color(0xFF6366F1),
+    double dashGap = 4.0,
+    bool animated = false,
+    double animationSpeed = 1.0,
+    double progress = 0.0,
+  }) : this(
+          style: BorderStyleType.beadChain,
+          width: width,
+          color: color,
+          dashGap: dashGap,
+          animated: animated,
+          animationSpeed: animationSpeed,
+          progress: progress,
+        );
+
+  /// Preset for a calligraphic stroke that swells and thins along the edge.
+  const Material4Border.tapered({
+    double width = 2.0,
+    Color color = const Color(0xFF1E1E24),
+    bool animated = false,
+    double animationSpeed = 1.0,
+    double progress = 0.0,
+  }) : this(
+          style: BorderStyleType.tapered,
+          width: width,
+          color: color,
+          animated: animated,
+          animationSpeed: animationSpeed,
+          progress: progress,
+        );
+
+  /// Preset for perpendicular ruler/gauge tick marks along the contour.
+  const Material4Border.tickMarks({
+    double width = 1.5,
+    Color color = const Color(0xFF334155),
+    double dashGap = 6.0,
+  }) : this(
+          style: BorderStyleType.tickMarks,
+          width: width,
+          color: color,
+          dashGap: dashGap,
+        );
+
+  /// Preset for a braided two-strand rope wound around the perimeter.
+  const Material4Border.ropeTwist({
+    double width = 3.0,
+    Color color = const Color(0xFFB45309),
+    bool animated = false,
+    double animationSpeed = 1.0,
+    double progress = 0.0,
+  }) : this(
+          style: BorderStyleType.ropeTwist,
+          width: width,
+          color: color,
+          animated: animated,
+          animationSpeed: animationSpeed,
+          progress: progress,
+        );
+
+  /// Preset for a bold comic ink outline with an offset depth line.
+  const Material4Border.comicInk({
+    double width = 2.0,
+    Color color = const Color(0xFF111111),
+  }) : this(
+          style: BorderStyleType.comicInk,
+          width: width,
+          color: color,
+        );
+
+  /// Preset for glowing runway dashes (dashed segments with soft bloom).
+  const Material4Border.segmentedGlow({
+    double width = 2.0,
+    Color color = const Color(0xFF22D3EE),
+    double dashLength = 10.0,
+    double dashGap = 8.0,
+    double blurRadius = 6.0,
+    bool animated = true,
+    double animationSpeed = 1.0,
+    double progress = 0.0,
+  }) : this(
+          style: BorderStyleType.segmentedGlow,
+          width: width,
+          color: color,
+          dashLength: dashLength,
+          dashGap: dashGap,
+          blurRadius: blurRadius,
+          animated: animated,
+          animationSpeed: animationSpeed,
+          progress: progress,
+        );
+
   Material4Border copyWith({
     BorderStyleType? style,
     double? width,

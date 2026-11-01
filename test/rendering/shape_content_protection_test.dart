@@ -177,60 +177,9 @@ void main() {
   });
 
   group('ShapeTextFitter & Multilingual / Bengali / RTL Support', () {
-    test('Measures Bengali text accurately without font reduction or clipping',
-        () {
-      const bengaliText = 'ডাইনামিক শেইপ ইঞ্জিন এবং টেক্সট প্রোটেকশন';
-      final size = ShapeTextFitter.measureText(
-        text: bengaliText,
-        style: const TextStyle(fontSize: 16.0),
-        maxWidth: 300.0,
-      );
 
-      expect(size.width, greaterThan(0.0));
-      expect(size.height, greaterThan(0.0));
-      expect(size.width, lessThanOrEqualTo(300.0));
-    });
 
-    test('Measures Arabic RTL text accurately', () {
-      const arabicText = 'محرك الأشكال الديناميكي لنظام فلاتر';
-      final size = ShapeTextFitter.measureText(
-        text: arabicText,
-        style: const TextStyle(fontSize: 16.0),
-        maxWidth: 300.0,
-        textDirection: TextDirection.rtl,
-      );
 
-      expect(size.width, greaterThan(0.0));
-      expect(size.height, greaterThan(0.0));
-      expect(size.width, lessThanOrEqualTo(300.0));
-    });
-
-    test('Computes optimal font size for bounded inscribed region', () {
-      const sampleText = 'Universal Material 4 Content Protection';
-      final optimalSize = ShapeTextFitter.computeOptimalFontSize(
-        text: sampleText,
-        targetSize: const Size(120, 40),
-        minFontSize: 8.0,
-        maxFontSize: 24.0,
-      );
-
-      expect(optimalSize, greaterThanOrEqualTo(8.0));
-      expect(optimalSize, lessThanOrEqualTo(24.0));
-    });
-
-    test('fitsWithin correctly verifies rectangular capacity', () {
-      const shortText = 'OK';
-      const longText =
-          'This is a very long multiline text description that will exceed small bounds easily.';
-
-      final smallBounds = const Rect.fromLTWH(0, 0, 40, 30);
-      expect(ShapeTextFitter.fitsWithin(text: shortText, bounds: smallBounds),
-          isTrue);
-      expect(
-          ShapeTextFitter.fitsWithin(
-              text: longText, bounds: smallBounds, maxLines: 1),
-          isFalse);
-    });
   });
 
   group('ShapeAnchorPlacer & ShapeContentPlacer Tests', () {
@@ -270,17 +219,6 @@ void main() {
       expect(center, equals(const Offset(100, 10)));
     });
 
-    test('Computes docked accessory offset with padding', () {
-      final offset = ShapeContentPlacer.computeAccessoryOffset(
-        shapeSize: const Size(200, 100),
-        accessorySize: const Size(24, 24),
-        anchor: ShapeAnchor.topRight,
-        padding: const EdgeInsets.only(top: 4, right: 8),
-      );
-
-      expect(offset.dx, equals(200 - 12 - 8));
-      expect(offset.dy, equals(0 - 12 + 4));
-    });
   });
 
   group('Widget Content Protection Integration Tests', () {

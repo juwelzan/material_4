@@ -340,7 +340,8 @@ void main() {
         MaterialApp(
           home: Scaffold(
             body: Center(
-              child: Material4Container.carbonTech(
+              child: Material4Container.fromPreset(
+                preset: Material4ContainerPreset.carbonTech,
                 width: 220,
                 height: 140,
                 child: const Text('Carbon Tech Card'),
@@ -355,7 +356,8 @@ void main() {
         MaterialApp(
           home: Scaffold(
             body: Center(
-              child: Material4Container.organicCard(
+              child: Material4Container.fromPreset(
+                preset: Material4ContainerPreset.organicCard,
                 width: 220,
                 height: 140,
                 child: const Text('Organic Sculpted Card'),

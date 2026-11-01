@@ -6,8 +6,8 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('Phase 2: Border Engine Comprehensive Tests', () {
-    test('All 32 BorderStyleType enum values are defined and distinct', () {
-      expect(BorderStyleType.values.length, 32);
+    test('All 40 BorderStyleType enum values are defined and distinct', () {
+      expect(BorderStyleType.values.length, 40);
       expect(
         BorderStyleType.values.toSet().length,
         BorderStyleType.values.length,
@@ -189,44 +189,56 @@ void main() {
               body: SingleChildScrollView(
                 child: Column(
                   children: [
-                    Material4Container.neon(
+                    const Material4Container(
                       width: 100,
                       height: 50,
-                      child: const Text('Neon'),
+                      border: Material4Border.neon(),
+                      child: Text('Neon'),
                     ),
-                    Material4Container.metallic(
+                    Material4Container(
                       width: 100,
                       height: 50,
-                      metallicType: MetallicType.gold,
+                      config: const Material4Config(
+                        borderStyle: BorderStyleType.metallic,
+                        metallicType: MetallicType.gold,
+                      ),
                       child: const Text('Metallic Gold'),
                     ),
-                    Material4Container.rainbow(
+                    const Material4Container(
                       width: 100,
                       height: 50,
-                      child: const Text('Rainbow'),
+                      border: Material4Border.rainbow(),
+                      child: Text('Rainbow'),
                     ),
-                    Material4Container.multiLayer(
+                    Material4Container(
                       width: 100,
                       height: 50,
-                      layers: const [
-                        BorderLayer(color: Colors.red, width: 2.0),
-                        BorderLayer(
-                          color: Colors.blue,
-                          width: 1.0,
-                          offset: 4.0,
-                        ),
-                      ],
+                      config: const Material4Config(
+                        borderStyle: BorderStyleType.multiLayer,
+                        multiLayerBorders: [
+                          BorderLayer(color: Colors.red, width: 2.0),
+                          BorderLayer(
+                            color: Colors.blue,
+                            width: 1.0,
+                            offset: 4.0,
+                          ),
+                        ],
+                      ),
                       child: const Text('Multi-Layer'),
                     ),
-                    Material4Container.cornerOnly(
+                    Material4Container(
                       width: 100,
                       height: 50,
+                      config: const Material4Config(
+                        borderStyle: BorderStyleType.cornerOnly,
+                      ),
                       child: const Text('Corner Only'),
                     ),
-                    Material4Container.handDrawn(
+                    const Material4Container(
                       width: 100,
                       height: 50,
-                      child: const Text('Hand Drawn'),
+                      border: Material4Border.styled(BorderStyleType.handDrawn),
+                      child: Text('Hand Drawn'),
                     ),
                   ],
                 ),

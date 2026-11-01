@@ -314,27 +314,5 @@ void main() {
       expect(cache.misses, 1);
     });
 
-    test(
-        'All SchoolShapePresets presets continue to build valid non-empty paths',
-        () {
-      final presets = [
-        SchoolShapePresets.attendanceConfig(),
-        SchoolShapePresets.academicConfig(),
-        SchoolShapePresets.studentIdConfig(),
-        SchoolShapePresets.achievementConfig(),
-        SchoolShapePresets.feeReceiptConfig(),
-        SchoolShapePresets.noticeBoardConfig(),
-        SchoolShapePresets.examScheduleConfig(),
-        SchoolShapePresets.resultConfig(),
-        SchoolShapePresets.timetableConfig(),
-        SchoolShapePresets.teacherProfileConfig(),
-      ];
-
-      for (final preset in presets) {
-        final path = Material4PathBuilder.buildPath(testSize, preset);
-        expect(path.getBounds().isEmpty, isFalse,
-            reason: 'Failed for ${preset.type}');
-      }
-    });
   });
 }

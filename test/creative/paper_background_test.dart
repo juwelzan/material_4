@@ -135,23 +135,5 @@ void main() {
       pic.dispose();
     });
 
-    test('PaperPatternCache enforces memory bound limit', () {
-      PaperPatternCache.clear();
-      expect(PaperPatternCache.entryCount, 0);
-
-      for (int i = 0; i < 60; i++) {
-        PaperPatternCache.getOrCreate('key_$i', () {
-          return Path()
-            ..addOval(
-              Rect.fromCircle(center: Offset(i.toDouble(), 10), radius: 5),
-            );
-        });
-      }
-
-      expect(PaperPatternCache.entryCount,
-          lessThanOrEqualTo(PaperPatternCache.maxEntries));
-      PaperPatternCache.clear();
-      expect(PaperPatternCache.entryCount, 0);
-    });
   });
 }

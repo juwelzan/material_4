@@ -277,6 +277,39 @@ class ShapeBorderPainter {
       case BorderStyleType.energyBorder:
         _drawEnergyBorder(canvas, path, config, borderColor, borderWidth);
         break;
+
+      // --- Next-Gen Border Styles (Phase 3) ---
+      case BorderStyleType.gradientGlow:
+        _drawGradientGlow(canvas, size, path, config, borderColor, borderWidth);
+        break;
+
+      case BorderStyleType.railroad:
+        _drawRailroad(canvas, path, config, borderColor, borderWidth);
+        break;
+
+      case BorderStyleType.beadChain:
+        _drawBeadChain(canvas, path, config, borderColor, borderWidth);
+        break;
+
+      case BorderStyleType.tapered:
+        _drawTapered(canvas, path, config, borderColor, borderWidth);
+        break;
+
+      case BorderStyleType.tickMarks:
+        _drawTickMarks(canvas, path, config, borderColor, borderWidth);
+        break;
+
+      case BorderStyleType.ropeTwist:
+        _drawRopeTwist(canvas, path, config, borderColor, borderWidth);
+        break;
+
+      case BorderStyleType.comicInk:
+        _drawComicInk(canvas, path, config, borderColor, borderWidth);
+        break;
+
+      case BorderStyleType.segmentedGlow:
+        _drawSegmentedGlow(canvas, path, config, borderColor, borderWidth);
+        break;
     }
   }
 
@@ -298,6 +331,7 @@ class ShapeBorderPainter {
       ..style = PaintingStyle.stroke
       ..strokeWidth = borderWidth
       ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
       ..color = borderColor
       ..isAntiAlias = true;
 
@@ -552,6 +586,7 @@ class ShapeBorderPainter {
     final paint = Paint()
       ..style = PaintingStyle.stroke
       ..strokeWidth = borderWidth
+      ..strokeJoin = StrokeJoin.round
       ..isAntiAlias = true;
 
     final progress = config.borderProgress;
@@ -612,6 +647,7 @@ class ShapeBorderPainter {
     final paint = Paint()
       ..style = PaintingStyle.stroke
       ..strokeWidth = borderWidth
+      ..strokeJoin = StrokeJoin.round
       ..isAntiAlias = true;
 
     final rotation = config.borderProgress * 2 * math.pi;
@@ -686,6 +722,7 @@ class ShapeBorderPainter {
     final paint = Paint()
       ..style = PaintingStyle.stroke
       ..strokeWidth = borderWidth
+      ..strokeJoin = StrokeJoin.round
       ..isAntiAlias = true;
 
     final colors = switch (config.metallicType) {
@@ -1454,6 +1491,7 @@ class ShapeBorderPainter {
     final paint = Paint()
       ..style = PaintingStyle.stroke
       ..strokeWidth = borderWidth
+      ..strokeJoin = StrokeJoin.round
       ..isAntiAlias = true;
 
     final progress = config.borderProgress;
@@ -1524,6 +1562,415 @@ class ShapeBorderPainter {
       }
       plasmaPath.close();
       canvas.drawPath(plasmaPath, corePaint);
+    }
+  }
+
+  // =========================================================================
+  // --- Next-Gen Border Renderers (Phase 3) ---
+  // =========================================================================
+
+  /// Luminous gradient stroke wrapped in a soft outer bloom halo.
+  static void _drawGradientGlow(
+    Canvas canvas,
+    Size size,
+    Path path,
+    Material4Config config,
+    Color borderColor,
+    double borderWidth,
+  ) {
+    final rect = Offset.zero & size;
+    final gradient = config.borderGradient ??
+        LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            borderColor,
+            Color.lerp(borderColor, Colors.white, 0.6) ?? borderColor,
+            borderColor,
+          ],
+        );
+    final shader = gradient.createShader(rect);
+    final blur = config.glowBlurRadius > 0 ? config.glowBlurRadius : 10.0;
+
+    // Soft bloom halo tinted by the gradient itself.
+    final haloPaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = borderWidth * 2.6
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..shader = shader
+      ..maskFilter = MaskFilter.blur(BlurStyle.normal, blur)
+      ..isAntiAlias = true;
+    canvas.drawPath(path, haloPaint);
+
+    // Crisp gradient core filament.
+    final corePaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = borderWidth
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..shader = shader
+      ..isAntiAlias = true;
+    canvas.drawPath(path, corePaint);
+  }
+
+  /// Twin parallel rails joined by evenly spaced perpendicular cross-ties.
+  static void _drawRailroad(
+    Canvas canvas,
+    Path path,
+    Material4Config config,
+    Color borderColor,
+    double borderWidth,
+  ) {
+    final gauge = (config.dashGap > 0 ? config.dashGap : 5.0) + borderWidth;
+    final tieSpacing = config.dashLength > 0 ? config.dashLength + 6.0 : 14.0;
+    final phase = config.dashPhase +
+        config.borderProgress * tieSpacing; // animate ties along the track
+
+    final railPaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = borderWidth * 0.7
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..color = borderColor
+      ..isAntiAlias = true;
+
+    final tiePaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = borderWidth * 0.7
+      ..strokeCap = StrokeCap.round
+      ..color = borderColor.withValues(alpha: borderColor.a * 0.85)
+      ..isAntiAlias = true;
+
+    for (final metric in path.computeMetrics()) {
+      if (metric.length <= 0) continue;
+      final inner = Path();
+      final outer = Path();
+      var first = true;
+      const step = 4.0;
+      double dist = 0.0;
+      while (dist <= metric.length) {
+        final tangent = metric.getTangentForOffset(dist);
+        if (tangent != null) {
+          final normal = Offset(-tangent.vector.dy, tangent.vector.dx);
+          final inPt = tangent.position + normal * (gauge * 0.5);
+          final outPt = tangent.position - normal * (gauge * 0.5);
+          if (first) {
+            inner.moveTo(inPt.dx, inPt.dy);
+            outer.moveTo(outPt.dx, outPt.dy);
+            first = false;
+          } else {
+            inner.lineTo(inPt.dx, inPt.dy);
+            outer.lineTo(outPt.dx, outPt.dy);
+          }
+        }
+        dist += step;
+      }
+      canvas.drawPath(inner, railPaint);
+      canvas.drawPath(outer, railPaint);
+
+      // Cross-ties.
+      double tieDist = phase % tieSpacing;
+      while (tieDist < metric.length) {
+        final tangent = metric.getTangentForOffset(tieDist);
+        if (tangent != null) {
+          final normal = Offset(-tangent.vector.dy, tangent.vector.dx);
+          final a = tangent.position + normal * (gauge * 0.5);
+          final b = tangent.position - normal * (gauge * 0.5);
+          canvas.drawLine(a, b, tiePaint);
+        }
+        tieDist += tieSpacing;
+      }
+    }
+  }
+
+  /// Alternating large and small pearl beads threaded along the contour.
+  static void _drawBeadChain(
+    Canvas canvas,
+    Path path,
+    Material4Config config,
+    Color borderColor,
+    double borderWidth,
+  ) {
+    final bigR = borderWidth * 0.9;
+    final smallR = borderWidth * 0.45;
+    final spacing = math.max(1.0, (config.dashGap > 0 ? config.dashGap : 4.0) +
+        bigR + smallR);
+    final phase = config.borderProgress * spacing;
+
+    final beadPaint = Paint()
+      ..style = PaintingStyle.fill
+      ..color = borderColor
+      ..isAntiAlias = true;
+    final highlightPaint = Paint()
+      ..style = PaintingStyle.fill
+      ..color = Color.lerp(borderColor, Colors.white, 0.6) ?? borderColor
+      ..isAntiAlias = true;
+
+    for (final metric in path.computeMetrics()) {
+      if (metric.length <= 0) continue;
+      double dist = phase % spacing;
+      int i = 0;
+      while (dist < metric.length) {
+        final tangent = metric.getTangentForOffset(dist);
+        if (tangent != null) {
+          final isBig = i.isEven;
+          final r = isBig ? bigR : smallR;
+          canvas.drawCircle(tangent.position, r, beadPaint);
+          if (isBig) {
+            canvas.drawCircle(
+              tangent.position - Offset(r * 0.3, r * 0.3),
+              r * 0.4,
+              highlightPaint,
+            );
+          }
+        }
+        dist += spacing;
+        i++;
+      }
+    }
+  }
+
+  /// Calligraphic stroke whose width swells and thins along the perimeter.
+  static void _drawTapered(
+    Canvas canvas,
+    Path path,
+    Material4Config config,
+    Color borderColor,
+    double borderWidth,
+  ) {
+    final phase = config.borderProgress * 2 * math.pi;
+    final maxW = borderWidth * 1.8;
+    final minW = borderWidth * 0.35;
+
+    for (final metric in path.computeMetrics()) {
+      if (metric.length <= 0) continue;
+      const step = 4.0;
+      double dist = 0.0;
+      Offset? prev;
+      while (dist <= metric.length) {
+        final tangent = metric.getTangentForOffset(dist);
+        if (tangent != null) {
+          if (prev != null) {
+            final t = dist / metric.length;
+            final swell = 0.5 + 0.5 * math.sin(t * 4 * math.pi + phase);
+            final w = minW + (maxW - minW) * swell;
+            final segPaint = Paint()
+              ..style = PaintingStyle.stroke
+              ..strokeWidth = w
+              ..strokeCap = StrokeCap.round
+              ..color = borderColor
+              ..isAntiAlias = true;
+            canvas.drawLine(prev, tangent.position, segPaint);
+          }
+          prev = tangent.position;
+        }
+        dist += step;
+      }
+    }
+  }
+
+  /// Short perpendicular ruler/gauge tick marks repeated along the contour.
+  static void _drawTickMarks(
+    Canvas canvas,
+    Path path,
+    Material4Config config,
+    Color borderColor,
+    double borderWidth,
+  ) {
+    // Thin base rail.
+    final railPaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = borderWidth * 0.6
+      ..strokeJoin = StrokeJoin.round
+      ..color = borderColor.withValues(alpha: borderColor.a * 0.6)
+      ..isAntiAlias = true;
+    canvas.drawPath(path, railPaint);
+
+    final spacing = config.dashGap > 0 ? config.dashGap + 4.0 : 10.0;
+    final longTick = borderWidth * 3.0;
+    final shortTick = borderWidth * 1.6;
+    final tickPaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = borderWidth * 0.8
+      ..strokeCap = StrokeCap.round
+      ..color = borderColor
+      ..isAntiAlias = true;
+
+    for (final metric in path.computeMetrics()) {
+      if (metric.length <= 0) continue;
+      double dist = 0.0;
+      int i = 0;
+      while (dist < metric.length) {
+        final tangent = metric.getTangentForOffset(dist);
+        if (tangent != null) {
+          final normal = Offset(-tangent.vector.dy, tangent.vector.dx);
+          final len = i % 5 == 0 ? longTick : shortTick;
+          final a = tangent.position;
+          final b = tangent.position + normal * len;
+          canvas.drawLine(a, b, tickPaint);
+        }
+        dist += spacing;
+        i++;
+      }
+    }
+  }
+
+  /// Braided two-strand rope wound around the shape perimeter.
+  static void _drawRopeTwist(
+    Canvas canvas,
+    Path path,
+    Material4Config config,
+    Color borderColor,
+    double borderWidth,
+  ) {
+    final phase = config.borderProgress * 2 * math.pi;
+    final amp = borderWidth * 0.75;
+    final twist = 0.5; // radians of twist per logical pixel
+    final strandPaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = borderWidth * 0.8
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..isAntiAlias = true;
+
+    final light = Color.lerp(borderColor, Colors.white, 0.4) ?? borderColor;
+    final dark = Color.lerp(borderColor, Colors.black, 0.25) ?? borderColor;
+
+    for (final metric in path.computeMetrics()) {
+      if (metric.length <= 0) continue;
+      final strandA = Path();
+      final strandB = Path();
+      var firstA = true;
+      var firstB = true;
+      const step = 3.0;
+      double dist = 0.0;
+      while (dist <= metric.length) {
+        final tangent = metric.getTangentForOffset(dist);
+        if (tangent != null) {
+          final normal = Offset(-tangent.vector.dy, tangent.vector.dx);
+          final s = math.sin(dist * twist + phase);
+          final aPt = tangent.position + normal * (amp * s);
+          final bPt = tangent.position - normal * (amp * s);
+          if (firstA) {
+            strandA.moveTo(aPt.dx, aPt.dy);
+            firstA = false;
+          } else {
+            strandA.lineTo(aPt.dx, aPt.dy);
+          }
+          if (firstB) {
+            strandB.moveTo(bPt.dx, bPt.dy);
+            firstB = false;
+          } else {
+            strandB.lineTo(bPt.dx, bPt.dy);
+          }
+        }
+        dist += step;
+      }
+      canvas.drawPath(strandB, strandPaint..color = dark);
+      canvas.drawPath(strandA, strandPaint..color = light);
+    }
+  }
+
+  /// Bold comic ink outline with an offset secondary line for depth.
+  static void _drawComicInk(
+    Canvas canvas,
+    Path path,
+    Material4Config config,
+    Color borderColor,
+    double borderWidth,
+  ) {
+    // Offset drop line (ink shadow).
+    final offset = config.neoOffset == Offset.zero
+        ? const Offset(2.5, 2.5)
+        : config.neoOffset;
+    final shadowPaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = borderWidth * 1.15
+      ..strokeJoin = StrokeJoin.round
+      ..strokeCap = StrokeCap.round
+      ..color = (config.neoColor == const Color(0xFF000000)
+              ? borderColor
+              : config.neoColor)
+          .withValues(alpha: 0.35)
+      ..isAntiAlias = true;
+    canvas.save();
+    canvas.translate(offset.dx, offset.dy);
+    canvas.drawPath(path, shadowPaint);
+    canvas.restore();
+
+    // Bold main ink outline.
+    final inkPaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = borderWidth * 1.4
+      ..strokeJoin = StrokeJoin.round
+      ..strokeCap = StrokeCap.round
+      ..color = borderColor
+      ..isAntiAlias = true;
+    canvas.drawPath(path, inkPaint);
+  }
+
+  /// Glowing runway dashes — dashed segments each wrapped in a soft bloom.
+  static void _drawSegmentedGlow(
+    Canvas canvas,
+    Path path,
+    Material4Config config,
+    Color borderColor,
+    double borderWidth,
+  ) {
+    final dashLength = config.dashLength > 0 ? config.dashLength : 10.0;
+    final dashGap = config.dashGap > 0 ? config.dashGap : 8.0;
+    final blur = config.glowBlurRadius > 0 ? config.glowBlurRadius : 6.0;
+    final glowColor = config.glowColor ?? borderColor;
+    final phase = config.dashPhase +
+        config.borderProgress * (dashLength + dashGap) * 4.0;
+
+    // Glow pass.
+    final glowPaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = borderWidth * 1.8
+      ..strokeCap = StrokeCap.round
+      ..color = glowColor.withValues(alpha: 0.6)
+      ..maskFilter = MaskFilter.blur(BlurStyle.normal, blur)
+      ..isAntiAlias = true;
+    _drawDashedWithPaint(path, canvas, glowPaint, dashLength, dashGap, phase);
+
+    // Crisp core pass.
+    final corePaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = borderWidth
+      ..strokeCap = StrokeCap.round
+      ..color = borderColor
+      ..isAntiAlias = true;
+    _drawDashedWithPaint(path, canvas, corePaint, dashLength, dashGap, phase);
+  }
+
+  /// Internal helper: draw a dashed stroke using a fully configured [paint].
+  static void _drawDashedWithPaint(
+    Path path,
+    Canvas canvas,
+    Paint paint,
+    double dashLength,
+    double dashGap,
+    double phaseOffset,
+  ) {
+    final totalCycle = dashLength + dashGap;
+    if (totalCycle <= 0) {
+      canvas.drawPath(path, paint);
+      return;
+    }
+    final normalizedPhase = phaseOffset % totalCycle;
+    for (final metric in path.computeMetrics()) {
+      if (metric.length <= 0) continue;
+      double distance = -normalizedPhase;
+      while (distance < metric.length) {
+        final start = math.max(0.0, distance);
+        final end = math.min(metric.length, distance + dashLength);
+        if (end > start) {
+          canvas.drawPath(metric.extractPath(start, end), paint);
+        }
+        distance += totalCycle;
+      }
     }
   }
 }

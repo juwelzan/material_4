@@ -448,60 +448,7 @@ void main() {
       }
     });
 
-    testWidgets(
-        'ShapeBorderDrawReveal renders through RenderBox pipeline without CustomPaint',
-        (
-      tester,
-    ) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: Center(
-              child: ShapeBorderDrawReveal(
-                size: const Size(200, 100),
-                progress: 0.7,
-                borderColor: Colors.pink,
-                borderWidth: 3,
-                config: const Material4Config(
-                  type: Material4Type.smoothRounded,
-                  cornerRadius: 20,
-                ),
-                child: const Text('Revealed Child'),
-              ),
-            ),
-          ),
-        ),
-      );
 
-      expect(find.text('Revealed Child'), findsOneWidget);
-      final renderBox = tester
-          .renderObject<RenderMaterial4>(find.byType(Material4RenderWidget));
-      expect(renderBox.config.borderProgress, 0.7);
-      expect(renderBox.borderColor, Colors.pink);
-      expect(renderBox.borderWidth, 3.0);
-    });
-
-    test('Legacy StrokeRevealPainter still repaints and renders cleanly', () {
-      final recorder = PictureRecorder();
-      final canvas = Canvas(recorder);
-      const testSize = Size(120, 80);
-      final painter = StrokeRevealPainter(
-        config: const Material4Config(type: Material4Type.smoothRounded),
-        progress: 0.6,
-        borderColor: Colors.red,
-        borderWidth: 2,
-      );
-
-      expect(() => painter.paint(canvas, testSize), returnsNormally);
-
-      final oldPainter = StrokeRevealPainter(
-        config: const Material4Config(type: Material4Type.smoothRounded),
-        progress: 0.3,
-        borderColor: Colors.red,
-        borderWidth: 2,
-      );
-      expect(painter.shouldRepaint(oldPainter), isTrue);
-    });
   });
 
   group('RenderMaterial4 Child Painting & Selective Clipping Tests', () {

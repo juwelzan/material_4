@@ -171,20 +171,18 @@ void main() {
     });
 
     testWidgets(
-      'AdaptiveShapeCard renders all 28 shapes without clipping text',
+      'Material4Container renders all shape presets without clipping text',
       (tester) async {
         for (final shape in Material4Type.values) {
           await tester.pumpWidget(
             MaterialApp(
               home: Scaffold(
                 body: Center(
-                  child: AdaptiveShapeCard(
-                    title: 'Grade 11-A',
-                    subtitle: 'Physics Lab Session',
-                    icon: Icons.science_rounded,
-                    shapeType: shape,
+                  child: Material4Container(
+                    shape: shape,
                     width: 220,
                     height: 90,
+                    child: const Center(child: Text('Grade 11-A')),
                   ),
                 ),
               ),
@@ -192,40 +190,44 @@ void main() {
           );
 
           expect(find.text('Grade 11-A'), findsOneWidget);
-          expect(find.text('Physics Lab Session'), findsOneWidget);
         }
       },
     );
 
     testWidgets(
-      'Material4Container convenience factories render correctly',
+      'Material4Container renders built-in shapes via the unified shape param',
       (tester) async {
         await tester.pumpWidget(
           MaterialApp(
             home: Scaffold(
               body: Column(
                 children: [
-                  Material4Container.capsule(
+                  Material4Container(
+                    shape: Material4Type.capsule,
                     width: 100,
                     height: 40,
                     child: const Text('Capsule'),
                   ),
-                  Material4Container.shield(
+                  Material4Container(
+                    shape: Material4Type.shield,
                     width: 100,
                     height: 80,
                     child: const Text('Shield'),
                   ),
-                  Material4Container.ribbon(
+                  Material4Container(
+                    shape: Material4Type.ribbon,
                     width: 120,
                     height: 40,
                     child: const Text('Ribbon'),
                   ),
-                  Material4Container.bookmark(
+                  Material4Container(
+                    shape: Material4Type.bookmark,
                     width: 60,
                     height: 100,
                     child: const Text('Bookmark'),
                   ),
-                  Material4Container.speechBubble(
+                  Material4Container(
+                    shape: Material4Type.speechBubble,
                     width: 120,
                     height: 70,
                     child: const Text('Speech'),

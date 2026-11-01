@@ -305,6 +305,31 @@ enum BorderStyleType {
 
   /// Electric plasma jitter stroke.
   energyBorder,
+
+  // --- Next-Gen Border Styles (Phase 3 Expansion) ---
+  /// Luminous gradient stroke wrapped in a soft outer bloom halo.
+  gradientGlow,
+
+  /// Twin parallel rails joined by evenly spaced perpendicular cross-ties.
+  railroad,
+
+  /// Alternating large and small pearl beads threaded along the contour.
+  beadChain,
+
+  /// Calligraphic stroke whose width swells and thins along the perimeter.
+  tapered,
+
+  /// Short perpendicular ruler/gauge tick marks repeated along the contour.
+  tickMarks,
+
+  /// Braided two-strand rope wound around the shape perimeter.
+  ropeTwist,
+
+  /// Bold comic ink outline with an offset secondary line for depth.
+  comicInk,
+
+  /// Glowing runway dashes — dashed segments each wrapped in a soft bloom.
+  segmentedGlow,
 }
 
 /// Visual background effect styles for Material 4 shape interiors.
@@ -351,16 +376,6 @@ enum BackgroundEffectType {
 
 /// Type alias for [Material4Config].
 typedef Material4ShapeConfig = Material4Config;
-
-/// Deprecated alias for [Material4Config].
-@Deprecated(
-    'Use Material4Config instead. This alias will be removed in a future release.')
-typedef DynamicShapeConfig = Material4Config;
-
-/// Deprecated alias for [Material4Type].
-@Deprecated(
-    'Use Material4Type instead. This alias will be removed in a future release.')
-typedef DynamicShapeType = Material4Type;
 
 class Material4Config {
   final Material4Type type;

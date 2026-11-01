@@ -5,6 +5,7 @@ import 'package:material_4/material_4.dart';
 // LiquidStretch is internal to the glass engine; imported only to assert on it.
 import 'package:material_4/src/liquid_glass/src/engine/stretch.dart'
     show LiquidStretch;
+import 'package:material_4/src/liquid_glass/utils/glass_quality_adapter.dart';
 
 Widget _host(Widget child, {bool disableAnimations = false}) => MaterialApp(
       home: MediaQuery(
@@ -61,7 +62,117 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  // Regression: missing shader *image filters* (web, Skia desktop, many
+  // Android GPUs; also the headless test runner) used to force minimal,
+  // stripping the lens shader and the blur from interactive glass.
+  test('static probe caps at standard without shader image filters', () {
+    final adapter = GlassQualityAdapter(
+      minQuality: GlassQuality.minimal,
+      maxQuality: GlassQuality.premium,
+      targetFrameMs: 16,
+      allowStepUp: false,
+      onQualityChanged: (_, __) {},
+    );
+    adapter.start();
+    addTearDown(adapter.stop);
+    expect(adapter.currentQuality, GlassQuality.standard);
+  });
+
   group('Material4Container liquidGlass', () {
+    testWidgets('minimal tier keeps the blur on interactive glass',
+        (tester) async {
+      await tester.pumpWidget(_host(_preset(
+        glass: const Material4LiquidGlass(quality: GlassQuality.minimal),
+      )));
+      final glass = tester.widget<AdaptiveGlass>(find.byType(AdaptiveGlass));
+      expect(glass.isInteractive, isFalse); // engine keeps BackdropFilter
+      expect(find.byType(LiquidStretch), findsNothing);
+      expect(find.byType(GlassGlow), findsOneWidget); // still responsive
+    });
+
+    // Regression: without an explicit fill the renderer paints opaque white
+    // over the glass (and a drop shadow), hiding the effect entirely.
+    testWidgets('glass container paints no opaque fill or default shadow',
+        (tester) async {
+      await tester.pumpWidget(_host(const Material4Container(
+        shape: Material4Type.squircle,
+        width: 200,
+        height: 100,
+        liquidGlass: Material4LiquidGlass(),
+        background: Material4Background(
+          pattern: Material4Pattern.dots(color: Color(0x33FFFFFF)),
+        ),
+      )));
+      final rw = tester
+          .widget<Material4RenderWidget>(find.byType(Material4RenderWidget));
+      expect(rw.color, isNotNull);
+      expect(rw.color!.a, 0.0);
+      expect(rw.shadows, isEmpty);
+      expect(rw.background!.color!.a, 0.0);
+    });
+
+    testWidgets('explicit fill and shadows on a glass container are kept',
+        (tester) async {
+      await tester.pumpWidget(_host(const Material4Container(
+        width: 200,
+        height: 100,
+        color: Color(0x40FFFFFF),
+        shadows: [BoxShadow(blurRadius: 4)],
+        liquidGlass: Material4LiquidGlass(),
+      )));
+      final rw = tester
+          .widget<Material4RenderWidget>(find.byType(Material4RenderWidget));
+      expect(rw.color, const Color(0x40FFFFFF));
+      expect(rw.shadows, hasLength(1));
+    });
+
+    testWidgets('containers without glass keep the default white fill',
+        (tester) async {
+      await tester.pumpWidget(_host(const Material4Container(
+        width: 200,
+        height: 100,
+      )));
+      final rw = tester
+          .widget<Material4RenderWidget>(find.byType(Material4RenderWidget));
+      expect(rw.color, isNull);
+      expect(rw.shadows, same(kMaterial4DefaultShadows));
+    });
+
+    // Regression: the shape used to be sized from unbounded ListView
+    // constraints, giving radius 0 and a rectangular slab of glass.
+    testWidgets('capsule glass stays a capsule inside a ListView',
+        (tester) async {
+      await tester.pumpWidget(MaterialApp(
+        home: ListView(children: [
+          Center(
+            child: Material4Container(
+              shape: Material4Type.capsule,
+              width: 220,
+              height: 60,
+              liquidGlass: const Material4LiquidGlass(),
+              onTap: () {},
+            ),
+          ),
+          const Material4Container(
+            shape: Material4Type.squircle,
+            height: 120,
+            config:
+                Material4Config(type: Material4Type.squircle, cornerRadius: 28),
+            liquidGlass: Material4LiquidGlass(),
+          ),
+        ]),
+      ));
+      final shapes = tester
+          .widgetList<AdaptiveGlass>(find.byType(AdaptiveGlass))
+          .map((g) => g.shape)
+          .toList();
+      expect(shapes, hasLength(2));
+      expect(shapes[0], isA<LiquidRoundedSuperellipse>());
+      expect((shapes[0] as LiquidRoundedSuperellipse).borderRadius,
+          greaterThan(1000));
+      expect((shapes[1] as LiquidRoundedSuperellipse).borderRadius, 28);
+    });
+
     testWidgets('native rounded preset uses the shader shape, no clip',
         (tester) async {
       await tester.pumpWidget(_host(_preset()));

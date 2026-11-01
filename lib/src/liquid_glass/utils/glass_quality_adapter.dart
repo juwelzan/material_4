@@ -5,7 +5,7 @@
 /// phases of [GlassAdaptiveScope]:
 ///
 ///   **Phase 1 — Static probe** (~0 ms, at scope construction):
-///   - `ImageFilter.isShaderFilterSupported == false` → force `minimal`
+///   - `ImageFilter.isShaderFilterSupported == false` → cap at `standard`
 ///   - `kIsWeb` → cap at `standard`
 ///   - Otherwise → proceed to Phase 2
 ///
@@ -538,10 +538,18 @@ class GlassQualityAdapter {
   /// Returns a forced quality if the device can't support higher tiers, or
   /// `null` if we should proceed to Phase 2.
   GlassQuality? _staticProbe() {
-    // No custom shader support (e.g. software renderer, some broken Android
-    // drivers) — force minimal: BackdropFilter only, zero shader cost.
+    // No shader *image filters* (web, Skia desktop, many Android/GLES
+    // devices): premium needs `ImageFilter.shader`, but the standard tier only
+    // uses a blur/saturation BackdropFilter plus an ordinary fragment-shader
+    // paint, which every backend supports. Cap at standard rather than forcing
+    // minimal, which strips the lens shader everywhere (and the blur from
+    // interactive glass). Genuinely slow devices (software rendering) are
+    // still stepped down to minimal by the frame-time phases below, and a
+    // shader that fails to load falls back to frosted glass in AdaptiveGlass.
+    // [material_4 change; upstream forced minimal here.]
     if (!ui.ImageFilter.isShaderFilterSupported) {
-      return GlassQuality.minimal;
+      final capped = _capQuality(maxQuality, GlassQuality.standard);
+      return capped == maxQuality ? null : capped;
     }
 
     // On web, Windows, and Linux: Impeller uses WebGL / ANGLE (OpenGLESSDF)

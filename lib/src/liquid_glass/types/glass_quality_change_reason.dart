@@ -11,10 +11,10 @@
 enum GlassQualityChangeReason {
   /// Phase 1 — the device failed the static capability probe.
   ///
-  /// Either `ImageFilter.isShaderFilterSupported` is `false` (software
-  /// renderer / broken driver) or the app is running on web (`kIsWeb`).
-  /// The adapter forced a lower quality tier immediately at startup, without
-  /// collecting any frame timings.
+  /// The backend lacks shader image filters
+  /// (`ImageFilter.isShaderFilterSupported == false`), or the app runs on web,
+  /// Windows or Linux. The adapter capped quality at standard immediately at
+  /// startup, without collecting any frame timings.
   staticProbe,
 
   /// The adapter started from a persisted or in-session cached quality,

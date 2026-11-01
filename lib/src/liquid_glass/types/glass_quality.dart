@@ -50,7 +50,6 @@ enum GlassQuality {
   /// *Device compatibility* — when even [standard] is too heavy:
   /// - Targeting very old Android devices with limited shader driver support
   /// - Devices where custom fragment shaders fail to compile entirely
-  /// - `ImageFilter.isShaderFilterSupported` returns `false`
   ///
   /// *GPU budget management* — when you have many glass surfaces on one screen:
   /// - List items with glass cards (each scroll frame would invoke the shader

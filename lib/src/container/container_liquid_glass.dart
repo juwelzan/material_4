@@ -145,9 +145,12 @@ class Material4LiquidGlass {
           interactive: true,
         );
 
-  /// The shader shape that reproduces [config] exactly at [size], or null
-  /// when the geometry has no native equivalent and must be clipped.
-  LiquidShape? nativeShapeFor(Material4Config config, Size size) {
+  /// The shader shape that reproduces [config] exactly, or null when the
+  /// geometry has no native equivalent and must be clipped.
+  ///
+  /// No size is needed: the shader clamps every radius to half the shortest
+  /// side, so a huge radius yields an exact capsule at any size.
+  LiquidShape? nativeShapeFor(Material4Config config) {
     if (glassShape != null) return glassShape;
     if (config.customShape != null ||
         config.notches != null ||
@@ -156,16 +159,15 @@ class Material4LiquidGlass {
         config.transform != null) {
       return null;
     }
-    final half = size.shortestSide / 2;
     switch (config.type) {
       case Material4Type.smoothRounded:
       case Material4Type.squircle:
       case Material4Type.continuousSquircle:
-        return LiquidRoundedSuperellipse(
-          borderRadius: math.min(config.cornerRadius, half),
-        );
+        return LiquidRoundedSuperellipse(borderRadius: config.cornerRadius);
       case Material4Type.capsule:
-        return LiquidRoundedSuperellipse(borderRadius: half);
+        return const LiquidRoundedSuperellipse(
+          borderRadius: GlassDefaults.maxSafeRadius,
+        );
       default:
         return null;
     }
@@ -289,118 +291,117 @@ class _Material4LiquidGlassSurfaceState
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(builder: (context, constraints) {
-      final glass = widget.glass;
-      final config = widget.config;
-      final reduceMotion =
-          MediaQuery.maybeDisableAnimationsOf(context) ?? false;
-      final interactive = _interactive;
+    final glass = widget.glass;
+    final config = widget.config;
+    final reduceMotion = MediaQuery.maybeDisableAnimationsOf(context) ?? false;
+    final interactive = _interactive;
 
-      final quality = GlassThemeHelpers.resolveQuality(context,
-          widgetQuality: glass.quality);
-      final settings =
-          GlassThemeHelpers.resolveSettings(context, explicit: glass.settings);
-      // Explicit settings are ignored by an enclosing grouped layer, so they
-      // always get their own layer; interactive glass does too (as on iOS).
-      final ownLayer =
-          glass.useOwnLayer || glass.settings != null || interactive;
+    final quality =
+        GlassThemeHelpers.resolveQuality(context, widgetQuality: glass.quality);
+    final settings =
+        GlassThemeHelpers.resolveSettings(context, explicit: glass.settings);
+    // Explicit settings are ignored by an enclosing grouped layer, so they
+    // always get their own layer; interactive glass does too (as on iOS).
+    final ownLayer = glass.useOwnLayer || glass.settings != null || interactive;
+    // On the minimal tier the engine removes the backdrop blur from
+    // interactive surfaces, because a BackdropFilter whose bounds spring can
+    // flicker there. That leaves a flat tint that no longer reads as glass,
+    // so on minimal we keep the blur and drop the stretch (the bounds change)
+    // instead; press brightening and the pointer glow stay.
+    final minimalTier = quality == GlassQuality.minimal;
 
-      final size = constraints.biggest.isFinite
-          ? constraints.biggest
-          : constraints.smallest;
-      final native = glass.nativeShapeFor(config, size);
-      final clipper = native == null ? _Material4PathClipper(config) : null;
-      final shaderShape =
-          native ?? LiquidRoundedRectangle(borderRadius: config.cornerRadius);
+    final native = glass.nativeShapeFor(config);
+    final clipper = native == null ? _Material4PathClipper(config) : null;
+    final shaderShape =
+        native ?? LiquidRoundedRectangle(borderRadius: config.cornerRadius);
 
-      Widget content = widget.child;
+    Widget content = widget.child;
 
-      if (native == null && glass.specularRim) {
-        content = CustomPaint(
-          foregroundPainter: _SpecularRimPainter(
-            config: config,
-            lightAngle: settings.lightAngle,
-            intensity: settings.effectiveLightIntensity.clamp(0.0, 1.0),
-            width: glass.rimWidth,
-          ),
-          child: content,
-        );
-      }
+    if (native == null && glass.specularRim) {
+      content = CustomPaint(
+        foregroundPainter: _SpecularRimPainter(
+          config: config,
+          lightAngle: settings.lightAngle,
+          intensity: settings.effectiveLightIntensity.clamp(0.0, 1.0),
+          width: glass.rimWidth,
+        ),
+        child: content,
+      );
+    }
 
-      if (interactive && glass.glowRadius != 0) {
-        final isDark = GlassTheme.brightnessOf(context) == Brightness.dark;
-        content = GlassGlow(
-          clipper: clipper ?? ShapeBorderClipper(shape: shaderShape),
-          glowColor: glass.glowColor ??
-              (isDark ? const Color(0x12FFFFFF) : const Color(0x1AFFFFFF)),
-          glowRadius: glass.glowRadius ?? 1.6,
-          glowBlurRadius: 16.0,
-          hitTestBehavior: HitTestBehavior.translucent,
-          child: content,
-        );
-      }
+    if (interactive && glass.glowRadius != 0) {
+      final isDark = GlassTheme.brightnessOf(context) == Brightness.dark;
+      content = GlassGlow(
+        clipper: clipper ?? ShapeBorderClipper(shape: shaderShape),
+        glowColor: glass.glowColor ??
+            (isDark ? const Color(0x12FFFFFF) : const Color(0x1AFFFFFF)),
+        glowRadius: glass.glowRadius ?? 1.6,
+        glowBlurRadius: 16.0,
+        hitTestBehavior: HitTestBehavior.translucent,
+        child: content,
+      );
+    }
 
-      final double headroom = ownLayer && interactive
-          ? (LiquidStretch.nativePressGrowth / 2 + 8).ceilToDouble()
-          : 0.0;
+    final double headroom = ownLayer && interactive
+        ? (LiquidStretch.nativePressGrowth / 2 + 8).ceilToDouble()
+        : 0.0;
 
-      Widget surface = interactive
-          ? AnimatedBuilder(
-              animation: _pressCurve,
-              child: content,
-              builder: (context, child) => _glass(
-                shaderShape,
-                settings,
-                quality,
-                ownLayer,
-                headroom,
-                _pressCurve.value,
-                true,
-                child!,
-              ),
-            )
-          : _glass(shaderShape, settings, quality, ownLayer, headroom, 0.0,
-              false, content);
+    Widget surface = interactive
+        ? AnimatedBuilder(
+            animation: _pressCurve,
+            child: content,
+            builder: (context, child) => _glass(
+              shaderShape,
+              settings,
+              quality,
+              ownLayer,
+              headroom,
+              _pressCurve.value,
+              !minimalTier,
+              child!,
+            ),
+          )
+        : _glass(shaderShape, settings, quality, ownLayer, headroom, 0.0, false,
+            content);
 
-      if (clipper != null) {
-        surface = ClipPath(
-          clipper: clipper,
-          clipBehavior: Clip.antiAlias,
-          child: surface,
-        );
-      }
-
-      if (!interactive) return surface;
-
-      final stretchy = !reduceMotion && glass.stretch > 0;
-      if (stretchy) {
-        surface = LiquidStretch(
-          interactionScale: glass.interactionScale ?? 1.0,
-          pressGrowth: glass.interactionScale == null
-              ? LiquidStretch.nativePressGrowth
-              : null,
-          stretch: glass.stretch,
-          resistance: glass.resistance,
-          hitTestBehavior: HitTestBehavior.translucent,
-          anchorStretchSettings: AnchorStretchSettings.nativeTremor,
-          child: surface,
-        );
-      }
-      // A stretching premium layer must not be cached in a RepaintBoundary
-      // (scaling the baked texture blurs its edges); the lightweight shader
-      // re-renders inside one at full resolution.
-      final skipBoundary = quality == GlassQuality.minimal ||
-          (quality == GlassQuality.premium && stretchy);
-      if (!skipBoundary) surface = RepaintBoundary(child: surface);
-
-      return Listener(
-        behavior: HitTestBehavior.translucent,
-        onPointerDown: (_) => _press.forward(),
-        onPointerUp: (_) => _press.reverse(),
-        onPointerCancel: (_) => _press.reverse(),
+    if (clipper != null) {
+      surface = ClipPath(
+        clipper: clipper,
+        clipBehavior: Clip.antiAlias,
         child: surface,
       );
-    });
+    }
+
+    if (!interactive) return surface;
+
+    final stretchy = !reduceMotion && !minimalTier && glass.stretch > 0;
+    if (stretchy) {
+      surface = LiquidStretch(
+        interactionScale: glass.interactionScale ?? 1.0,
+        pressGrowth: glass.interactionScale == null
+            ? LiquidStretch.nativePressGrowth
+            : null,
+        stretch: glass.stretch,
+        resistance: glass.resistance,
+        hitTestBehavior: HitTestBehavior.translucent,
+        anchorStretchSettings: AnchorStretchSettings.nativeTremor,
+        child: surface,
+      );
+    }
+    // A stretching premium layer must not be cached in a RepaintBoundary
+    // (scaling the baked texture blurs its edges); the lightweight shader
+    // re-renders inside one at full resolution.
+    final skipBoundary = quality == GlassQuality.minimal ||
+        (quality == GlassQuality.premium && stretchy);
+    if (!skipBoundary) surface = RepaintBoundary(child: surface);
+
+    return Listener(
+      behavior: HitTestBehavior.translucent,
+      onPointerDown: (_) => _press.forward(),
+      onPointerUp: (_) => _press.reverse(),
+      onPointerCancel: (_) => _press.reverse(),
+      child: surface,
+    );
   }
 
   Widget _glass(

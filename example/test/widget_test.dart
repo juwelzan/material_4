@@ -32,8 +32,14 @@ void main() {
     );
     await tester.tap(find.text('Glass').last);
     await tester.pump(const Duration(milliseconds: 300));
-    await tester.tap(find.textContaining('Tap me'));
+    final button = find.textContaining('Add to Bag');
+    await tester.scrollUntilVisible(
+      button,
+      200,
+      scrollable: find.byType(Scrollable).last,
+    );
+    await tester.tap(button);
     await tester.pump(const Duration(milliseconds: 300));
-    expect(find.text('Tap me · 1'), findsOneWidget);
+    expect(find.text('Add to Bag · 1'), findsOneWidget);
   });
 }

@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:material_4/material_4.dart';
 
-/// Liquid-glass containers over a busy background, to compare platforms.
+/// Liquid Glass as Apple describes it, built with [Material4Container]:
+///
+/// * regular / clear (with dimming) / tinted glass,
+/// * small glass that flips light ↔ dark with the content scrolling under it,
+/// * larger glass that is thicker and more opaque,
+/// * `.interactive()` controls that flex and light up under the finger,
+/// * a `GlassEffectContainer`-style group whose buttons melt together,
+/// * materialize in / out.
 class LiquidGlassDemoScreen extends StatefulWidget {
   const LiquidGlassDemoScreen({super.key});
 
@@ -10,152 +17,363 @@ class LiquidGlassDemoScreen extends StatefulWidget {
 }
 
 class _LiquidGlassDemoScreenState extends State<LiquidGlassDemoScreen> {
-  int _taps = 0;
-  GlassQuality? _quality;
+  // Start offset for screenshots, e.g. --dart-define=M4_GLASS_SCROLL=700.
+  final _scroll = ScrollController(
+    initialScrollOffset:
+        const int.fromEnvironment('M4_GLASS_SCROLL').toDouble(),
+  );
+  bool _merged = true;
+  bool _showCard = true;
+  int _likes = 0;
+
+  @override
+  void dispose() {
+    _scroll.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final glass = Material4LiquidGlass(quality: _quality);
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Liquid Glass'),
-        actions: [
-          PopupMenuButton<GlassQuality?>(
-            tooltip: 'Quality',
-            icon: const Icon(Icons.tune),
-            onSelected: (q) => setState(() => _quality = q),
-            itemBuilder: (_) => [
-              const PopupMenuItem(value: null, child: Text('Auto')),
-              for (final q in GlassQuality.values)
-                PopupMenuItem(value: q, child: Text(q.name)),
-            ],
-          ),
-        ],
-      ),
-      body: Stack(
-        children: [
-          const Positioned.fill(child: _Backdrop()),
-          ListView(
-            padding: const EdgeInsets.all(24),
-            children: [
-              Material4Container(
-                shape: Material4Type.squircle,
-                height: 120,
-                liquidGlass: glass.copyWith(interactive: false),
-                child: const Center(child: _Label('Panel · squircle')),
-              ),
-              const SizedBox(height: 24),
-              Center(
-                child: Material4Container(
-                  shape: Material4Type.capsule,
-                  width: 220,
-                  height: 60,
-                  liquidGlass: glass,
-                  onTap: () => setState(() => _taps++),
-                  child: Center(child: _Label('Tap me · $_taps')),
-                ),
-              ),
-              const SizedBox(height: 24),
-              Row(
-                children: [
-                  Expanded(
-                    child: Material4Container(
-                      customShape: Material4CustomShape.star(
-                        points: 6,
-                        innerRadiusRatio: 0.62,
-                        cornerRadius: 10,
-                      ),
-                      height: 160,
-                      liquidGlass: glass.copyWith(interactive: true),
-                      border: const Material4Border.gradientGlow(width: 1.2),
-                      child: const Center(child: _Label('Star')),
-                    ),
+    final bottom = MediaQuery.paddingOf(context).bottom;
+    return GlassContentAwareScope(
+      // The black scaffold shows through unpainted content, so tell the
+      // sampler; otherwise it assumes white in light mode.
+      backgroundColor: Colors.black,
+      child: Scaffold(
+        backgroundColor: Colors.black,
+        body: Stack(
+          children: [
+            // ---- Content layer (sampled for light/dark adaptation) ----
+            Positioned.fill(
+              child: GlassContentAwareContent(
+                child: ListView(
+                  controller: _scroll,
+                  padding: EdgeInsets.fromLTRB(
+                    0,
+                    MediaQuery.paddingOf(context).top + 72,
+                    0,
+                    140,
                   ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Material4Container(
-                      shape: Material4Type.hexagonSoft,
-                      height: 160,
-                      liquidGlass: glass.copyWith(
-                        interactive: true,
-                        settings: const LiquidGlassSettings(
-                          thickness: 30,
-                          blur: 4,
-                          glassColor: Color(0x33FF4FD8),
-                          chromaticAberration: 0.6,
+                  children: [
+                    _section('Regular · larger glass is thicker'),
+                    const _Photo(
+                      colors: [Color(0xFFFDE68A), Color(0xFFF472B6)],
+                    ),
+                    _onPhoto(
+                      const [Color(0xFF38BDF8), Color(0xFF818CF8)],
+                      Material4Container(
+                        shape: Material4Type.squircle,
+                        width: double.infinity,
+                        height: 150,
+                        config: const Material4Config(
+                          type: Material4Type.squircle,
+                          cornerRadius: 34,
+                        ),
+                        liquidGlass: const Material4LiquidGlass(),
+                        padding: const EdgeInsets.all(20),
+                        child: const Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'Now Playing',
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            SizedBox(height: 4),
+                            Text(
+                              'Liquid Afternoon',
+                              style: TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      child: const Center(child: _Label('Tinted hex')),
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 24),
-              Material4Container(
-                shape: Material4Type.ticketScallop,
-                height: 110,
-                liquidGlass: glass.copyWith(interactive: false),
-                border: const Material4Border.styled(
-                  BorderStyleType.dashed,
-                  width: 1.2,
-                  color: Color(0x88FFFFFF),
-                ),
-                child: const Center(child: _Label('Ticket · custom rim')),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _Label extends StatelessWidget {
-  final String text;
-  const _Label(this.text);
-
-  @override
-  Widget build(BuildContext context) => Text(
-        text,
-        style: const TextStyle(
-          color: Colors.white,
-          fontWeight: FontWeight.w700,
-          fontSize: 16,
-        ),
-      );
-}
-
-/// Colourful content behind the glass so refraction and blur are visible.
-class _Backdrop extends StatelessWidget {
-  const _Backdrop();
-
-  @override
-  Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFF0EA5E9), Color(0xFF7C3AED), Color(0xFFF97316)],
-        ),
-      ),
-      child: GridView.count(
-        crossAxisCount: 6,
-        physics: const NeverScrollableScrollPhysics(),
-        children: [
-          for (var i = 0; i < 120; i++)
-            Center(
-              child: Container(
-                width: 14,
-                height: 14,
-                decoration: BoxDecoration(
-                  shape: i.isEven ? BoxShape.circle : BoxShape.rectangle,
-                  color: Colors.white.withValues(alpha: 0.55),
+                    _section('Clear · over media, with 35 % dimming'),
+                    _onPhoto(
+                      const [
+                        Color(0xFFFFF7AE),
+                        Color(0xFF34D399),
+                        Color(0xFF0EA5E9),
+                      ],
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          for (final icon in [
+                            Icons.skip_previous_rounded,
+                            Icons.pause_rounded,
+                            Icons.skip_next_rounded,
+                          ])
+                            Padding(
+                              padding: const EdgeInsets.all(8),
+                              child: Material4Container(
+                                shape: Material4Type.capsule,
+                                width: 64,
+                                height: 64,
+                                liquidGlass: const Material4LiquidGlass.clear(
+                                  dimming: .35,
+                                ),
+                                onTap: () {},
+                                child: Icon(icon, size: 32),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                    _section('Tint · prominent action'),
+                    _onPhoto(
+                      const [Color(0xFFE0E7FF), Color(0xFFFBCFE8)],
+                      Material4Container(
+                        shape: Material4Type.capsule,
+                        width: 220,
+                        height: 56,
+                        liquidGlass: const Material4LiquidGlass.control(
+                          tint: Color(0xFFFF9500),
+                        ),
+                        onTap: () => setState(() => _likes++),
+                        child: Center(
+                          child: Text(
+                            'Add to Bag · $_likes',
+                            style: const TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    _section('Materialize'),
+                    _onPhoto(
+                      const [Color(0xFF1E1B4B), Color(0xFF7C3AED)],
+                      Column(
+                        children: [
+                          Material4Container(
+                            shape: Material4Type.capsule,
+                            width: 180,
+                            height: 48,
+                            liquidGlass: const Material4LiquidGlass(),
+                            onTap: () => setState(() => _showCard = !_showCard),
+                            child: Center(
+                              child: Text(
+                                _showCard ? 'Hide card' : 'Show card',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          Material4Container(
+                            shape: Material4Type.squircle,
+                            height: 110,
+                            config: const Material4Config(
+                              type: Material4Type.squircle,
+                              cornerRadius: 30,
+                            ),
+                            liquidGlass: Material4LiquidGlass(
+                              visible: _showCard,
+                            ),
+                            child: const Center(
+                              child: Text(
+                                'Materialized glass',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    _section('Custom shapes (clipped glass)'),
+                    _onPhoto(
+                      const [Color(0xFFFFEDD5), Color(0xFFFB7185)],
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Material4Container(
+                            customShape: Material4CustomShape.star(
+                              points: 6,
+                              innerRadiusRatio: .62,
+                              cornerRadius: 10,
+                            ),
+                            width: 140,
+                            height: 140,
+                            liquidGlass: const Material4LiquidGlass(),
+                            onTap: () {},
+                            child: const Center(child: Text('Star')),
+                          ),
+                          Material4Container(
+                            shape: Material4Type.hexagonSoft,
+                            width: 140,
+                            height: 140,
+                            liquidGlass: const Material4LiquidGlass(),
+                            child: const Center(child: Text('Hexagon')),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const _Photo(
+                      colors: [Color(0xFF020617), Color(0xFF0F172A)],
+                    ),
+                    const _Photo(
+                      colors: [Color(0xFFF8FAFC), Color(0xFFE2E8F0)],
+                    ),
+                  ],
                 ),
               ),
             ),
-        ],
+
+            // ---- Functional layer: floating glass ----
+            // Small title pill: flips light/dark with the content beneath.
+            Positioned(
+              top: MediaQuery.paddingOf(context).top + 12,
+              left: 0,
+              right: 0,
+              child: const Center(
+                child: Material4Container(
+                  shape: Material4Type.capsule,
+                  width: 180,
+                  height: 44,
+                  liquidGlass: Material4LiquidGlass(),
+                  child: Center(
+                    child: Text(
+                      'Liquid Glass',
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            // Toolbar: a group whose buttons melt into one another.
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: bottom + 20,
+              child: Center(
+                child: Material4GlassGroup(
+                  spacing: 24,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _toolButton(Icons.edit_rounded),
+                      AnimatedContainer(
+                        duration: const Duration(milliseconds: 450),
+                        curve: Curves.easeInOutCubic,
+                        width: _merged ? 4 : 36,
+                      ),
+                      _toolButton(Icons.brush_rounded),
+                      AnimatedContainer(
+                        duration: const Duration(milliseconds: 450),
+                        curve: Curves.easeInOutCubic,
+                        width: _merged ? 4 : 36,
+                      ),
+                      _toolButton(
+                        _merged
+                            ? Icons.unfold_more_rounded
+                            : Icons.unfold_less_rounded,
+                        onTap: () => setState(() => _merged = !_merged),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
+
+  Widget _toolButton(IconData icon, {VoidCallback? onTap}) =>
+      Material4Container(
+        shape: Material4Type.capsule,
+        width: 56,
+        height: 56,
+        liquidGlass: const Material4LiquidGlass(),
+        onTap: onTap ?? () {},
+        child: Icon(icon, size: 26),
+      );
+
+  Widget _section(String title) => Container(
+    color: Colors.white,
+    padding: const EdgeInsets.fromLTRB(20, 28, 20, 10),
+    child: Text(
+      title,
+      style: const TextStyle(
+        fontSize: 13,
+        fontWeight: FontWeight.w700,
+        color: Color(0xFF475569),
+      ),
+    ),
+  );
+
+  /// Places [child] over colourful, detailed "media" so the lensing shows.
+  Widget _onPhoto(List<Color> colors, Widget child) => Stack(
+    children: [
+      Positioned.fill(child: _Photo(colors: colors, height: null)),
+      Padding(padding: const EdgeInsets.all(24), child: child),
+    ],
+  );
+}
+
+/// Stand-in for a photo: a gradient with stripes and dots, so refraction and
+/// edge lensing are easy to see.
+class _Photo extends StatelessWidget {
+  final List<Color> colors;
+  final double? height;
+  const _Photo({required this.colors, this.height = 160});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: height,
+      child: CustomPaint(
+        painter: _PhotoPainter(colors),
+        child: const SizedBox.expand(),
+      ),
+    );
+  }
+}
+
+class _PhotoPainter extends CustomPainter {
+  final List<Color> colors;
+  const _PhotoPainter(this.colors);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final rect = Offset.zero & size;
+    canvas.drawRect(
+      rect,
+      Paint()
+        ..shader = LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: colors,
+        ).createShader(rect),
+    );
+    final line = Paint()
+      ..color = Colors.white.withValues(alpha: .35)
+      ..strokeWidth = 3;
+    for (double x = -size.height; x < size.width; x += 28) {
+      canvas.drawLine(Offset(x, size.height), Offset(x + size.height, 0), line);
+    }
+    final dot = Paint()..color = Colors.black.withValues(alpha: .25);
+    for (double y = 14; y < size.height; y += 30) {
+      for (double x = 14; x < size.width; x += 30) {
+        canvas.drawCircle(Offset(x, y), 4, dot);
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(_PhotoPainter old) => old.colors != colors;
 }

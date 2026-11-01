@@ -64,9 +64,7 @@ class _ContainerGalleryHomeState extends State<ContainerGalleryHome> {
       // The glass screen brings its own app bar.
       appBar: isGlass
           ? null
-          : AppBar(
-              title: Text('Material4Container · ${current.title}'),
-            ),
+          : AppBar(title: Text('Material4Container · ${current.title}')),
       body: IndexedStack(
         index: _index,
         // Pause animations on hidden tabs.

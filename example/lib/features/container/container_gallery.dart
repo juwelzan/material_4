@@ -71,12 +71,19 @@ class DemoSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title,
-              style: const TextStyle(
-                  fontSize: 18, fontWeight: FontWeight.w800, color: _ink)),
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w800,
+              color: _ink,
+            ),
+          ),
           const SizedBox(height: 2),
-          Text(subtitle,
-              style: TextStyle(fontSize: 12, color: _ink.withValues(alpha: .6))),
+          Text(
+            subtitle,
+            style: TextStyle(fontSize: 12, color: _ink.withValues(alpha: .6)),
+          ),
         ],
       ),
     );
@@ -110,8 +117,12 @@ class ShapesTab extends StatelessWidget {
                   ? Material4Config.customBezier(
                       builder: (s) => Path()
                         ..moveTo(0, s.height)
-                        ..quadraticBezierTo(s.width / 2, -s.height * .4,
-                            s.width, s.height)
+                        ..quadraticBezierTo(
+                          s.width / 2,
+                          -s.height * .4,
+                          s.width,
+                          s.height,
+                        )
                         ..close(),
                     )
                   : const Material4Config(),
@@ -136,11 +147,18 @@ class CustomShapesTab extends StatelessWidget {
     'polygon(8, r6)': Material4CustomShape.polygon(sides: 8, cornerRadius: 6),
     'star(5)': Material4CustomShape.star(points: 5, innerRadiusRatio: .45),
     'star(8, r4)': Material4CustomShape.star(
-        points: 8, innerRadiusRatio: .7, cornerRadius: 4),
+      points: 8,
+      innerRadiusRatio: .7,
+      cornerRadius: 4,
+    ),
     'superellipse(2.5)': Material4CustomShape.superellipse(n: 2.5),
     'superellipse(6)': Material4CustomShape.superellipse(n: 6),
     'corners(40,4,40,4)': Material4CustomShape.corners(
-        topLeft: 40, topRight: 4, bottomRight: 40, bottomLeft: 4),
+      topLeft: 40,
+      topRight: 4,
+      bottomRight: 40,
+      bottomLeft: 4,
+    ),
     'bezier: heart': Material4CustomShape.bezier((s) {
       final w = s.width, h = s.height;
       return Path()
@@ -149,18 +167,21 @@ class CustomShapesTab extends StatelessWidget {
         ..cubicTo(w * .8, -h * .1, w * 1.2, h * .45, w / 2, h * .9)
         ..close();
     }),
-    'builder: wave card': Material4CustomShape.builder((s) =>
-        Material4ShapeBuilder()
-            .moveTo(0, 16)
-            .quadraticBezierTo(0, 0, 16, 0)
-            .lineTo(s.width - 16, 0)
-            .quadraticBezierTo(s.width, 0, s.width, 16)
-            .lineTo(s.width, s.height - 12)
-            .addConvexBulge(Offset(s.width, s.height - 12),
-                Offset(0, s.height - 12), 14)
-            .close()),
-    'from preset: shield':
-        Material4CustomShape.fromType(Material4Type.shield),
+    'builder: wave card': Material4CustomShape.builder(
+      (s) => Material4ShapeBuilder()
+          .moveTo(0, 16)
+          .quadraticBezierTo(0, 0, 16, 0)
+          .lineTo(s.width - 16, 0)
+          .quadraticBezierTo(s.width, 0, s.width, 16)
+          .lineTo(s.width, s.height - 12)
+          .addConvexBulge(
+            Offset(s.width, s.height - 12),
+            Offset(0, s.height - 12),
+            14,
+          )
+          .close(),
+    ),
+    'from preset: shield': Material4CustomShape.fromType(Material4Type.shield),
     'morph 50%: hex→flower': Material4CustomShape.morph(
       from: Material4Type.roundedHexagon,
       to: Material4Type.flower,
@@ -173,8 +194,10 @@ class CustomShapesTab extends StatelessWidget {
     return CustomScrollView(
       slivers: [
         const SliverToBoxAdapter(
-          child: DemoSection('Custom shapes',
-              'Material4CustomShape — polygon, star, superellipse, corners, bezier, builder'),
+          child: DemoSection(
+            'Custom shapes',
+            'Material4CustomShape — polygon, star, superellipse, corners, bezier, builder',
+          ),
         ),
         SliverPadding(
           padding: const EdgeInsets.all(16),
@@ -195,15 +218,19 @@ class CustomShapesTab extends StatelessWidget {
                       colors: [Color(0xFFA5B4FC), Color(0xFFF0ABFC)],
                     ),
                     border: const Material4Border.solid(
-                        color: Color(0xFF4338CA), width: 1.4),
+                      color: Color(0xFF4338CA),
+                      width: 1.4,
+                    ),
                   ),
                 ),
             ],
           ),
         ),
         const SliverToBoxAdapter(
-          child: DemoSection('Live morphing',
-              'containerAnimation: shapeSequence morphs through presets'),
+          child: DemoSection(
+            'Live morphing',
+            'containerAnimation: shapeSequence morphs through presets',
+          ),
         ),
         SliverToBoxAdapter(
           child: Padding(
@@ -233,25 +260,26 @@ class CustomShapesTab extends StatelessWidget {
   }
 
   Widget _morph(List<Material4Type> seq) => Material4Container(
-        width: 150,
-        height: 130,
-        shape: seq.first,
-        gradient: const LinearGradient(
-          colors: [Color(0xFF22D3EE), Color(0xFF6366F1)],
-        ),
-        border: const Material4Border.animatedGradient(width: 2),
-        containerAnimation: Material4ContainerAnimation(
-          shapeSequence: seq,
-          borderAnimation: true,
-          shapeDuration: Duration(milliseconds: 1600 * seq.length),
-          pingPong: false,
-        ),
-        child: const Center(
-          child: Text('morph',
-              style: TextStyle(
-                  color: Colors.white, fontWeight: FontWeight.w700)),
-        ),
-      );
+    width: 150,
+    height: 130,
+    shape: seq.first,
+    gradient: const LinearGradient(
+      colors: [Color(0xFF22D3EE), Color(0xFF6366F1)],
+    ),
+    border: const Material4Border.animatedGradient(width: 2),
+    containerAnimation: Material4ContainerAnimation(
+      shapeSequence: seq,
+      borderAnimation: true,
+      shapeDuration: Duration(milliseconds: 1600 * seq.length),
+      pingPong: false,
+    ),
+    child: const Center(
+      child: Text(
+        'morph',
+        style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+      ),
+    ),
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -387,12 +415,14 @@ class _BorderCell extends StatelessWidget {
               config: Material4Config(
                 type: shape,
                 borderStyle: style,
-                borderGradient: const SweepGradient(colors: [
-                  Color(0xFF22D3EE),
-                  Color(0xFFA855F7),
-                  Color(0xFFF43F5E),
-                  Color(0xFF22D3EE),
-                ]),
+                borderGradient: const SweepGradient(
+                  colors: [
+                    Color(0xFF22D3EE),
+                    Color(0xFFA855F7),
+                    Color(0xFFF43F5E),
+                    Color(0xFF22D3EE),
+                  ],
+                ),
                 glowColor: stroke,
                 neonGlowColor: stroke,
                 metallicType: MetallicType.gold,
@@ -402,12 +432,14 @@ class _BorderCell extends StatelessWidget {
                 style,
                 width: 2.4,
                 color: stroke,
-                gradient: const SweepGradient(colors: [
-                  Color(0xFF22D3EE),
-                  Color(0xFFA855F7),
-                  Color(0xFFF43F5E),
-                  Color(0xFF22D3EE),
-                ]),
+                gradient: const SweepGradient(
+                  colors: [
+                    Color(0xFF22D3EE),
+                    Color(0xFFA855F7),
+                    Color(0xFFF43F5E),
+                    Color(0xFF22D3EE),
+                  ],
+                ),
                 blurRadius: 8,
                 glowIntensity: 1.2,
                 animated: animated,
@@ -427,7 +459,10 @@ class _BorderCell extends StatelessWidget {
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: TextStyle(
-              fontSize: 11, fontWeight: FontWeight.w600, color: labelColor),
+            fontSize: 11,
+            fontWeight: FontWeight.w600,
+            color: labelColor,
+          ),
         ),
       ],
     );
@@ -505,8 +540,10 @@ class SurfacesTab extends StatelessWidget {
                   ),
                 ),
             ]),
-            _section('Background effects',
-                'Material4Background(effect: BackgroundEffectType.*)'),
+            _section(
+              'Background effects',
+              'Material4Background(effect: BackgroundEffectType.*)',
+            ),
             _grid([
               for (final effect in BackgroundEffectType.values)
                 DemoTile(
@@ -558,7 +595,8 @@ class SurfacesTab extends StatelessWidget {
                       pattern: e.value,
                     ),
                     border: const Material4Border.solid(
-                        color: Color(0x334338CA)),
+                      color: Color(0x334338CA),
+                    ),
                   ),
                 ),
             ]),
@@ -573,13 +611,13 @@ class SurfacesTab extends StatelessWidget {
       SliverToBoxAdapter(child: DemoSection(t, s));
 
   Widget _grid(List<Widget> children) => SliverPadding(
-        padding: const EdgeInsets.all(16),
-        sliver: SliverGrid.extent(
-          maxCrossAxisExtent: 150,
-          mainAxisSpacing: 16,
-          crossAxisSpacing: 16,
-          childAspectRatio: .95,
-          children: children,
-        ),
-      );
+    padding: const EdgeInsets.all(16),
+    sliver: SliverGrid.extent(
+      maxCrossAxisExtent: 150,
+      mainAxisSpacing: 16,
+      crossAxisSpacing: 16,
+      childAspectRatio: .95,
+      children: children,
+    ),
+  );
 }

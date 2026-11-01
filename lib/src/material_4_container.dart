@@ -425,6 +425,15 @@ class Material4Container extends StatelessWidget {
 
   Color? get _fillColor => _glassWithoutFill ? _kTransparent : color;
 
+  // The default hairline outline reads as a dark seam on glass (Apple's glass
+  // has none), so it is dropped unless a border was asked for.
+  double get _effectiveBorderWidth => liquidGlass != null &&
+          border == null &&
+          borderColor == const Color(0x1F1A1A1A) &&
+          borderWidth == 1.0
+      ? 0.0
+      : borderWidth;
+
   List<BoxShadow>? get _effectiveShadows =>
       liquidGlass != null && identical(shadows, kMaterial4DefaultShadows)
           ? const <BoxShadow>[]
@@ -479,7 +488,7 @@ class Material4Container extends StatelessWidget {
         color: _fillColor,
         gradient: gradient,
         borderColor: borderColor,
-        borderWidth: borderWidth,
+        borderWidth: _effectiveBorderWidth,
         shadows: _effectiveShadows,
         onTap: onTap,
         onLongPress: onLongPress,
@@ -512,7 +521,7 @@ class Material4Container extends StatelessWidget {
         color: _fillColor,
         gradient: gradient,
         borderColor: borderColor,
-        borderWidth: borderWidth,
+        borderWidth: _effectiveBorderWidth,
         shadows: _effectiveShadows,
         onTap: onTap,
         dockedBadge: dockedBadge,
@@ -579,7 +588,7 @@ class Material4Container extends StatelessWidget {
         color: _fillColor,
         gradient: gradient,
         borderColor: borderColor,
-        borderWidth: borderWidth,
+        borderWidth: _effectiveBorderWidth,
         shadows: _effectiveShadows,
         clipBehavior: clipBehavior,
         contentProtection: contentProtection,
@@ -623,7 +632,7 @@ class Material4Container extends StatelessWidget {
         color: _fillColor,
         gradient: gradient,
         borderColor: borderColor,
-        borderWidth: borderWidth,
+        borderWidth: _effectiveBorderWidth,
         shadows: _effectiveShadows,
         clipBehavior: clipBehavior,
         contentProtection: contentProtection,

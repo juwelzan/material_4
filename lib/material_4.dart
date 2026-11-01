@@ -58,5 +58,8 @@ export 'src/creative/paper/repeating_patterns.dart';
 export 'src/layout/shape_anchor_placer.dart';
 export 'src/rendering/material_4_parent_data.dart';
 
+// --- Liquid Glass (ported from liquid_glass_widgets 1.16.1, MIT) ---
+export 'src/liquid_glass/liquid_glass_widgets.dart';
+
 // --- Caching ---
 export 'src/shape_path_cache.dart';

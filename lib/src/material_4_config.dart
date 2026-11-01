@@ -658,7 +658,7 @@ class Material4Config {
   /// Resolved four-corner radii configuration with CSS proportional downscaling support.
   ShapeCorners get resolvedCorners {
     if (corners != null) return corners!;
-    if (_cornerRadii != null) return _cornerRadii!.toShapeCorners();
+    if (_cornerRadii != null) return _cornerRadii.toShapeCorners();
     return ShapeCorners.all(Radius.circular(cornerRadius));
   }
 

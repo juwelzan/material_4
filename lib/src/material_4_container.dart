@@ -8,6 +8,7 @@ import 'animation/shape_animation_controller.dart';
 import 'material_4_config.dart';
 import 'material_4_path_builder.dart';
 import 'container/container.dart';
+import 'liquid_glass/widgets/containers/glass_container.dart';
 import 'material_4_stack.dart';
 import 'layout/shape_collision_detector.dart';
 import 'layout/shape_content_protection.dart';
@@ -205,6 +206,10 @@ class Material4Container extends StatelessWidget {
   /// Programmatic morph controller for dynamic shape transitions and sequences.
   final Material4MorphController? morphController;
 
+  /// Optional real liquid-glass surface (refraction, blur, specular rim,
+  /// chromatic aberration) clipped to this container's shape.
+  final Material4LiquidGlass? liquidGlass;
+
   const Material4Container({
     super.key,
     this.config = const Material4Config(),
@@ -216,6 +221,7 @@ class Material4Container extends StatelessWidget {
     this.border,
     this.containerAnimation,
     this.morphController,
+    this.liquidGlass,
     this.child,
     this.children,
     this.width,
@@ -260,6 +266,7 @@ class Material4Container extends StatelessWidget {
     this.border,
     this.containerAnimation,
     this.morphController,
+    this.liquidGlass,
     this.child,
     this.children,
     required ShapeContentMode mode,
@@ -409,8 +416,7 @@ class Material4Container extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var effectiveConfig =
-        shape != null ? config.copyWith(type: shape) : config;
+    var effectiveConfig = shape != null ? config.copyWith(type: shape) : config;
 
     if (customShape != null) {
       effectiveConfig = effectiveConfig.copyWith(customShape: customShape);
@@ -442,6 +448,7 @@ class Material4Container extends StatelessWidget {
         customShape: customShape,
         background: background,
         border: border,
+        liquidGlass: liquidGlass,
         width: width,
         height: height,
         padding: padding,
@@ -470,7 +477,7 @@ class Material4Container extends StatelessWidget {
     }
 
     if (animation != null) {
-      return AnimatedMaterial4Container(
+      Widget animated = AnimatedMaterial4Container(
         key: key,
         duration: animation!.duration,
         curve: animation!.curve,
@@ -478,7 +485,7 @@ class Material4Container extends StatelessWidget {
         width: width,
         height: height,
         padding: padding,
-        margin: margin,
+        margin: liquidGlass == null ? margin : null,
         color: color,
         gradient: gradient,
         borderColor: borderColor,
@@ -488,6 +495,14 @@ class Material4Container extends StatelessWidget {
         dockedBadge: dockedBadge,
         child: child,
       );
+      if (liquidGlass != null) {
+        animated =
+            wrapMaterial4LiquidGlass(animated, effectiveConfig, liquidGlass);
+        if (margin != null) {
+          animated = Padding(padding: margin!, child: animated);
+        }
+      }
+      return animated;
     }
 
     if (controller != null) {
@@ -617,6 +632,8 @@ class Material4Container extends StatelessWidget {
       );
     }
 
+    rendered = wrapMaterial4LiquidGlass(rendered, activeConfig, liquidGlass);
+
     if (margin != null) {
       rendered = Padding(padding: margin!, child: rendered);
     }
@@ -625,12 +642,38 @@ class Material4Container extends StatelessWidget {
   }
 }
 
+/// Places a liquid-glass surface behind [content], clipped to the shape that
+/// [config] describes. Returns [content] unchanged when [glass] is null.
+Widget wrapMaterial4LiquidGlass(
+  Widget content,
+  Material4Config config,
+  Material4LiquidGlass? glass,
+) {
+  if (glass == null) return content;
+  return ClipPath(
+    clipper: Material4Clipper(config: config),
+    clipBehavior: Clip.antiAlias,
+    child: GlassContainer(
+      shape: glass.resolveShape(config.cornerRadius),
+      settings: glass.settings,
+      quality: glass.quality,
+      color: glass.color,
+      glowIntensity: glass.glowIntensity,
+      useOwnLayer: glass.useOwnLayer,
+      allowElevation: glass.allowElevation,
+      platformViewBackdrop: glass.platformViewBackdrop,
+      child: content,
+    ),
+  );
+}
+
 class _Material4CoordinatedAnimationContainer extends StatefulWidget {
   final Material4ContainerAnimation animation;
   final Material4Config config;
   final Material4CustomShape? customShape;
   final Material4Background? background;
   final Material4Border? border;
+  final Material4LiquidGlass? liquidGlass;
   final double? width;
   final double? height;
   final EdgeInsetsGeometry? padding;
@@ -662,6 +705,7 @@ class _Material4CoordinatedAnimationContainer extends StatefulWidget {
     this.customShape,
     this.background,
     this.border,
+    this.liquidGlass,
     this.width,
     this.height,
     this.padding,
@@ -750,8 +794,10 @@ class _Material4CoordinatedAnimationContainerState
     final disableAnimations = mediaQuery?.disableAnimations ?? false;
 
     if (disableAnimations) {
-      return Material4RenderWidget(
-        config: widget.config.copyWith(customShape: widget.customShape),
+      final staticConfig =
+          widget.config.copyWith(customShape: widget.customShape);
+      Widget still = Material4RenderWidget(
+        config: staticConfig,
         color: widget.color,
         gradient: widget.gradient,
         borderColor: widget.borderColor,
@@ -775,6 +821,11 @@ class _Material4CoordinatedAnimationContainerState
         border: widget.border,
         child: widget.child,
       );
+      still = wrapMaterial4LiquidGlass(still, staticConfig, widget.liquidGlass);
+      if (widget.margin != null) {
+        still = Padding(padding: widget.margin!, child: still);
+      }
+      return still;
     }
 
     return AnimatedBuilder(
@@ -889,6 +940,9 @@ class _Material4CoordinatedAnimationContainerState
             ),
           );
         }
+
+        rendered = wrapMaterial4LiquidGlass(
+            rendered, activeConfig, widget.liquidGlass);
 
         if (widget.margin != null) {
           rendered = Padding(padding: widget.margin!, child: rendered);

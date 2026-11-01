@@ -8,7 +8,6 @@ import 'animation/shape_animation_controller.dart';
 import 'material_4_config.dart';
 import 'material_4_path_builder.dart';
 import 'container/container.dart';
-import 'liquid_glass/widgets/containers/glass_container.dart';
 import 'material_4_stack.dart';
 import 'layout/shape_collision_detector.dart';
 import 'layout/shape_content_protection.dart';
@@ -496,8 +495,12 @@ class Material4Container extends StatelessWidget {
         child: child,
       );
       if (liquidGlass != null) {
-        animated =
-            wrapMaterial4LiquidGlass(animated, effectiveConfig, liquidGlass);
+        animated = wrapMaterial4LiquidGlass(
+          animated,
+          effectiveConfig,
+          liquidGlass,
+          hasTapHandler: onTap != null,
+        );
         if (margin != null) {
           animated = Padding(padding: margin!, child: animated);
         }
@@ -632,7 +635,13 @@ class Material4Container extends StatelessWidget {
       );
     }
 
-    rendered = wrapMaterial4LiquidGlass(rendered, activeConfig, liquidGlass);
+    rendered = wrapMaterial4LiquidGlass(
+      rendered,
+      activeConfig,
+      liquidGlass,
+      hasTapHandler:
+          onTap != null || onLongPress != null || onDoubleTap != null,
+    );
 
     if (margin != null) {
       rendered = Padding(padding: margin!, child: rendered);
@@ -642,28 +651,21 @@ class Material4Container extends StatelessWidget {
   }
 }
 
-/// Places a liquid-glass surface behind [content], clipped to the shape that
-/// [config] describes. Returns [content] unchanged when [glass] is null.
+/// Places [content] on a liquid-glass surface shaped by [config]. Returns
+/// [content] unchanged when [glass] is null. [hasTapHandler] enables the iOS
+/// touch behaviour when [Material4LiquidGlass.interactive] is left null.
 Widget wrapMaterial4LiquidGlass(
   Widget content,
   Material4Config config,
-  Material4LiquidGlass? glass,
-) {
+  Material4LiquidGlass? glass, {
+  bool hasTapHandler = false,
+}) {
   if (glass == null) return content;
-  return ClipPath(
-    clipper: Material4Clipper(config: config),
-    clipBehavior: Clip.antiAlias,
-    child: GlassContainer(
-      shape: glass.resolveShape(config.cornerRadius),
-      settings: glass.settings,
-      quality: glass.quality,
-      color: glass.color,
-      glowIntensity: glass.glowIntensity,
-      useOwnLayer: glass.useOwnLayer,
-      allowElevation: glass.allowElevation,
-      platformViewBackdrop: glass.platformViewBackdrop,
-      child: content,
-    ),
+  return Material4LiquidGlassSurface(
+    glass: glass,
+    config: config,
+    hasTapHandler: hasTapHandler,
+    child: content,
   );
 }
 
@@ -821,7 +823,14 @@ class _Material4CoordinatedAnimationContainerState
         border: widget.border,
         child: widget.child,
       );
-      still = wrapMaterial4LiquidGlass(still, staticConfig, widget.liquidGlass);
+      still = wrapMaterial4LiquidGlass(
+        still,
+        staticConfig,
+        widget.liquidGlass,
+        hasTapHandler: widget.onTap != null ||
+            widget.onLongPress != null ||
+            widget.onDoubleTap != null,
+      );
       if (widget.margin != null) {
         still = Padding(padding: widget.margin!, child: still);
       }
@@ -942,7 +951,13 @@ class _Material4CoordinatedAnimationContainerState
         }
 
         rendered = wrapMaterial4LiquidGlass(
-            rendered, activeConfig, widget.liquidGlass);
+          rendered,
+          activeConfig,
+          widget.liquidGlass,
+          hasTapHandler: widget.onTap != null ||
+              widget.onLongPress != null ||
+              widget.onDoubleTap != null,
+        );
 
         if (widget.margin != null) {
           rendered = Padding(padding: widget.margin!, child: rendered);

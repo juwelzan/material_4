@@ -1,30 +1,39 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
+import 'package:material_4/material_4.dart';
 import 'package:material_4_example/main.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  testWidgets('every gallery tab renders without exceptions', (tester) async {
+    tester.view.physicalSize = const Size(1080, 2340);
+    tester.view.devicePixelRatio = 2.75;
+    addTearDown(tester.view.reset);
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    await tester.pumpWidget(
+      LiquidGlassWidgets.wrap(child: const Material4ExampleApp()),
+    );
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(tester.takeException(), isNull);
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+    for (final tab in ['Shapes', 'Custom', 'Borders', 'Surfaces', 'Glass']) {
+      await tester.tap(find.text(tab).last);
+      // Animations loop forever, so pump frames instead of settling.
+      for (var i = 0; i < 6; i++) {
+        await tester.pump(const Duration(milliseconds: 120));
+      }
+      expect(tester.takeException(), isNull, reason: 'tab $tab');
+      expect(find.byType(Material4Container), findsWidgets, reason: 'tab $tab');
+    }
+  });
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+  testWidgets('liquid glass button responds to taps', (tester) async {
+    await tester.pumpWidget(
+      LiquidGlassWidgets.wrap(child: const Material4ExampleApp()),
+    );
+    await tester.tap(find.text('Glass').last);
+    await tester.pump(const Duration(milliseconds: 300));
+    await tester.tap(find.textContaining('Tap me'));
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(find.text('Tap me · 1'), findsOneWidget);
   });
 }

@@ -86,6 +86,13 @@ class Material4CustomPainter extends CustomPainter {
 /// Type alias for [Material4Container].
 typedef Material4ShapeContainer = Material4Container;
 
+/// The soft drop shadow a [Material4Container] gets when none is specified.
+const List<BoxShadow> kMaterial4DefaultShadows = [
+  BoxShadow(color: Color(0x0C000000), blurRadius: 10, offset: Offset(0, 4)),
+];
+
+const Color _kTransparent = Color(0x00000000);
+
 /// The single, universal Material 4 shape container.
 ///
 /// One widget renders every container in the system — there is no separate
@@ -235,9 +242,7 @@ class Material4Container extends StatelessWidget {
     this.gradient,
     this.borderColor = const Color(0x1F1A1A1A),
     this.borderWidth = 1.0,
-    this.shadows = const [
-      BoxShadow(color: Color(0x0C000000), blurRadius: 10, offset: Offset(0, 4)),
-    ],
+    this.shadows = kMaterial4DefaultShadows,
     this.onTap,
     this.onLongPress,
     this.onDoubleTap,
@@ -281,9 +286,7 @@ class Material4Container extends StatelessWidget {
     this.gradient,
     this.borderColor = const Color(0x1F1A1A1A),
     this.borderWidth = 1.0,
-    this.shadows = const [
-      BoxShadow(color: Color(0x0C000000), blurRadius: 10, offset: Offset(0, 4)),
-    ],
+    this.shadows = kMaterial4DefaultShadows,
     this.onTap,
     this.onLongPress,
     this.onDoubleTap,
@@ -413,6 +416,27 @@ class Material4Container extends StatelessWidget {
     );
   }
 
+  // A liquid-glass container must not paint an opaque surface over its own
+  // glass. Without an explicit fill the renderer uses opaque white, and the
+  // default drop shadow would darken the glass, so both are dropped unless the
+  // developer asked for them.
+  bool get _glassWithoutFill =>
+      liquidGlass != null && color == null && gradient == null;
+
+  Color? get _fillColor => _glassWithoutFill ? _kTransparent : color;
+
+  List<BoxShadow>? get _effectiveShadows =>
+      liquidGlass != null && identical(shadows, kMaterial4DefaultShadows)
+          ? const <BoxShadow>[]
+          : shadows;
+
+  Material4Background? get _effectiveBackground {
+    final bg = background;
+    if (liquidGlass == null || bg == null) return bg;
+    if (bg.color != null || bg.gradient != null) return bg;
+    return bg.copyWith(color: _kTransparent);
+  }
+
   @override
   Widget build(BuildContext context) {
     var effectiveConfig = shape != null ? config.copyWith(type: shape) : config;
@@ -433,7 +457,7 @@ class Material4Container extends StatelessWidget {
           return _buildRenderTree(
             context,
             morphedConfig,
-            activeBackground: background,
+            activeBackground: _effectiveBackground,
             activeBorder: border,
           );
         },
@@ -445,18 +469,18 @@ class Material4Container extends StatelessWidget {
         animation: containerAnimation!,
         config: effectiveConfig,
         customShape: customShape,
-        background: background,
+        background: _effectiveBackground,
         border: border,
         liquidGlass: liquidGlass,
         width: width,
         height: height,
         padding: padding,
         margin: margin,
-        color: color,
+        color: _fillColor,
         gradient: gradient,
         borderColor: borderColor,
         borderWidth: borderWidth,
-        shadows: shadows,
+        shadows: _effectiveShadows,
         onTap: onTap,
         onLongPress: onLongPress,
         onDoubleTap: onDoubleTap,
@@ -485,11 +509,11 @@ class Material4Container extends StatelessWidget {
         height: height,
         padding: padding,
         margin: liquidGlass == null ? margin : null,
-        color: color,
+        color: _fillColor,
         gradient: gradient,
         borderColor: borderColor,
         borderWidth: borderWidth,
-        shadows: shadows,
+        shadows: _effectiveShadows,
         onTap: onTap,
         dockedBadge: dockedBadge,
         child: child,
@@ -515,7 +539,7 @@ class Material4Container extends StatelessWidget {
           return _buildRenderTree(
             context,
             controller!.currentConfig,
-            activeBackground: background,
+            activeBackground: _effectiveBackground,
             activeBorder: border,
           );
         },
@@ -525,7 +549,7 @@ class Material4Container extends StatelessWidget {
     return _buildRenderTree(
       context,
       effectiveConfig,
-      activeBackground: background,
+      activeBackground: _effectiveBackground,
       activeBorder: border,
     );
   }
@@ -552,11 +576,11 @@ class Material4Container extends StatelessWidget {
       }
       rendered = Material4MultiChildRenderWidget(
         config: activeConfig,
-        color: color,
+        color: _fillColor,
         gradient: gradient,
         borderColor: borderColor,
         borderWidth: borderWidth,
-        shadows: shadows,
+        shadows: _effectiveShadows,
         clipBehavior: clipBehavior,
         contentProtection: contentProtection,
         hitTestBehavior: hitTestBehavior,
@@ -596,11 +620,11 @@ class Material4Container extends StatelessWidget {
 
       rendered = Material4RenderWidget(
         config: activeConfig,
-        color: color,
+        color: _fillColor,
         gradient: gradient,
         borderColor: borderColor,
         borderWidth: borderWidth,
-        shadows: shadows,
+        shadows: _effectiveShadows,
         clipBehavior: clipBehavior,
         contentProtection: contentProtection,
         hitTestBehavior: hitTestBehavior,

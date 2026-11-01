@@ -66,12 +66,16 @@ class _LiquidGlassDemoScreenState extends State<LiquidGlassDemoScreen> {
                         width: double.infinity,
                         height: 150,
                         config: const Material4Config(
-                          type: Material4Type.squircle,
+                          type: Material4Type.arch,
                           cornerRadius: 34,
                         ),
-                        liquidGlass: const Material4LiquidGlass(),
+                        liquidGlass: const Material4LiquidGlass(
+                            followTheme: true,
+                            settings: LiquidGlassSettings(
+                              specularSharpness: GlassSpecularSharpness.sharp,
+                            )),
                         padding: const EdgeInsets.all(20),
-                        child: const Column(
+                        child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
@@ -235,12 +239,15 @@ class _LiquidGlassDemoScreenState extends State<LiquidGlassDemoScreen> {
               top: MediaQuery.paddingOf(context).top + 12,
               left: 0,
               right: 0,
-              child: const Center(
+              child: Center(
                 child: Material4Container(
-                  shape: Material4Type.capsule,
+                  shape: Material4Type.concaveRounded,
+                  config: Material4Config(
+                    type: Material4Type.concaveRounded,
+                    cornerRadius: 4,
+                  ),
                   width: 180,
                   height: 44,
-                  liquidGlass: Material4LiquidGlass(),
                   child: Center(
                     child: Text(
                       'Liquid Glass',
@@ -304,25 +311,25 @@ class _LiquidGlassDemoScreenState extends State<LiquidGlassDemoScreen> {
       );
 
   Widget _section(String title) => Container(
-    color: Colors.white,
-    padding: const EdgeInsets.fromLTRB(20, 28, 20, 10),
-    child: Text(
-      title,
-      style: const TextStyle(
-        fontSize: 13,
-        fontWeight: FontWeight.w700,
-        color: Color(0xFF475569),
-      ),
-    ),
-  );
+        color: Colors.white,
+        padding: const EdgeInsets.fromLTRB(20, 28, 20, 10),
+        child: Text(
+          title,
+          style: const TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w700,
+            color: Color(0xFF475569),
+          ),
+        ),
+      );
 
   /// Places [child] over colourful, detailed "media" so the lensing shows.
   Widget _onPhoto(List<Color> colors, Widget child) => Stack(
-    children: [
-      Positioned.fill(child: _Photo(colors: colors, height: null)),
-      Padding(padding: const EdgeInsets.all(24), child: child),
-    ],
-  );
+        children: [
+          Positioned.fill(child: _Photo(colors: colors, height: null)),
+          Padding(padding: const EdgeInsets.all(24), child: child),
+        ],
+      );
 }
 
 /// Stand-in for a photo: a gradient with stripes and dots, so refraction and

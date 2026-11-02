@@ -1,7 +1,9 @@
 import 'dart:math' as math;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
 import '../liquid_glass/constants/glass_defaults.dart';
@@ -13,10 +15,12 @@ import '../liquid_glass/theme/glass_theme.dart';
 import '../liquid_glass/theme/glass_theme_helpers.dart';
 import '../liquid_glass/types/glass_quality.dart';
 import '../liquid_glass/widgets/effects/glass_materialize.dart';
+import '../liquid_glass/widgets/overlays/glass_context_menu.dart';
 import '../liquid_glass/widgets/shared/adaptive_glass.dart';
 import '../liquid_glass/widgets/shared/adaptive_liquid_glass_layer.dart';
 import '../liquid_glass/widgets/shared/glass_content_aware_scope.dart';
 import '../material_4_config.dart';
+import 'container_glass_light.dart';
 import '../material_4_path_builder.dart';
 
 // ===========================================================================
@@ -44,6 +48,26 @@ enum Material4GlassVariant {
 
 /// Apple-calibrated Liquid Glass materials and the adaptations Apple applies
 /// to them.
+/// How glass responds to a hovering pointer (mouse, trackpad, Pencil hover),
+/// mirroring iPadOS / macOS pointer effects (`UIPointerEffect`).
+enum Material4GlassHoverEffect {
+  /// `lift` for small interactive glass, `highlight` for large interactive
+  /// glass (or glass with a context menu), `none` for static panels.
+  automatic,
+
+  /// `UIPointerEffect.lift` — the glass rises toward the pointer: it grows a
+  /// few points, drifts with the pointer (parallax), casts a soft shadow and
+  /// a specular spotlight follows the cursor.
+  lift,
+
+  /// `UIPointerEffect.highlight` — no movement; the glass brightens, the
+  /// specular light turns toward the pointer and a spotlight follows it.
+  highlight,
+
+  /// No hover response.
+  none,
+}
+
 abstract final class Material4GlassMaterials {
   /// `glassEffect(.regular)`, light appearance.
   static const LiquidGlassSettings regularLight =
@@ -147,6 +171,14 @@ abstract final class Material4GlassMaterials {
 /// * **Interaction** — with [interactive] (`.interactive()`), the glass
 ///   flexes toward the finger, inflates while pressed and lights up from
 ///   under the fingertip.
+/// * **Pointer** — on iPad / Mac / desktop / web a hovering pointer lifts
+///   the glass, turns its specular light toward the cursor and a spotlight
+///   follows it ([hoverEffect]); right-click (or long-press) opens an iOS 26
+///   glass context menu ([contextMenu]).
+/// * **Light** — inside a [Material4GlassLight] every glass is lit by one
+///   shared source (device motion, an animation, or the pointer).
+/// * **Keyboard** — focusable glass lifts and shows a focus ring
+///   ([focusable]); Enter / Space activate it. [tooltip] adds a help tag.
 /// * **Materialize** — toggling [visible] materializes the glass in/out by
 ///   ramping its lensing, not by fading opacity.
 /// * **Grouping** — inside a [Material4GlassGroup] (`GlassEffectContainer`)
@@ -233,6 +265,77 @@ class Material4LiquidGlass {
   /// Use the live backdrop path, needed over platform views (maps, video).
   final bool platformViewBackdrop;
 
+  /// Pointer hover response (mouse / trackpad / Pencil hover). Touch input
+  /// never triggers it.
+  final Material4GlassHoverEffect hoverEffect;
+
+  /// Scale reached by [Material4GlassHoverEffect.lift]. `null` grows the
+  /// glass by a few points like iPadOS (more on small controls).
+  final double? hoverScale;
+
+  /// Whether the specular light (and rim) turns toward the hovering pointer.
+  final bool hoverLightTracking;
+
+  /// Mouse cursor over the glass. `null` uses the click cursor on
+  /// interactive glass.
+  final MouseCursor? cursor;
+
+  /// Called with `true` when a pointer starts hovering, `false` when it
+  /// leaves.
+  final ValueChanged<bool>? onHover;
+
+  /// Context menu actions (usually [GlassContextMenuAction] and
+  /// [GlassMenuDivider]). When set, right-click and long-press lift the
+  /// glass out of the page and open an iOS 26 glass menu beside it, with
+  /// drag-to-select (glide) on touch.
+  final List<Widget>? contextMenu;
+
+  /// Width of the [contextMenu] platter.
+  final double contextMenuWidth;
+
+  /// Right-click / secondary tap, with the global pointer position. Ignored
+  /// when [contextMenu] is set.
+  final ValueChanged<Offset>? onSecondaryTap;
+
+  /// Custom preview lifted out of the page while the [contextMenu] is open
+  /// (like SwiftUI's `contextMenu(menuItems:preview:)`). `null` lifts the
+  /// glass itself.
+  final WidgetBuilder? contextMenuPreview;
+
+  /// Called when the [contextMenu] opens.
+  final VoidCallback? onContextMenuOpened;
+
+  /// Called when the [contextMenu] closes.
+  final VoidCallback? onContextMenuDismissed;
+
+  /// How strongly lifted glass drifts with the pointer (parallax), 0–3.
+  /// 0 keeps it still; 1 is iPadOS.
+  final double hoverMagnetism;
+
+  /// A macOS-style help tag: a small glass capsule shown after the pointer
+  /// rests on the glass for [tooltipDelay]. Also exposed to screen readers.
+  final String? tooltip;
+
+  /// How long the pointer must rest before [tooltip] appears.
+  final Duration tooltipDelay;
+
+  /// Keyboard focus (Tab / arrow keys, iPadOS & tvOS style): focused glass
+  /// lifts like on hover and shows a focus ring; Enter / Space activate it.
+  /// `null` makes interactive glass focusable.
+  final bool? focusable;
+
+  /// Focus ring colour. `null` uses the iOS accent blue.
+  final Color? focusColor;
+
+  /// Optional focus node for [focusable] glass.
+  final FocusNode? focusNode;
+
+  /// Request focus when first built.
+  final bool autofocus;
+
+  /// A light haptic tick when interactive glass is pressed.
+  final bool haptics;
+
   const Material4LiquidGlass({
     this.variant = Material4GlassVariant.regular,
     this.settings,
@@ -255,6 +358,25 @@ class Material4LiquidGlass {
     this.useOwnLayer = false,
     this.allowElevation = true,
     this.platformViewBackdrop = false,
+    this.hoverEffect = Material4GlassHoverEffect.automatic,
+    this.hoverScale,
+    this.hoverLightTracking = true,
+    this.cursor,
+    this.onHover,
+    this.contextMenu,
+    this.contextMenuWidth = 250.0,
+    this.onSecondaryTap,
+    this.contextMenuPreview,
+    this.onContextMenuOpened,
+    this.onContextMenuDismissed,
+    this.hoverMagnetism = 1.0,
+    this.tooltip,
+    this.tooltipDelay = const Duration(milliseconds: 700),
+    this.focusable,
+    this.focusColor,
+    this.focusNode,
+    this.autofocus = false,
+    this.haptics = false,
   });
 
   /// `glassEffect(.regular)`.
@@ -262,7 +384,13 @@ class Material4LiquidGlass {
     Color? tint,
     bool? interactive,
     bool visible = true,
-  }) : this(tint: tint, interactive: interactive, visible: visible);
+    List<Widget>? contextMenu,
+  }) : this(
+          tint: tint,
+          interactive: interactive,
+          visible: visible,
+          contextMenu: contextMenu,
+        );
 
   /// `glassEffect(.clear)`, optionally over a dimming layer.
   const Material4LiquidGlass.clear({
@@ -300,7 +428,15 @@ class Material4LiquidGlass {
     double? interactionScale,
     double stretch = 0.5,
     Color? glowColor,
+    List<Widget>? contextMenu,
+    Material4GlassHoverEffect hoverEffect = Material4GlassHoverEffect.automatic,
+    String? tooltip,
+    bool haptics = false,
   }) : this(
+          contextMenu: contextMenu,
+          hoverEffect: hoverEffect,
+          tooltip: tooltip,
+          haptics: haptics,
           settings: settings,
           quality: quality,
           tint: tint,
@@ -358,6 +494,25 @@ class Material4LiquidGlass {
     bool? useOwnLayer,
     bool? allowElevation,
     bool? platformViewBackdrop,
+    Material4GlassHoverEffect? hoverEffect,
+    double? hoverScale,
+    bool? hoverLightTracking,
+    MouseCursor? cursor,
+    ValueChanged<bool>? onHover,
+    List<Widget>? contextMenu,
+    double? contextMenuWidth,
+    ValueChanged<Offset>? onSecondaryTap,
+    WidgetBuilder? contextMenuPreview,
+    VoidCallback? onContextMenuOpened,
+    VoidCallback? onContextMenuDismissed,
+    double? hoverMagnetism,
+    String? tooltip,
+    Duration? tooltipDelay,
+    bool? focusable,
+    Color? focusColor,
+    FocusNode? focusNode,
+    bool? autofocus,
+    bool? haptics,
   }) {
     return Material4LiquidGlass(
       variant: variant ?? this.variant,
@@ -381,6 +536,26 @@ class Material4LiquidGlass {
       useOwnLayer: useOwnLayer ?? this.useOwnLayer,
       allowElevation: allowElevation ?? this.allowElevation,
       platformViewBackdrop: platformViewBackdrop ?? this.platformViewBackdrop,
+      hoverEffect: hoverEffect ?? this.hoverEffect,
+      hoverScale: hoverScale ?? this.hoverScale,
+      hoverLightTracking: hoverLightTracking ?? this.hoverLightTracking,
+      cursor: cursor ?? this.cursor,
+      onHover: onHover ?? this.onHover,
+      contextMenu: contextMenu ?? this.contextMenu,
+      contextMenuWidth: contextMenuWidth ?? this.contextMenuWidth,
+      onSecondaryTap: onSecondaryTap ?? this.onSecondaryTap,
+      contextMenuPreview: contextMenuPreview ?? this.contextMenuPreview,
+      onContextMenuOpened: onContextMenuOpened ?? this.onContextMenuOpened,
+      onContextMenuDismissed:
+          onContextMenuDismissed ?? this.onContextMenuDismissed,
+      hoverMagnetism: hoverMagnetism ?? this.hoverMagnetism,
+      tooltip: tooltip ?? this.tooltip,
+      tooltipDelay: tooltipDelay ?? this.tooltipDelay,
+      focusable: focusable ?? this.focusable,
+      focusColor: focusColor ?? this.focusColor,
+      focusNode: focusNode ?? this.focusNode,
+      autofocus: autofocus ?? this.autofocus,
+      haptics: haptics ?? this.haptics,
     );
   }
 
@@ -406,6 +581,25 @@ class Material4LiquidGlass {
         useOwnLayer,
         allowElevation,
         platformViewBackdrop,
+        hoverEffect,
+        hoverScale,
+        hoverLightTracking,
+        cursor,
+        onHover,
+        contextMenu,
+        contextMenuWidth,
+        onSecondaryTap,
+        contextMenuPreview,
+        onContextMenuOpened,
+        onContextMenuDismissed,
+        hoverMagnetism,
+        tooltip,
+        tooltipDelay,
+        focusable,
+        focusColor,
+        focusNode,
+        autofocus,
+        haptics,
       ];
 
   @override
@@ -519,8 +713,7 @@ class Material4LiquidGlassSurface extends StatefulWidget {
 }
 
 class _Material4LiquidGlassSurfaceState
-    extends State<Material4LiquidGlassSurface>
-    with SingleTickerProviderStateMixin {
+    extends State<Material4LiquidGlassSurface> with TickerProviderStateMixin {
   // Illumination on press: up over ~150 ms, gone ~60 ms after lift-off.
   late final AnimationController _press = AnimationController(
     duration: GlassDefaults.ambientLiftDuration,
@@ -530,12 +723,82 @@ class _Material4LiquidGlassSurfaceState
   late final Animation<double> _pressCurve =
       CurvedAnimation(parent: _press, curve: Curves.easeOut);
 
+  // Pointer hover: a quick, slightly springy rise and a softer settle, like
+  // the iPadOS pointer lift.
+  late final AnimationController _hover = AnimationController(
+    duration: const Duration(milliseconds: 260),
+    reverseDuration: const Duration(milliseconds: 340),
+    vsync: this,
+  );
+  late final Animation<double> _hoverCurve = CurvedAnimation(
+    parent: _hover,
+    curve: const Cubic(0.2, 1.3, 0.4, 1.0),
+    reverseCurve: Curves.easeInOutCubic,
+  );
+
+  /// Hovering pointer in local (untransformed) coordinates. Kept after exit
+  /// so effects fade out where the pointer left.
+  final ValueNotifier<Offset?> _pointer = ValueNotifier<Offset?>(null);
+
   Size? _size;
 
   @override
   void dispose() {
     _press.dispose();
+    _hover.dispose();
+    _pointer.dispose();
     super.dispose();
+  }
+
+  void _hoverEnter(PointerEvent e) {
+    _pointer.value = e.localPosition;
+    _hover.forward();
+    widget.glass.onHover?.call(true);
+  }
+
+  void _hoverExit(PointerEvent e) {
+    _hover.reverse();
+    widget.glass.onHover?.call(false);
+  }
+
+  Material4GlassHoverEffect _resolveHover(bool interactive) {
+    final effect = widget.glass.hoverEffect;
+    if (effect != Material4GlassHoverEffect.automatic) return effect;
+    if (!interactive && widget.glass.contextMenu == null) {
+      return Material4GlassHoverEffect.none;
+    }
+    final small = _size == null ||
+        _size!.shortestSide < Material4LiquidGlassSurface.smallElementExtent;
+    return small
+        ? Material4GlassHoverEffect.lift
+        : Material4GlassHoverEffect.highlight;
+  }
+
+  /// iPadOS grows a lifted element by a few points, so small controls scale
+  /// more than wide ones.
+  double get _liftScale {
+    final explicit = widget.glass.hoverScale;
+    if (explicit != null) return explicit;
+    final longest = _size?.longestSide ?? 64.0;
+    return 1.0 + (6.0 / longest).clamp(0.015, 0.08);
+  }
+
+  /// The material's light turned toward the hovering pointer by [t].
+  LiquidGlassSettings _trackLight(LiquidGlassSettings s, double t) {
+    final p = _pointer.value;
+    final size = _size;
+    if (t <= 0 || p == null || size == null) return s;
+    final d = p - size.center(Offset.zero);
+    if (d.distance < 1) return s;
+    final target = math.atan2(-d.dy, d.dx);
+    var delta = target - s.lightAngle;
+    while (delta > math.pi) {
+      delta -= 2 * math.pi;
+    }
+    while (delta < -math.pi) {
+      delta += 2 * math.pi;
+    }
+    return s.copyWith(lightAngle: s.lightAngle + delta * t);
   }
 
   void _onSize(Size size) {
@@ -579,10 +842,34 @@ class _Material4LiquidGlassSurfaceState
       body = _buildGlass(context, GlassTheme.brightnessOf(context), grouped);
     }
 
-    return _SizeReporter(
+    Widget result = _SizeReporter(
       onSize: _onSize,
       child: GlassMaterialize(visible: glass.visible, child: body),
     );
+
+    final menu = glass.contextMenu;
+    if (menu != null && menu.isNotEmpty) {
+      // Right-click / long-press: the glass lifts out of the page and an
+      // iOS 26 glass menu opens beside it.
+      result = GlassContextMenu(
+        actions: menu,
+        menuWidth: glass.contextMenuWidth,
+        previewBorderRadius: widget.config.cornerRadius,
+        quality: glass.quality,
+        onOpened: () => _hover.value = 0,
+        child: result,
+      );
+    } else if (glass.onSecondaryTap != null) {
+      result = GestureDetector(
+        behavior: HitTestBehavior.translucent,
+        onSecondaryTapUp: (d) {
+          HapticFeedback.selectionClick();
+          glass.onSecondaryTap!(d.globalPosition);
+        },
+        child: result,
+      );
+    }
+    return result;
   }
 
   Widget _buildGlass(
@@ -596,6 +883,9 @@ class _Material4LiquidGlassSurfaceState
     final highContrast = MediaQuery.maybeHighContrastOf(context) ?? false;
     final interactive = _interactive;
     final isDark = brightness == Brightness.dark;
+    final hover = _resolveHover(interactive);
+    final hovers = hover != Material4GlassHoverEffect.none;
+    final lift = hover == Material4GlassHoverEffect.lift && !reduceMotion;
 
     final quality = GlassThemeHelpers.resolveQuality(
       context,
@@ -679,10 +969,28 @@ class _Material4LiquidGlassSurfaceState
       );
     }
 
+    final shapeClipper = clipper ?? ShapeBorderClipper(shape: shaderShape);
+
+    if (hovers) {
+      // A soft specular spotlight under the cursor, and the rim catching the
+      // light nearest to it.
+      content = CustomPaint(
+        foregroundPainter: _HoverSpotlightPainter(
+          hover: _hoverCurve,
+          pointer: _pointer,
+          clipper: shapeClipper,
+          strength:
+              (hover == Material4GlassHoverEffect.highlight ? 1.25 : 1.0) *
+                  (isDark ? 0.75 : 1.0),
+        ),
+        child: content,
+      );
+    }
+
     if (interactive && glass.glowRadius != 0) {
       // The glass illuminates from within, starting under the fingertip.
       content = GlassGlow(
-        clipper: clipper ?? ShapeBorderClipper(shape: shaderShape),
+        clipper: shapeClipper,
         glowColor: glass.glowColor ??
             (isDark ? const Color(0x12FFFFFF) : const Color(0x1AFFFFFF)),
         glowRadius: glass.glowRadius ?? 1.6,
@@ -696,20 +1004,29 @@ class _Material4LiquidGlassSurfaceState
         ? (LiquidStretch.nativePressGrowth / 2 + 8).ceilToDouble()
         : 0.0;
 
-    Widget surface = interactive
+    final tracksLight = hovers && glass.hoverLightTracking;
+    Widget surface = interactive || hovers
         ? AnimatedBuilder(
-            animation: _pressCurve,
+            animation: Listenable.merge([
+              _pressCurve,
+              _hoverCurve,
+              if (tracksLight) _pointer,
+            ]),
             child: content,
-            builder: (context, child) => _glass(
-              shaderShape,
-              settings,
-              quality,
-              ownLayer,
-              headroom,
-              _pressCurve.value,
-              !minimalTier,
-              child!,
-            ),
+            builder: (context, child) {
+              final h = hovers ? _hoverCurve.value.clamp(0.0, 1.0) : 0.0;
+              return _glass(
+                shaderShape,
+                tracksLight ? _trackLight(settings, h) : settings,
+                quality,
+                ownLayer,
+                headroom,
+                // Hover brightens the glass a little; a press fully.
+                math.max(_pressCurve.value, h * 0.3),
+                interactive && !minimalTier,
+                child!,
+              );
+            },
           )
         : _glass(shaderShape, settings, quality, ownLayer, headroom, 0.0, false,
             content);
@@ -741,8 +1058,77 @@ class _Material4LiquidGlassSurfaceState
       );
     }
 
-    if (!interactive) return surface;
+    if (lift) {
+      // Lifted glass casts a soft shadow around (never through) itself.
+      surface = CustomPaint(
+        painter: _LiftShadowPainter(hover: _hoverCurve, clipper: shapeClipper),
+        child: surface,
+      );
+    }
 
+    if (interactive) {
+      surface = _interactiveSurface(
+        context,
+        surface,
+        glass,
+        reduceMotion: reduceMotion,
+        minimalTier: minimalTier,
+        quality: quality,
+        grouped: grouped,
+      );
+    }
+
+    if (lift) {
+      // Rise toward the pointer and drift with it (parallax); a press
+      // settles the lift back down, as on iPadOS.
+      surface = AnimatedBuilder(
+        animation: Listenable.merge([_hoverCurve, _pointer, _pressCurve]),
+        child: surface,
+        builder: (context, child) {
+          final t = _hoverCurve.value;
+          final size = _size;
+          final p = _pointer.value;
+          var dx = 0.0, dy = 0.0;
+          if (size != null && p != null && !size.isEmpty) {
+            final shift = (size.shortestSide * 0.06).clamp(1.5, 4.0);
+            dx = ((p.dx / size.width) * 2 - 1).clamp(-1.0, 1.0) * shift * t;
+            dy = ((p.dy / size.height) * 2 - 1).clamp(-1.0, 1.0) * shift * t;
+          }
+          final scale =
+              1.0 + (_liftScale - 1.0) * t * (1.0 - 0.6 * _pressCurve.value);
+          return Transform(
+            alignment: Alignment.center,
+            transform: Matrix4.translationValues(dx, dy, 0)
+              ..multiply(Matrix4.diagonal3Values(scale, scale, 1)),
+            child: child,
+          );
+        },
+      );
+    }
+
+    if (hovers || interactive || glass.cursor != null) {
+      surface = MouseRegion(
+        opaque: false,
+        cursor: glass.cursor ??
+            (interactive ? SystemMouseCursors.click : MouseCursor.defer),
+        onEnter: hovers ? _hoverEnter : null,
+        onHover: hovers ? (e) => _pointer.value = e.localPosition : null,
+        onExit: hovers ? _hoverExit : null,
+        child: surface,
+      );
+    }
+    return surface;
+  }
+
+  Widget _interactiveSurface(
+    BuildContext context,
+    Widget surface,
+    Material4LiquidGlass glass, {
+    required bool reduceMotion,
+    required bool minimalTier,
+    required GlassQuality quality,
+    required bool grouped,
+  }) {
     // Gel-like flex toward the finger; Reduce Motion disables the elastic
     // properties (Apple), and so does the minimal tier.
     final stretchy = !reduceMotion && !minimalTier && glass.stretch > 0;
@@ -926,4 +1312,105 @@ class _ContrastBorderPainter extends CustomPainter {
   @override
   bool shouldRepaint(_ContrastBorderPainter old) =>
       old.config != config || old.color != color;
+}
+
+/// Specular spotlight that follows a hovering pointer, plus the rim catching
+/// the light nearest to it. Repaints from its listenables, never rebuilds.
+class _HoverSpotlightPainter extends CustomPainter {
+  final Animation<double> hover;
+  final ValueListenable<Offset?> pointer;
+  final CustomClipper<Path> clipper;
+  final double strength;
+
+  _HoverSpotlightPainter({
+    required this.hover,
+    required this.pointer,
+    required this.clipper,
+    required this.strength,
+  }) : super(repaint: Listenable.merge([hover, pointer]));
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final t = hover.value.clamp(0.0, 1.0);
+    final p = pointer.value;
+    if (t <= 0 || p == null || size.isEmpty) return;
+    final path = clipper.getClip(size);
+    final radius = (size.shortestSide * 1.1).clamp(36.0, 260.0);
+    const white = Color(0xFFFFFFFF);
+    final a = 0.16 * strength * t;
+
+    canvas.save();
+    canvas.clipPath(path);
+    canvas.drawCircle(
+      p,
+      radius,
+      Paint()
+        ..shader = RadialGradient(
+          colors: [
+            white.withValues(alpha: a),
+            white.withValues(alpha: a * 0.35),
+            white.withValues(alpha: 0),
+          ],
+          stops: const [0.0, 0.45, 1.0],
+        ).createShader(Rect.fromCircle(center: p, radius: radius)),
+    );
+    // Rim light: a thin edge glint brightest where the pointer is closest.
+    final rimRadius = radius * 1.2;
+    canvas.drawPath(
+      path,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2.0
+        ..isAntiAlias = true
+        ..shader = RadialGradient(
+          colors: [
+            white.withValues(alpha: (0.55 * strength * t).clamp(0.0, 1.0)),
+            white.withValues(alpha: 0),
+          ],
+        ).createShader(Rect.fromCircle(center: p, radius: rimRadius)),
+    );
+    canvas.restore();
+  }
+
+  @override
+  bool shouldRepaint(_HoverSpotlightPainter old) =>
+      old.hover != hover ||
+      old.pointer != pointer ||
+      old.clipper != clipper ||
+      old.strength != strength;
+}
+
+/// Soft shadow of lifted glass, painted only outside the shape so the glass
+/// never refracts it.
+class _LiftShadowPainter extends CustomPainter {
+  final Animation<double> hover;
+  final CustomClipper<Path> clipper;
+
+  _LiftShadowPainter({required this.hover, required this.clipper})
+      : super(repaint: hover);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final t = hover.value.clamp(0.0, 1.0);
+    if (t <= 0 || size.isEmpty) return;
+    final path = clipper.getClip(size);
+    final blur = 6.0 + 10.0 * t;
+    final outside = Path()
+      ..fillType = PathFillType.evenOdd
+      ..addRect((Offset.zero & size).inflate(blur * 4))
+      ..addPath(path, Offset.zero);
+    canvas.save();
+    canvas.clipPath(outside);
+    canvas.drawPath(
+      path.shift(Offset(0, 6.0 * t)),
+      Paint()
+        ..color = const Color(0xFF000000).withValues(alpha: 0.18 * t)
+        ..maskFilter = MaskFilter.blur(BlurStyle.normal, blur),
+    );
+    canvas.restore();
+  }
+
+  @override
+  bool shouldRepaint(_LiftShadowPainter old) =>
+      old.hover != hover || old.clipper != clipper;
 }

@@ -8,7 +8,9 @@ import 'package:material_4/material_4.dart';
 /// * larger glass that is thicker and more opaque,
 /// * `.interactive()` controls that flex and light up under the finger,
 /// * a `GlassEffectContainer`-style group whose buttons melt together,
-/// * materialize in / out.
+/// * materialize in / out,
+/// * pointer hover (lift / highlight, light follows the cursor) and a
+///   right-click / long-press glass context menu.
 class LiquidGlassDemoScreen extends StatefulWidget {
   const LiquidGlassDemoScreen({super.key});
 
@@ -19,8 +21,8 @@ class LiquidGlassDemoScreen extends StatefulWidget {
 class _LiquidGlassDemoScreenState extends State<LiquidGlassDemoScreen> {
   // Start offset for screenshots, e.g. --dart-define=M4_GLASS_SCROLL=700.
   final _scroll = ScrollController(
-    initialScrollOffset:
-        const int.fromEnvironment('M4_GLASS_SCROLL').toDouble(),
+    initialScrollOffset: const int.fromEnvironment('M4_GLASS_SCROLL')
+        .toDouble(),
   );
   bool _merged = true;
   bool _showCard = true;
@@ -70,10 +72,11 @@ class _LiquidGlassDemoScreenState extends State<LiquidGlassDemoScreen> {
                           cornerRadius: 34,
                         ),
                         liquidGlass: const Material4LiquidGlass(
-                            followTheme: true,
-                            settings: LiquidGlassSettings(
-                              specularSharpness: GlassSpecularSharpness.sharp,
-                            )),
+                          followTheme: true,
+                          settings: LiquidGlassSettings(
+                            specularSharpness: GlassSpecularSharpness.sharp,
+                          ),
+                        ),
                         padding: const EdgeInsets.all(20),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -148,6 +151,63 @@ class _LiquidGlassDemoScreenState extends State<LiquidGlassDemoScreen> {
                             ),
                           ),
                         ),
+                      ),
+                    ),
+                    _section(
+                      'Pointer · hover lifts, right-click / long-press = menu',
+                    ),
+                    _onPhoto(
+                      const [Color(0xFF0F766E), Color(0xFF22D3EE)],
+                      Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              for (final icon in [
+                                Icons.photo_rounded,
+                                Icons.ios_share_rounded,
+                                Icons.favorite_rounded,
+                              ])
+                                Padding(
+                                  padding: const EdgeInsets.all(8),
+                                  child: Material4Container(
+                                    shape: Material4Type.capsule,
+                                    width: 60,
+                                    height: 60,
+                                    liquidGlass: Material4LiquidGlass(
+                                      contextMenu: _menu(context),
+                                    ),
+                                    onTap: () {},
+                                    child: Icon(icon, size: 28),
+                                  ),
+                                ),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          Material4Container(
+                            shape: Material4Type.squircle,
+                            width: double.infinity,
+                            height: 140,
+                            config: const Material4Config(
+                              type: Material4Type.squircle,
+                              cornerRadius: 30,
+                            ),
+                            liquidGlass: Material4LiquidGlass(
+                              // Large glass: highlight (no movement); the
+                              // light follows the cursor.
+                              contextMenu: _menu(context),
+                            ),
+                            child: const Center(
+                              child: Text(
+                                'Hover me · right-click me',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                     _section('Materialize'),
@@ -300,6 +360,36 @@ class _LiquidGlassDemoScreenState extends State<LiquidGlassDemoScreen> {
     );
   }
 
+  List<Widget> _menu(BuildContext context) {
+    void say(String what) => ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(what)));
+    return [
+      GlassContextMenuAction(
+        icon: const Icon(Icons.copy_rounded),
+        onPressed: () => say('Copy'),
+        child: const Text('Copy'),
+      ),
+      GlassContextMenuAction(
+        icon: const Icon(Icons.ios_share_rounded),
+        onPressed: () => say('Share'),
+        child: const Text('Share'),
+      ),
+      GlassContextMenuAction(
+        icon: const Icon(Icons.favorite_border_rounded),
+        onPressed: () => say('Favorite'),
+        child: const Text('Favorite'),
+      ),
+      const GlassMenuDivider(),
+      GlassContextMenuAction(
+        icon: const Icon(Icons.delete_outline_rounded),
+        isDestructive: true,
+        onPressed: () => say('Delete'),
+        child: const Text('Delete'),
+      ),
+    ];
+  }
+
   Widget _toolButton(IconData icon, {VoidCallback? onTap}) =>
       Material4Container(
         shape: Material4Type.capsule,
@@ -311,25 +401,25 @@ class _LiquidGlassDemoScreenState extends State<LiquidGlassDemoScreen> {
       );
 
   Widget _section(String title) => Container(
-        color: Colors.white,
-        padding: const EdgeInsets.fromLTRB(20, 28, 20, 10),
-        child: Text(
-          title,
-          style: const TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.w700,
-            color: Color(0xFF475569),
-          ),
-        ),
-      );
+    color: Colors.white,
+    padding: const EdgeInsets.fromLTRB(20, 28, 20, 10),
+    child: Text(
+      title,
+      style: const TextStyle(
+        fontSize: 13,
+        fontWeight: FontWeight.w700,
+        color: Color(0xFF475569),
+      ),
+    ),
+  );
 
   /// Places [child] over colourful, detailed "media" so the lensing shows.
   Widget _onPhoto(List<Color> colors, Widget child) => Stack(
-        children: [
-          Positioned.fill(child: _Photo(colors: colors, height: null)),
-          Padding(padding: const EdgeInsets.all(24), child: child),
-        ],
-      );
+    children: [
+      Positioned.fill(child: _Photo(colors: colors, height: null)),
+      Padding(padding: const EdgeInsets.all(24), child: child),
+    ],
+  );
 }
 
 /// Stand-in for a photo: a gradient with stripes and dots, so refraction and

@@ -17,6 +17,7 @@ A next-generation, high-performance universal Flutter design system with 28+ har
 
 ## ✨ Features
 
+- **Apple-Grade Liquid Glass Engine**: Real-time paraxial lens refraction, dynamic thickness adaptation, content-aware contrast sampling, fluid merging (`Material4GlassGroup`), cursor-following specular light, and native macOS/iOS context menus & help tags. Check the [Liquid Glass API Reference](doc/LIQUID_GLASS_API.md).
 - **28+ Parameter-Driven Geometries**: Full catalog of mathematically smooth vector paths including folder tabs, ticket scallops, postage stamps, asymmetric cards, hexagonal seals, and custom Bézier contours.
 - **38 Creative Borders**: Realistic torn paper with cellulose fibers and drop shadow, deckled edges, perforated coupons, charred burnt boundaries, stamps, stitches, neon tubes, art deco, ropes, chains, and double/triple lines.
 - **20 Physical Paper Backgrounds**: Authentic tactile materials including vintage parchment, brown kraft paper, cold-press watercolor, handmade cotton, old newspaper, blueprint, sticky notes, and canvas.

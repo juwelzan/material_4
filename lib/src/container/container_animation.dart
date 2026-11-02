@@ -310,7 +310,8 @@ class Material4MorphController extends ChangeNotifier {
   /// Effective vector shape geometry representing current interpolation progress.
   Material4CustomShape get currentCustomShape {
     final from = _customShape ?? Material4CustomShape.fromType(_currentShape);
-    if ((_targetShape != null || _targetCustomShape != null) && _morphProgress > 0) {
+    if ((_targetShape != null || _targetCustomShape != null) &&
+        _morphProgress > 0) {
       final to = _targetCustomShape ??
           Material4CustomShape.fromType(_targetShape ?? _currentShape);
       return Material4CustomShape.morph(

@@ -196,7 +196,8 @@ class Material4Painter {
     }
 
     // 4. Inner Shadows
-    if (background.innerShadows != null && background.innerShadows!.isNotEmpty) {
+    if (background.innerShadows != null &&
+        background.innerShadows!.isNotEmpty) {
       paintInnerShadows(
         canvas: canvas,
         size: size,

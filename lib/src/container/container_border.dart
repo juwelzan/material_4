@@ -402,9 +402,11 @@ class Material4Border {
       strokeAlign: t < 0.5 ? a.strokeAlign : b.strokeAlign,
       dashLength: lerpDouble(a.dashLength, b.dashLength, t) ?? b.dashLength,
       dashGap: lerpDouble(a.dashGap, b.dashGap, t) ?? b.dashGap,
-      glowIntensity: lerpDouble(a.glowIntensity, b.glowIntensity, t) ?? b.glowIntensity,
+      glowIntensity:
+          lerpDouble(a.glowIntensity, b.glowIntensity, t) ?? b.glowIntensity,
       blurRadius: lerpDouble(a.blurRadius, b.blurRadius, t) ?? b.blurRadius,
-      animationSpeed: lerpDouble(a.animationSpeed, b.animationSpeed, t) ?? b.animationSpeed,
+      animationSpeed:
+          lerpDouble(a.animationSpeed, b.animationSpeed, t) ?? b.animationSpeed,
       animated: t < 0.5 ? a.animated : b.animated,
       progress: lerpDouble(a.progress, b.progress, t) ?? b.progress,
       opacity: lerpDouble(a.opacity, b.opacity, t) ?? b.opacity,

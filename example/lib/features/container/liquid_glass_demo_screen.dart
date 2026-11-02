@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:material_4/material_4.dart';
 
@@ -10,7 +12,9 @@ import 'package:material_4/material_4.dart';
 /// * a `GlassEffectContainer`-style group whose buttons melt together,
 /// * materialize in / out,
 /// * pointer hover (lift / highlight, light follows the cursor) and a
-///   right-click / long-press glass context menu.
+///   right-click / long-press glass context menu,
+/// * one shared light for all glass (pointer or orbiting), help tags and
+///   keyboard focus.
 class LiquidGlassDemoScreen extends StatefulWidget {
   const LiquidGlassDemoScreen({super.key});
 
@@ -18,7 +22,8 @@ class LiquidGlassDemoScreen extends StatefulWidget {
   State<LiquidGlassDemoScreen> createState() => _LiquidGlassDemoScreenState();
 }
 
-class _LiquidGlassDemoScreenState extends State<LiquidGlassDemoScreen> {
+class _LiquidGlassDemoScreenState extends State<LiquidGlassDemoScreen>
+    with SingleTickerProviderStateMixin {
   // Start offset for screenshots, e.g. --dart-define=M4_GLASS_SCROLL=700.
   final _scroll = ScrollController(
     initialScrollOffset: const int.fromEnvironment('M4_GLASS_SCROLL')
@@ -27,15 +32,41 @@ class _LiquidGlassDemoScreenState extends State<LiquidGlassDemoScreen> {
   bool _merged = true;
   bool _showCard = true;
   int _likes = 0;
+  bool _sweepLight = false;
+
+  // A light source orbiting the screen: every glass highlight turns with it.
+  late final AnimationController _sweep = AnimationController(
+    vsync: this,
+    duration: const Duration(seconds: 6),
+  );
+  late final Animation<double> _sweepAngle = _sweep.drive(
+    Tween(begin: 0.0, end: 2 * math.pi),
+  );
+
+  void _toggleSweep() {
+    setState(() => _sweepLight = !_sweepLight);
+    _sweepLight ? _sweep.repeat() : _sweep.stop();
+  }
 
   @override
   void dispose() {
+    _sweep.dispose();
     _scroll.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    // One shared light for all glass: it sits at the mouse pointer on
+    // desktop / web / iPad, or orbits the screen when "Sweep light" is on.
+    return Material4GlassLight(
+      followPointer: true,
+      angle: _sweepLight ? _sweepAngle : null,
+      child: _page(context),
+    );
+  }
+
+  Widget _page(BuildContext context) {
     final bottom = MediaQuery.paddingOf(context).bottom;
     return GlassContentAwareScope(
       // The black scaffold shows through unpainted content, so tell the
@@ -163,10 +194,10 @@ class _LiquidGlassDemoScreenState extends State<LiquidGlassDemoScreen> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              for (final icon in [
-                                Icons.photo_rounded,
-                                Icons.ios_share_rounded,
-                                Icons.favorite_rounded,
+                              for (final (icon, label) in [
+                                (Icons.photo_rounded, 'Photos'),
+                                (Icons.ios_share_rounded, 'Share'),
+                                (Icons.favorite_rounded, 'Favorite'),
                               ])
                                 Padding(
                                   padding: const EdgeInsets.all(8),
@@ -176,12 +207,37 @@ class _LiquidGlassDemoScreenState extends State<LiquidGlassDemoScreen> {
                                     height: 60,
                                     liquidGlass: Material4LiquidGlass(
                                       contextMenu: _menu(context),
+                                      // Help tag after resting the pointer;
+                                      // Tab focuses, Enter / Space activate.
+                                      tooltip: label,
+                                      haptics: true,
                                     ),
                                     onTap: () {},
                                     child: Icon(icon, size: 28),
                                   ),
                                 ),
                             ],
+                          ),
+                          const SizedBox(height: 8),
+                          Material4Container(
+                            shape: Material4Type.capsule,
+                            width: 200,
+                            height: 44,
+                            liquidGlass: Material4LiquidGlass(
+                              tooltip: 'Orbit one light around every glass',
+                              tint: _sweepLight
+                                  ? const Color(0xFF0A84FF)
+                                  : null,
+                            ),
+                            onTap: _toggleSweep,
+                            child: Center(
+                              child: Text(
+                                _sweepLight ? 'Light: sweep' : 'Light: pointer',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
                           ),
                           const SizedBox(height: 16),
                           Material4Container(
@@ -196,6 +252,30 @@ class _LiquidGlassDemoScreenState extends State<LiquidGlassDemoScreen> {
                               // Large glass: highlight (no movement); the
                               // light follows the cursor.
                               contextMenu: _menu(context),
+                              // A custom lifted preview while the menu is open.
+                              contextMenuPreview: (context) => Container(
+                                width: 260,
+                                height: 160,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(28),
+                                  gradient: const LinearGradient(
+                                    colors: [
+                                      Color(0xFF0F766E),
+                                      Color(0xFF22D3EE),
+                                    ],
+                                  ),
+                                ),
+                                alignment: Alignment.center,
+                                child: const Text(
+                                  'Preview',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.w700,
+                                    decoration: TextDecoration.none,
+                                  ),
+                                ),
+                              ),
                             ),
                             child: const Center(
                               child: Text(

@@ -357,13 +357,16 @@ class Material4TextureRenderer {
     canvas.restore();
   }
 
-  static void _renderCarbonFiber(Canvas canvas, double w, double h, Material4Texture texture) {
+  static void _renderCarbonFiber(
+      Canvas canvas, double w, double h, Material4Texture texture) {
     final cellSize = 8.0 * texture.scale.clamp(0.5, 3.0);
     final paintDark = Paint()
-      ..color = (texture.color ?? Colors.black).withValues(alpha: texture.opacity * 0.9)
+      ..color = (texture.color ?? Colors.black)
+          .withValues(alpha: texture.opacity * 0.9)
       ..style = PaintingStyle.fill;
     final paintLight = Paint()
-      ..color = (texture.color ?? Colors.white).withValues(alpha: texture.opacity * 0.4)
+      ..color = (texture.color ?? Colors.white)
+          .withValues(alpha: texture.opacity * 0.4)
       ..style = PaintingStyle.fill;
 
     for (double y = 0; y < h; y += cellSize) {
@@ -377,9 +380,11 @@ class Material4TextureRenderer {
     }
   }
 
-  static void _renderBrushedMetal(Canvas canvas, double w, double h, Material4Texture texture) {
+  static void _renderBrushedMetal(
+      Canvas canvas, double w, double h, Material4Texture texture) {
     final paint = Paint()
-      ..color = (texture.color ?? Colors.white).withValues(alpha: texture.opacity)
+      ..color =
+          (texture.color ?? Colors.white).withValues(alpha: texture.opacity)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.0;
 
@@ -395,14 +400,17 @@ class Material4TextureRenderer {
     canvas.restore();
   }
 
-  static void _renderPaper(Canvas canvas, double w, double h, Material4Texture texture) {
+  static void _renderPaper(
+      Canvas canvas, double w, double h, Material4Texture texture) {
     final fiberPaint = Paint()
-      ..color = (texture.color ?? const Color(0xFF6B4423)).withValues(alpha: texture.opacity * 0.45)
+      ..color = (texture.color ?? const Color(0xFF6B4423))
+          .withValues(alpha: texture.opacity * 0.45)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 0.8;
 
     final dotPaint = Paint()
-      ..color = (texture.color ?? const Color(0xFF3E2723)).withValues(alpha: texture.opacity * 0.6)
+      ..color = (texture.color ?? const Color(0xFF3E2723))
+          .withValues(alpha: texture.opacity * 0.6)
       ..style = PaintingStyle.fill;
 
     // Fixed deterministic pseudo-random seeds
@@ -422,9 +430,11 @@ class Material4TextureRenderer {
     }
   }
 
-  static void _renderNoiseGrain(Canvas canvas, double w, double h, Material4Texture texture, double anim) {
+  static void _renderNoiseGrain(Canvas canvas, double w, double h,
+      Material4Texture texture, double anim) {
     final paint = Paint()
-      ..color = (texture.color ?? Colors.black).withValues(alpha: texture.opacity)
+      ..color =
+          (texture.color ?? Colors.black).withValues(alpha: texture.opacity)
       ..style = PaintingStyle.fill;
 
     final step = 4.0 / texture.density.clamp(0.5, 3.0);
@@ -440,9 +450,11 @@ class Material4TextureRenderer {
     }
   }
 
-  static void _renderMarble(Canvas canvas, double w, double h, Material4Texture texture, double anim) {
+  static void _renderMarble(Canvas canvas, double w, double h,
+      Material4Texture texture, double anim) {
     final paint = Paint()
-      ..color = (texture.color ?? const Color(0xFF1E293B)).withValues(alpha: texture.opacity)
+      ..color = (texture.color ?? const Color(0xFF1E293B))
+          .withValues(alpha: texture.opacity)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2.0;
 
@@ -452,28 +464,34 @@ class Material4TextureRenderer {
     for (double y = -h * 0.2; y < h * 1.2; y += 40.0 * texture.scale) {
       path.moveTo(0, y);
       for (double x = 0; x < w; x += 15) {
-        final ny = y + math.sin((x * 0.02) + phase) * 20.0 + math.cos(x * 0.05) * 8.0;
+        final ny =
+            y + math.sin((x * 0.02) + phase) * 20.0 + math.cos(x * 0.05) * 8.0;
         path.lineTo(x, ny);
       }
     }
     canvas.drawPath(path, paint);
   }
 
-  static void _renderWoodGrain(Canvas canvas, double w, double h, Material4Texture texture) {
+  static void _renderWoodGrain(
+      Canvas canvas, double w, double h, Material4Texture texture) {
     final paint = Paint()
-      ..color = (texture.color ?? const Color(0xFF78350F)).withValues(alpha: texture.opacity)
+      ..color = (texture.color ?? const Color(0xFF78350F))
+          .withValues(alpha: texture.opacity)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.2;
 
     for (double r = 10; r < math.max(w, h) * 1.5; r += 12 * texture.scale) {
-      final rect = Rect.fromCenter(center: Offset(w * 0.2, h * 0.5), width: r * 2.5, height: r);
+      final rect = Rect.fromCenter(
+          center: Offset(w * 0.2, h * 0.5), width: r * 2.5, height: r);
       canvas.drawOval(rect, paint);
     }
   }
 
-  static void _renderMesh(Canvas canvas, double w, double h, Material4Texture texture) {
+  static void _renderMesh(
+      Canvas canvas, double w, double h, Material4Texture texture) {
     final dotPaint = Paint()
-      ..color = (texture.color ?? Colors.black).withValues(alpha: texture.opacity)
+      ..color =
+          (texture.color ?? Colors.black).withValues(alpha: texture.opacity)
       ..style = PaintingStyle.fill;
 
     final spacing = 12.0 * texture.scale;
@@ -487,7 +505,8 @@ class Material4TextureRenderer {
     }
   }
 
-  static void _renderHolographic(Canvas canvas, double w, double h, Material4Texture texture, double anim) {
+  static void _renderHolographic(Canvas canvas, double w, double h,
+      Material4Texture texture, double anim) {
     final phase = texture.animated ? anim : 0.0;
     final gradient = LinearGradient(
       begin: Alignment(-1.0 + phase * 2, -1.0),
@@ -510,9 +529,11 @@ class Material4TextureRenderer {
     canvas.drawRect(Rect.fromLTWH(0, 0, w, h), paint);
   }
 
-  static void _renderFabric(Canvas canvas, double w, double h, Material4Texture texture) {
+  static void _renderFabric(
+      Canvas canvas, double w, double h, Material4Texture texture) {
     final paint = Paint()
-      ..color = (texture.color ?? Colors.black).withValues(alpha: texture.opacity * 0.6)
+      ..color = (texture.color ?? Colors.black)
+          .withValues(alpha: texture.opacity * 0.6)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 0.8;
 
@@ -525,9 +546,11 @@ class Material4TextureRenderer {
     }
   }
 
-  static void _renderStone(Canvas canvas, double w, double h, Material4Texture texture) {
+  static void _renderStone(
+      Canvas canvas, double w, double h, Material4Texture texture) {
     final paintDark = Paint()
-      ..color = (texture.color ?? Colors.black).withValues(alpha: texture.opacity)
+      ..color =
+          (texture.color ?? Colors.black).withValues(alpha: texture.opacity)
       ..style = PaintingStyle.fill;
     final paintLight = Paint()
       ..color = Colors.white.withValues(alpha: texture.opacity * 0.5)
@@ -541,9 +564,11 @@ class Material4TextureRenderer {
     }
   }
 
-  static void _renderLeather(Canvas canvas, double w, double h, Material4Texture texture) {
+  static void _renderLeather(
+      Canvas canvas, double w, double h, Material4Texture texture) {
     final cellPaint = Paint()
-      ..color = (texture.color ?? Colors.black).withValues(alpha: texture.opacity)
+      ..color =
+          (texture.color ?? Colors.black).withValues(alpha: texture.opacity)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.0;
 
@@ -551,21 +576,26 @@ class Material4TextureRenderer {
     for (double y = 0; y < h; y += cell) {
       for (double x = 0; x < w; x += cell) {
         canvas.drawRRect(
-          RRect.fromRectAndRadius(Rect.fromLTWH(x + 1, y + 1, cell - 2, cell - 2), const Radius.circular(3)),
+          RRect.fromRectAndRadius(
+              Rect.fromLTWH(x + 1, y + 1, cell - 2, cell - 2),
+              const Radius.circular(3)),
           cellPaint,
         );
       }
     }
   }
 
-  static void _renderSoftMatte(Canvas canvas, double w, double h, Material4Texture texture) {
+  static void _renderSoftMatte(
+      Canvas canvas, double w, double h, Material4Texture texture) {
     final paint = Paint()
-      ..color = (texture.color ?? Colors.white).withValues(alpha: texture.opacity * 0.5)
+      ..color = (texture.color ?? Colors.white)
+          .withValues(alpha: texture.opacity * 0.5)
       ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4.0);
     canvas.drawRect(Rect.fromLTWH(0, 0, w, h), paint);
   }
 
-  static void _renderMetallicFoil(Canvas canvas, double w, double h, Material4Texture texture, double anim) {
+  static void _renderMetallicFoil(Canvas canvas, double w, double h,
+      Material4Texture texture, double anim) {
     final offset = texture.animated ? anim * w : 0.0;
     final gradient = LinearGradient(
       colors: [
@@ -581,10 +611,12 @@ class Material4TextureRenderer {
     canvas.drawRect(Rect.fromLTWH(0, 0, w, h), paint);
   }
 
-  static void _renderLiquidTexture(Canvas canvas, double w, double h, Material4Texture texture, double anim) {
+  static void _renderLiquidTexture(Canvas canvas, double w, double h,
+      Material4Texture texture, double anim) {
     final phase = texture.animated ? anim * 2 * math.pi : 0.0;
     final paint = Paint()
-      ..color = (texture.color ?? Colors.cyan).withValues(alpha: texture.opacity)
+      ..color =
+          (texture.color ?? Colors.cyan).withValues(alpha: texture.opacity)
       ..style = PaintingStyle.fill;
 
     for (int i = 0; i < 6; i++) {
@@ -594,9 +626,11 @@ class Material4TextureRenderer {
     }
   }
 
-  static void _renderDottedTexture(Canvas canvas, double w, double h, Material4Texture texture) {
+  static void _renderDottedTexture(
+      Canvas canvas, double w, double h, Material4Texture texture) {
     final paint = Paint()
-      ..color = (texture.color ?? Colors.white).withValues(alpha: texture.opacity)
+      ..color =
+          (texture.color ?? Colors.white).withValues(alpha: texture.opacity)
       ..style = PaintingStyle.fill;
     final step = 10.0 * texture.scale;
     for (double y = step / 2; y < h; y += step) {
@@ -606,7 +640,8 @@ class Material4TextureRenderer {
     }
   }
 
-  static void _renderGradientNoise(Canvas canvas, double w, double h, Material4Texture texture, double anim) {
+  static void _renderGradientNoise(Canvas canvas, double w, double h,
+      Material4Texture texture, double anim) {
     final gradient = RadialGradient(
       center: Alignment.center,
       radius: 0.8,
@@ -615,7 +650,8 @@ class Material4TextureRenderer {
         Colors.transparent,
       ],
     );
-    final paint = Paint()..shader = gradient.createShader(Rect.fromLTWH(0, 0, w, h));
+    final paint = Paint()
+      ..shader = gradient.createShader(Rect.fromLTWH(0, 0, w, h));
     canvas.drawRect(Rect.fromLTWH(0, 0, w, h), paint);
   }
 }

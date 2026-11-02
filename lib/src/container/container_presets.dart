@@ -46,7 +46,8 @@ class Material4ContainerPreset {
       glassBlur: 18.0,
       glassTint: Color(0x24FFFFFF),
       shadows: [
-        BoxShadow(color: Color(0x1A000000), blurRadius: 16, offset: Offset(0, 8)),
+        BoxShadow(
+            color: Color(0x1A000000), blurRadius: 16, offset: Offset(0, 8)),
       ],
     ),
     border: Material4Border.solid(
@@ -63,7 +64,8 @@ class Material4ContainerPreset {
     background: Material4Background(
       color: Color(0xFF0F172A),
       shadows: [
-        BoxShadow(color: Color(0x3300E5FF), blurRadius: 20, offset: Offset(0, 4)),
+        BoxShadow(
+            color: Color(0x3300E5FF), blurRadius: 20, offset: Offset(0, 4)),
       ],
     ),
     border: Material4Border.neon(
@@ -87,7 +89,8 @@ class Material4ContainerPreset {
       color: Color(0xFFFFFFFF),
       texture: Material4Texture.paper(opacity: 0.15),
       shadows: [
-        BoxShadow(color: Color(0x14000000), blurRadius: 18, offset: Offset(0, 6)),
+        BoxShadow(
+            color: Color(0x14000000), blurRadius: 18, offset: Offset(0, 6)),
       ],
     ),
     border: Material4Border.solid(
@@ -104,7 +107,8 @@ class Material4ContainerPreset {
       color: Color(0xFF18181B),
       texture: Material4Texture.carbonFiber(opacity: 0.35),
       shadows: [
-        BoxShadow(color: Color(0x33000000), blurRadius: 16, offset: Offset(0, 8)),
+        BoxShadow(
+            color: Color(0x33000000), blurRadius: 16, offset: Offset(0, 8)),
       ],
     ),
     border: Material4Border.movingDash(
@@ -135,7 +139,8 @@ class Material4ContainerPreset {
         animated: true,
       ),
       shadows: [
-        BoxShadow(color: Color(0x2806B6D4), blurRadius: 16, offset: Offset(0, 6)),
+        BoxShadow(
+            color: Color(0x2806B6D4), blurRadius: 16, offset: Offset(0, 6)),
       ],
     ),
     border: Material4Border.solid(
@@ -156,7 +161,8 @@ class Material4ContainerPreset {
       color: Color(0xFF09090B),
       texture: Material4Texture.holographic(opacity: 0.45, animated: true),
       shadows: [
-        BoxShadow(color: Color(0x29FF007F), blurRadius: 18, offset: Offset(0, 8)),
+        BoxShadow(
+            color: Color(0x29FF007F), blurRadius: 18, offset: Offset(0, 8)),
       ],
     ),
     border: Material4Border.rainbow(
@@ -181,7 +187,8 @@ class Material4ContainerPreset {
         spacing: 18.0,
       ),
       shadows: [
-        BoxShadow(color: Color(0x18000000), blurRadius: 10, offset: Offset(0, 4)),
+        BoxShadow(
+            color: Color(0x18000000), blurRadius: 10, offset: Offset(0, 4)),
       ],
     ),
     border: Material4Border.solid(
@@ -197,7 +204,8 @@ class Material4ContainerPreset {
     background: Material4Background(
       color: Colors.white,
       shadows: [
-        BoxShadow(color: Color(0x0A000000), blurRadius: 12, offset: Offset(0, 2)),
+        BoxShadow(
+            color: Color(0x0A000000), blurRadius: 12, offset: Offset(0, 2)),
       ],
     ),
     border: Material4Border.solid(

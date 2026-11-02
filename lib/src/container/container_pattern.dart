@@ -326,15 +326,18 @@ class Material4PatternRenderer {
 
     final w = size.width;
     final h = size.height;
-    final resolvedColor = (pattern.color ?? const Color(0xFF000000)).withValues(alpha: pattern.opacity);
+    final resolvedColor = (pattern.color ?? const Color(0xFF000000))
+        .withValues(alpha: pattern.opacity);
     final paint = Paint()
       ..color = resolvedColor
       ..strokeWidth = pattern.strokeWidth
       ..style = PaintingStyle.stroke
       ..isAntiAlias = true;
 
-    final effectiveSpacing = (pattern.spacing * pattern.scale).clamp(4.0, 200.0);
-    final effectiveProgress = pattern.progress > 0.0 ? pattern.progress : animationProgress;
+    final effectiveSpacing =
+        (pattern.spacing * pattern.scale).clamp(4.0, 200.0);
+    final effectiveProgress =
+        pattern.progress > 0.0 ? pattern.progress : animationProgress;
     final animShift = (pattern.animated || pattern.progress > 0.0)
         ? (effectiveProgress * effectiveSpacing * pattern.animationSpeed)
         : 0.0;
@@ -345,7 +348,9 @@ class Material4PatternRenderer {
 
       case Material4PatternType.diagonalStripes:
         final totalSpan = w + h;
-        for (double d = -h + (animShift % effectiveSpacing); d < totalSpan; d += effectiveSpacing) {
+        for (double d = -h + (animShift % effectiveSpacing);
+            d < totalSpan;
+            d += effectiveSpacing) {
           canvas.drawLine(Offset(d, 0), Offset(d + h, h), paint);
         }
         break;
@@ -355,8 +360,12 @@ class Material4PatternRenderer {
           ..color = resolvedColor
           ..style = PaintingStyle.fill;
         final r = pattern.strokeWidth;
-        for (double y = (effectiveSpacing * 0.5 + animShift) % effectiveSpacing; y < h; y += effectiveSpacing) {
-          for (double x = effectiveSpacing * 0.5; x < w; x += effectiveSpacing) {
+        for (double y = (effectiveSpacing * 0.5 + animShift) % effectiveSpacing;
+            y < h;
+            y += effectiveSpacing) {
+          for (double x = effectiveSpacing * 0.5;
+              x < w;
+              x += effectiveSpacing) {
             canvas.drawCircle(Offset(x, y), r, dotPaint);
           }
         }
@@ -376,11 +385,13 @@ class Material4PatternRenderer {
       case Material4PatternType.guillocheWaves:
       case Material4PatternType.wavePattern:
         final wavePath = Path();
-        final phase = pattern.animated ? (animationProgress * 2 * math.pi) : 0.0;
+        final phase =
+            pattern.animated ? (animationProgress * 2 * math.pi) : 0.0;
         for (double y = effectiveSpacing / 2; y < h; y += effectiveSpacing) {
           wavePath.moveTo(0, y);
           for (double x = 0; x <= w; x += 16) {
-            final wy = y + math.sin((x / 16) + phase) * (effectiveSpacing * 0.28);
+            final wy =
+                y + math.sin((x / 16) + phase) * (effectiveSpacing * 0.28);
             wavePath.lineTo(x, wy);
           }
         }
@@ -404,7 +415,9 @@ class Material4PatternRenderer {
           for (double x = 0; x < w; x += effectiveSpacing) {
             final col = (x / effectiveSpacing).floor();
             if ((row + col) % 2 == 0) {
-              canvas.drawRect(Rect.fromLTWH(x, y, effectiveSpacing, effectiveSpacing), fillPaint);
+              canvas.drawRect(
+                  Rect.fromLTWH(x, y, effectiveSpacing, effectiveSpacing),
+                  fillPaint);
             }
           }
         }
@@ -484,8 +497,10 @@ class Material4PatternRenderer {
         final dY = effectiveSpacing * math.tan(math.pi / 6);
         for (double y = -h; y < h * 2; y += effectiveSpacing) {
           canvas.drawLine(Offset(0, y), Offset(w, y), paint);
-          canvas.drawLine(Offset(0, y), Offset(w, y + w * dY / effectiveSpacing), paint);
-          canvas.drawLine(Offset(0, y), Offset(w, y - w * dY / effectiveSpacing), paint);
+          canvas.drawLine(
+              Offset(0, y), Offset(w, y + w * dY / effectiveSpacing), paint);
+          canvas.drawLine(
+              Offset(0, y), Offset(w, y - w * dY / effectiveSpacing), paint);
         }
         break;
 
@@ -495,11 +510,15 @@ class Material4PatternRenderer {
           final isEven = (y / step).floor() % 2 == 0;
           canvas.drawLine(Offset(0, y), Offset(w * 0.4, y), paint);
           if (isEven) {
-            canvas.drawLine(Offset(w * 0.4, y), Offset(w * 0.5, y + step * 0.5), paint);
-            canvas.drawLine(Offset(w * 0.5, y + step * 0.5), Offset(w, y + step * 0.5), paint);
+            canvas.drawLine(
+                Offset(w * 0.4, y), Offset(w * 0.5, y + step * 0.5), paint);
+            canvas.drawLine(Offset(w * 0.5, y + step * 0.5),
+                Offset(w, y + step * 0.5), paint);
           } else {
-            canvas.drawLine(Offset(w * 0.4, y), Offset(w * 0.5, y - step * 0.5), paint);
-            canvas.drawLine(Offset(w * 0.5, y - step * 0.5), Offset(w, y - step * 0.5), paint);
+            canvas.drawLine(
+                Offset(w * 0.4, y), Offset(w * 0.5, y - step * 0.5), paint);
+            canvas.drawLine(Offset(w * 0.5, y - step * 0.5),
+                Offset(w, y - step * 0.5), paint);
           }
         }
         break;
@@ -507,7 +526,9 @@ class Material4PatternRenderer {
       case Material4PatternType.meshPattern:
         for (double x = 0; x < w; x += effectiveSpacing) {
           for (double y = 0; y < h; y += effectiveSpacing) {
-            canvas.drawRect(Rect.fromLTWH(x, y, effectiveSpacing - 2, effectiveSpacing - 2), paint);
+            canvas.drawRect(
+                Rect.fromLTWH(x, y, effectiveSpacing - 2, effectiveSpacing - 2),
+                paint);
           }
         }
         break;
@@ -533,7 +554,9 @@ class Material4PatternRenderer {
         final dotPaint = Paint()
           ..color = resolvedColor
           ..style = PaintingStyle.fill;
-        final pulse = pattern.animated ? (math.sin(animationProgress * 2 * math.pi) * 0.5 + 0.5) : 1.0;
+        final pulse = pattern.animated
+            ? (math.sin(animationProgress * 2 * math.pi) * 0.5 + 0.5)
+            : 1.0;
         final r = pattern.strokeWidth * (0.8 + 0.6 * pulse);
         for (double y = effectiveSpacing / 2; y < h; y += effectiveSpacing) {
           for (double x = effectiveSpacing / 2; x < w; x += effectiveSpacing) {
@@ -546,7 +569,8 @@ class Material4PatternRenderer {
     canvas.restore();
   }
 
-  static void _drawHexagon(Canvas canvas, Offset center, double radius, Paint paint) {
+  static void _drawHexagon(
+      Canvas canvas, Offset center, double radius, Paint paint) {
     final path = Path();
     for (int i = 0; i < 6; i++) {
       final angle = (i * 60) * math.pi / 180;

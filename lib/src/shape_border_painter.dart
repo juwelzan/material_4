@@ -231,7 +231,8 @@ class ShapeBorderPainter {
 
       // --- Universal Next-Gen Animated Border Styles ---
       case BorderStyleType.flowingBorder:
-        _drawFlowingBorder(canvas, size, path, config, borderColor, borderWidth);
+        _drawFlowingBorder(
+            canvas, size, path, config, borderColor, borderWidth);
         break;
 
       case BorderStyleType.movingDash:
@@ -259,19 +260,23 @@ class ShapeBorderPainter {
         break;
 
       case BorderStyleType.orbitingLightBorder:
-        _drawOrbitingLightBorder(canvas, path, config, borderColor, borderWidth);
+        _drawOrbitingLightBorder(
+            canvas, path, config, borderColor, borderWidth);
         break;
 
       case BorderStyleType.dualLayerBorder:
-        _drawDualLayerBorder(canvas, size, path, config, borderColor, borderWidth);
+        _drawDualLayerBorder(
+            canvas, size, path, config, borderColor, borderWidth);
         break;
 
       case BorderStyleType.shimmerBorder:
-        _drawShimmerBorder(canvas, size, path, config, borderColor, borderWidth);
+        _drawShimmerBorder(
+            canvas, size, path, config, borderColor, borderWidth);
         break;
 
       case BorderStyleType.conicGradientBorder:
-        _drawConicGradientBorder(canvas, size, path, config, borderColor, borderWidth);
+        _drawConicGradientBorder(
+            canvas, size, path, config, borderColor, borderWidth);
         break;
 
       case BorderStyleType.energyBorder:
@@ -1147,13 +1152,14 @@ class ShapeBorderPainter {
     final progress = config.borderProgress;
     final angle = progress * 2 * math.pi;
 
-    final colors = (config.borderGradient?.colors ?? [
-      borderColor,
-      borderColor.withValues(alpha: 0.15),
-      borderColor,
-      borderColor.withValues(alpha: 0.9),
-      borderColor,
-    ]);
+    final colors = (config.borderGradient?.colors ??
+        [
+          borderColor,
+          borderColor.withValues(alpha: 0.15),
+          borderColor,
+          borderColor.withValues(alpha: 0.9),
+          borderColor,
+        ]);
 
     paint.shader = SweepGradient(
       startAngle: angle,
@@ -1401,8 +1407,7 @@ class ShapeBorderPainter {
       const segments = 12;
       for (int i = 0; i < segments; i++) {
         final tailDist = headDist - (i * (cometLength / segments));
-        final clampedDist =
-            tailDist < 0 ? tailDist + metric.length : tailDist;
+        final clampedDist = tailDist < 0 ? tailDist + metric.length : tailDist;
         final alpha = (1.0 - (i / segments)).clamp(0.0, 1.0);
         final segmentPath = metric.extractPath(
           clampedDist,
@@ -1694,8 +1699,8 @@ class ShapeBorderPainter {
   ) {
     final bigR = borderWidth * 0.9;
     final smallR = borderWidth * 0.45;
-    final spacing = math.max(1.0, (config.dashGap > 0 ? config.dashGap : 4.0) +
-        bigR + smallR);
+    final spacing = math.max(
+        1.0, (config.dashGap > 0 ? config.dashGap : 4.0) + bigR + smallR);
     final phase = config.borderProgress * spacing;
 
     final beadPaint = Paint()
@@ -1922,8 +1927,8 @@ class ShapeBorderPainter {
     final dashGap = config.dashGap > 0 ? config.dashGap : 8.0;
     final blur = config.glowBlurRadius > 0 ? config.glowBlurRadius : 6.0;
     final glowColor = config.glowColor ?? borderColor;
-    final phase = config.dashPhase +
-        config.borderProgress * (dashLength + dashGap) * 4.0;
+    final phase =
+        config.dashPhase + config.borderProgress * (dashLength + dashGap) * 4.0;
 
     // Glow pass.
     final glowPaint = Paint()

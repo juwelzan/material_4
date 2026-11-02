@@ -126,7 +126,8 @@ class Material4CustomShape {
         final vertices = <Offset>[];
         for (int i = 0; i < sides; i++) {
           final a = startAngle + i * angleStep;
-          vertices.add(Offset(cx + radius * math.cos(a), cy + radius * math.sin(a)));
+          vertices.add(
+              Offset(cx + radius * math.cos(a), cy + radius * math.sin(a)));
         }
 
         if (cornerRadius <= 0.0) {
@@ -297,7 +298,8 @@ class Material4CustomShape {
   }) {
     return Material4CustomShape(
       id: id ?? 'corners_${topLeft}_${topRight}_${bottomRight}_$bottomLeft',
-      name: name ?? 'Independent Corners ($topLeft, $topRight, $bottomRight, $bottomLeft)',
+      name: name ??
+          'Independent Corners ($topLeft, $topRight, $bottomRight, $bottomLeft)',
       pathBuilder: (Size size) {
         final w = size.width;
         final h = size.height;
@@ -437,7 +439,8 @@ class Material4ShapeBuilder {
   }
 
   /// Adds an inward circular or curved scoop between [start] and [end] with [depth].
-  Material4ShapeBuilder addConcaveNotch(Offset start, Offset end, double depth) {
+  Material4ShapeBuilder addConcaveNotch(
+      Offset start, Offset end, double depth) {
     final mid = Offset((start.dx + end.dx) / 2.0, (start.dy + end.dy) / 2.0);
     final dx = end.dx - start.dx;
     final dy = end.dy - start.dy;
@@ -454,7 +457,8 @@ class Material4ShapeBuilder {
   }
 
   /// Adds an outward curved bulge between [start] and [end] with [height].
-  Material4ShapeBuilder addConvexBulge(Offset start, Offset end, double height) {
+  Material4ShapeBuilder addConvexBulge(
+      Offset start, Offset end, double height) {
     return addConcaveNotch(start, end, -height);
   }
 

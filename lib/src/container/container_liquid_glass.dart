@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart';
@@ -692,6 +693,10 @@ class Material4LiquidGlassSurface extends StatefulWidget {
   final Material4LiquidGlass glass;
   final Material4Config config;
   final bool hasTapHandler;
+
+  /// Invoked when focused glass is activated from the keyboard (Enter /
+  /// Space); the container passes its `onTap`.
+  final VoidCallback? onActivate;
   final Widget child;
 
   const Material4LiquidGlassSurface({
@@ -700,6 +705,7 @@ class Material4LiquidGlassSurface extends StatefulWidget {
     required this.config,
     required this.child,
     this.hasTapHandler = false,
+    this.onActivate,
   });
 
   /// Below this shortest side glass counts as a "small element" that flips
@@ -736,16 +742,42 @@ class _Material4LiquidGlassSurfaceState
     reverseCurve: Curves.easeInOutCubic,
   );
 
+  // Keyboard focus raises the glass like a hover (iPadOS / tvOS).
+  late final AnimationController _focus = AnimationController(
+    duration: const Duration(milliseconds: 220),
+    reverseDuration: const Duration(milliseconds: 280),
+    vsync: this,
+  );
+  late final Animation<double> _focusCurve = CurvedAnimation(
+    parent: _focus,
+    curve: const Cubic(0.2, 1.3, 0.4, 1.0),
+    reverseCurve: Curves.easeInOutCubic,
+  );
+
+  /// How raised the glass is: the stronger of hover and keyboard focus.
+  late final Animation<double> _raise =
+      AnimationMax<double>(_hoverCurve, _focusCurve);
+
   /// Hovering pointer in local (untransformed) coordinates. Kept after exit
   /// so effects fade out where the pointer left.
   final ValueNotifier<Offset?> _pointer = ValueNotifier<Offset?>(null);
+
+  // Help tag (tooltip).
+  final OverlayPortalController _tip = OverlayPortalController();
+  final LayerLink _tipLink = LayerLink();
+  Timer? _tipTimer;
+  bool _tipBelow = false;
+
+  Material4GlassLightSource? _lightSource;
 
   Size? _size;
 
   @override
   void dispose() {
+    _tipTimer?.cancel();
     _press.dispose();
     _hover.dispose();
+    _focus.dispose();
     _pointer.dispose();
     super.dispose();
   }
@@ -754,11 +786,58 @@ class _Material4LiquidGlassSurfaceState
     _pointer.value = e.localPosition;
     _hover.forward();
     widget.glass.onHover?.call(true);
+    if (widget.glass.tooltip != null) {
+      _tipTimer?.cancel();
+      _tipTimer = Timer(widget.glass.tooltipDelay, _showTip);
+    }
   }
 
   void _hoverExit(PointerEvent e) {
     _hover.reverse();
     widget.glass.onHover?.call(false);
+    _hideTip();
+  }
+
+  void _showTip() {
+    if (!mounted) return;
+    final box = context.findRenderObject();
+    // Not enough room above: show the help tag below instead.
+    _tipBelow = box is RenderBox &&
+        box.attached &&
+        box.localToGlobal(Offset.zero).dy < 56;
+    _tip.show();
+  }
+
+  void _hideTip() {
+    _tipTimer?.cancel();
+    _tipTimer = null;
+    if (_tip.isShowing) _tip.hide();
+  }
+
+  void _activate() {
+    _hideTip();
+    if (widget.glass.haptics) HapticFeedback.lightImpact();
+    _press.forward().whenCompleteOrCancel(() {
+      if (mounted) _press.reverse();
+    });
+    widget.onActivate?.call();
+  }
+
+  Offset? _globalCenter() {
+    final box = context.findRenderObject();
+    if (box is! RenderBox || !box.attached || !box.hasSize) return null;
+    return box.localToGlobal(box.size.center(Offset.zero));
+  }
+
+  static double _lerpAngle(double from, double to, double t) {
+    var delta = to - from;
+    while (delta > math.pi) {
+      delta -= 2 * math.pi;
+    }
+    while (delta < -math.pi) {
+      delta += 2 * math.pi;
+    }
+    return from + delta * t;
   }
 
   Material4GlassHoverEffect _resolveHover(bool interactive) {
@@ -783,22 +862,25 @@ class _Material4LiquidGlassSurfaceState
     return 1.0 + (6.0 / longest).clamp(0.015, 0.08);
   }
 
-  /// The material's light turned toward the hovering pointer by [t].
-  LiquidGlassSettings _trackLight(LiquidGlassSettings s, double t) {
+  /// The material's light: turned toward the shared [Material4GlassLight]
+  /// (if any), then toward the hovering pointer by [t].
+  LiquidGlassSettings _lit(LiquidGlassSettings s, double t, bool track) {
+    var angle = s.lightAngle;
+    final source = _lightSource;
+    if (source != null) {
+      final a =
+          source.angleFor(source.position == null ? null : _globalCenter());
+      if (a != null) angle = _lerpAngle(angle, a, source.strength);
+    }
     final p = _pointer.value;
     final size = _size;
-    if (t <= 0 || p == null || size == null) return s;
-    final d = p - size.center(Offset.zero);
-    if (d.distance < 1) return s;
-    final target = math.atan2(-d.dy, d.dx);
-    var delta = target - s.lightAngle;
-    while (delta > math.pi) {
-      delta -= 2 * math.pi;
+    if (track && t > 0 && p != null && size != null) {
+      final d = p - size.center(Offset.zero);
+      if (d.distance >= 1) {
+        angle = _lerpAngle(angle, math.atan2(-d.dy, d.dx), t);
+      }
     }
-    while (delta < -math.pi) {
-      delta += 2 * math.pi;
-    }
-    return s.copyWith(lightAngle: s.lightAngle + delta * t);
+    return angle == s.lightAngle ? s : s.copyWith(lightAngle: angle);
   }
 
   void _onSize(Size size) {
@@ -814,6 +896,8 @@ class _Material4LiquidGlassSurfaceState
 
   bool get _interactive => widget.glass.interactive ?? widget.hasTapHandler;
 
+  bool get _focusable => widget.glass.focusable ?? _interactive;
+
   bool get _usesAppleMaterial =>
       widget.glass.settings == null && !widget.glass.followTheme;
 
@@ -822,6 +906,7 @@ class _Material4LiquidGlassSurfaceState
     final glass = widget.glass;
     if (glass.variant == Material4GlassVariant.identity) return widget.child;
 
+    _lightSource = Material4GlassLight.maybeOf(context);
     final grouped = Material4GlassGroup.isGrouped(context);
     final small = _size == null ||
         _size!.shortestSide < Material4LiquidGlassSurface.smallElementExtent;
@@ -847,6 +932,53 @@ class _Material4LiquidGlassSurfaceState
       child: GlassMaterialize(visible: glass.visible, child: body),
     );
 
+    if (_focusable) {
+      result = FocusableActionDetector(
+        focusNode: glass.focusNode,
+        autofocus: glass.autofocus,
+        mouseCursor: MouseCursor.defer,
+        onShowFocusHighlight: (v) => v ? _focus.forward() : _focus.reverse(),
+        actions: {
+          ActivateIntent: CallbackAction<ActivateIntent>(
+            onInvoke: (_) {
+              _activate();
+              return null;
+            },
+          ),
+        },
+        child: result,
+      );
+    }
+
+    final tooltip = glass.tooltip;
+    if (tooltip != null) {
+      result = Semantics(
+        tooltip: tooltip,
+        child: CompositedTransformTarget(
+          link: _tipLink,
+          child: OverlayPortal(
+            controller: _tip,
+            overlayChildBuilder: (context) => Align(
+              alignment: Alignment.topLeft,
+              child: CompositedTransformFollower(
+                link: _tipLink,
+                showWhenUnlinked: false,
+                targetAnchor:
+                    _tipBelow ? Alignment.bottomCenter : Alignment.topCenter,
+                followerAnchor:
+                    _tipBelow ? Alignment.topCenter : Alignment.bottomCenter,
+                offset: Offset(0, _tipBelow ? 10 : -10),
+                child: IgnorePointer(
+                  child: _GlassHelpTag(text: tooltip, below: _tipBelow),
+                ),
+              ),
+            ),
+            child: result,
+          ),
+        ),
+      );
+    }
+
     final menu = glass.contextMenu;
     if (menu != null && menu.isNotEmpty) {
       // Right-click / long-press: the glass lifts out of the page and an
@@ -855,8 +987,14 @@ class _Material4LiquidGlassSurfaceState
         actions: menu,
         menuWidth: glass.contextMenuWidth,
         previewBorderRadius: widget.config.cornerRadius,
+        previewBuilder: glass.contextMenuPreview,
         quality: glass.quality,
-        onOpened: () => _hover.value = 0,
+        onOpened: () {
+          _hover.value = 0;
+          _hideTip();
+          glass.onContextMenuOpened?.call();
+        },
+        onDismissed: glass.onContextMenuDismissed,
         child: result,
       );
     } else if (glass.onSecondaryTap != null) {
@@ -976,7 +1114,7 @@ class _Material4LiquidGlassSurfaceState
       // light nearest to it.
       content = CustomPaint(
         foregroundPainter: _HoverSpotlightPainter(
-          hover: _hoverCurve,
+          hover: _raise,
           pointer: _pointer,
           clipper: shapeClipper,
           strength:
@@ -1005,19 +1143,21 @@ class _Material4LiquidGlassSurfaceState
         : 0.0;
 
     final tracksLight = hovers && glass.hoverLightTracking;
-    Widget surface = interactive || hovers
+    final light = _lightSource;
+    Widget surface = interactive || hovers || light != null
         ? AnimatedBuilder(
             animation: Listenable.merge([
               _pressCurve,
-              _hoverCurve,
+              _raise,
               if (tracksLight) _pointer,
+              if (light != null) light,
             ]),
             child: content,
             builder: (context, child) {
-              final h = hovers ? _hoverCurve.value.clamp(0.0, 1.0) : 0.0;
+              final h = hovers ? _raise.value.clamp(0.0, 1.0) : 0.0;
               return _glass(
                 shaderShape,
-                tracksLight ? _trackLight(settings, h) : settings,
+                _lit(settings, hovers ? _hoverCurve.value : 0.0, tracksLight),
                 quality,
                 ownLayer,
                 headroom,
@@ -1061,7 +1201,19 @@ class _Material4LiquidGlassSurfaceState
     if (lift) {
       // Lifted glass casts a soft shadow around (never through) itself.
       surface = CustomPaint(
-        painter: _LiftShadowPainter(hover: _hoverCurve, clipper: shapeClipper),
+        painter: _LiftShadowPainter(hover: _raise, clipper: shapeClipper),
+        child: surface,
+      );
+    }
+
+    if (_focusable) {
+      // iPadOS keyboard focus ring hugging the shape.
+      surface = CustomPaint(
+        foregroundPainter: _FocusRingPainter(
+          focus: _focusCurve,
+          clipper: shapeClipper,
+          color: glass.focusColor ?? const Color(0xFF0A84FF),
+        ),
         child: surface,
       );
     }
@@ -1082,17 +1234,20 @@ class _Material4LiquidGlassSurfaceState
       // Rise toward the pointer and drift with it (parallax); a press
       // settles the lift back down, as on iPadOS.
       surface = AnimatedBuilder(
-        animation: Listenable.merge([_hoverCurve, _pointer, _pressCurve]),
+        animation: Listenable.merge([_raise, _pointer, _pressCurve]),
         child: surface,
         builder: (context, child) {
-          final t = _hoverCurve.value;
+          final t = _raise.value;
           final size = _size;
           final p = _pointer.value;
           var dx = 0.0, dy = 0.0;
           if (size != null && p != null && !size.isEmpty) {
-            final shift = (size.shortestSide * 0.06).clamp(1.5, 4.0);
-            dx = ((p.dx / size.width) * 2 - 1).clamp(-1.0, 1.0) * shift * t;
-            dy = ((p.dy / size.height) * 2 - 1).clamp(-1.0, 1.0) * shift * t;
+            // Parallax follows the pointer only (not keyboard focus).
+            final shift = (size.shortestSide * 0.06).clamp(1.5, 4.0) *
+                glass.hoverMagnetism.clamp(0.0, 3.0) *
+                _hoverCurve.value;
+            dx = ((p.dx / size.width) * 2 - 1).clamp(-1.0, 1.0) * shift;
+            dy = ((p.dy / size.height) * 2 - 1).clamp(-1.0, 1.0) * shift;
           }
           final scale =
               1.0 + (_liftScale - 1.0) * t * (1.0 - 0.6 * _pressCurve.value);
@@ -1153,7 +1308,11 @@ class _Material4LiquidGlassSurfaceState
 
     return Listener(
       behavior: HitTestBehavior.translucent,
-      onPointerDown: (_) => _press.forward(),
+      onPointerDown: (_) {
+        _hideTip();
+        if (glass.haptics) HapticFeedback.lightImpact();
+        _press.forward();
+      },
       onPointerUp: (_) => _press.reverse(),
       onPointerCancel: (_) => _press.reverse(),
       child: surface,
@@ -1332,8 +1491,9 @@ class _HoverSpotlightPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final t = hover.value.clamp(0.0, 1.0);
-    final p = pointer.value;
-    if (t <= 0 || p == null || size.isEmpty) return;
+    if (t <= 0 || size.isEmpty) return;
+    // Keyboard focus without a pointer: light from the top, like a sheen.
+    final p = pointer.value ?? Offset(size.width / 2, size.height * 0.2);
     final path = clipper.getClip(size);
     final radius = (size.shortestSide * 1.1).clamp(36.0, 260.0);
     const white = Color(0xFFFFFFFF);
@@ -1413,4 +1573,113 @@ class _LiftShadowPainter extends CustomPainter {
   @override
   bool shouldRepaint(_LiftShadowPainter old) =>
       old.hover != hover || old.clipper != clipper;
+}
+
+/// iPadOS-style keyboard focus ring drawn just outside the shape.
+class _FocusRingPainter extends CustomPainter {
+  final Animation<double> focus;
+  final CustomClipper<Path> clipper;
+  final Color color;
+
+  _FocusRingPainter({
+    required this.focus,
+    required this.clipper,
+    required this.color,
+  }) : super(repaint: focus);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final t = focus.value.clamp(0.0, 1.0);
+    if (t <= 0 || size.isEmpty) return;
+    const gap = 3.5;
+    final path = clipper.getClip(size);
+    final outset = gap * t;
+    final c = size.center(Offset.zero);
+    final m = Matrix4.translationValues(c.dx, c.dy, 0)
+      ..multiply(Matrix4.diagonal3Values(
+        (size.width + 2 * outset) / size.width,
+        (size.height + 2 * outset) / size.height,
+        1,
+      ))
+      ..multiply(Matrix4.translationValues(-c.dx, -c.dy, 0));
+    final ring = path.transform(m.storage);
+    canvas.drawPath(
+      ring,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 7
+        ..color = color.withValues(alpha: 0.28 * t)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4),
+    );
+    canvas.drawPath(
+      ring,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 3
+        ..isAntiAlias = true
+        ..color = color.withValues(alpha: t),
+    );
+  }
+
+  @override
+  bool shouldRepaint(_FocusRingPainter old) =>
+      old.focus != focus || old.clipper != clipper || old.color != color;
+}
+
+/// A small glass capsule help tag (macOS / iPadOS tooltip) that springs in.
+class _GlassHelpTag extends StatefulWidget {
+  final String text;
+  final bool below;
+  const _GlassHelpTag({required this.text, required this.below});
+
+  @override
+  State<_GlassHelpTag> createState() => _GlassHelpTagState();
+}
+
+class _GlassHelpTagState extends State<_GlassHelpTag>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _in = AnimationController(
+    duration: const Duration(milliseconds: 220),
+    vsync: this,
+  )..forward();
+  late final Animation<double> _curve =
+      CurvedAnimation(parent: _in, curve: const Cubic(0.2, 1.25, 0.4, 1.0));
+
+  @override
+  void dispose() {
+    _in.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FadeTransition(
+      opacity: _in,
+      child: ScaleTransition(
+        scale: Tween(begin: 0.86, end: 1.0).animate(_curve),
+        alignment: widget.below ? Alignment.topCenter : Alignment.bottomCenter,
+        child: DefaultTextStyle(
+          style: const TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w500,
+            color: Color(0xFF000000),
+            decoration: TextDecoration.none,
+            letterSpacing: -0.08,
+          ),
+          child: Material4LiquidGlassSurface(
+            glass: const Material4LiquidGlass(
+              interactive: false,
+              hoverEffect: Material4GlassHoverEffect.none,
+              focusable: false,
+            ),
+            config: const Material4Config(type: Material4Type.capsule),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              child: Text(widget.text, maxLines: 1),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }

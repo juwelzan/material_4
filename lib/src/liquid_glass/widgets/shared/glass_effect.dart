@@ -126,8 +126,7 @@ class GlassEffect extends StatefulWidget {
   static Future<void> preWarm() async {
     if (_cachedProgram != null || _isPreparing) return;
     _isPreparing = true;
-    const path =
-        'packages/material_4/shaders/interactive_indicator.frag';
+    const path = 'packages/material_4/shaders/interactive_indicator.frag';
     const testPath = 'shaders/interactive_indicator.frag';
 
     try {

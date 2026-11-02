@@ -177,4 +177,3 @@ class Material4Background {
         glassTint,
       );
 }
-

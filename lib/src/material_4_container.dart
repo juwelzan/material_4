@@ -533,6 +533,7 @@ class Material4Container extends StatelessWidget {
           effectiveConfig,
           liquidGlass,
           hasTapHandler: onTap != null,
+          onActivate: onTap,
         );
         if (margin != null) {
           animated = Padding(padding: margin!, child: animated);
@@ -674,6 +675,7 @@ class Material4Container extends StatelessWidget {
       liquidGlass,
       hasTapHandler:
           onTap != null || onLongPress != null || onDoubleTap != null,
+      onActivate: onTap,
     );
 
     if (margin != null) {
@@ -692,12 +694,14 @@ Widget wrapMaterial4LiquidGlass(
   Material4Config config,
   Material4LiquidGlass? glass, {
   bool hasTapHandler = false,
+  VoidCallback? onActivate,
 }) {
   if (glass == null) return content;
   return Material4LiquidGlassSurface(
     glass: glass,
     config: config,
     hasTapHandler: hasTapHandler,
+    onActivate: onActivate,
     child: content,
   );
 }
@@ -863,6 +867,7 @@ class _Material4CoordinatedAnimationContainerState
         hasTapHandler: widget.onTap != null ||
             widget.onLongPress != null ||
             widget.onDoubleTap != null,
+        onActivate: widget.onTap,
       );
       if (widget.margin != null) {
         still = Padding(padding: widget.margin!, child: still);
@@ -990,6 +995,7 @@ class _Material4CoordinatedAnimationContainerState
           hasTapHandler: widget.onTap != null ||
               widget.onLongPress != null ||
               widget.onDoubleTap != null,
+          onActivate: widget.onTap,
         );
 
         if (widget.margin != null) {

@@ -1478,7 +1478,8 @@ class Material4PathBuilder {
     final w = size.width;
     final h = size.height;
     final r = math.min(config.cornerRadius, 18.0);
-    final notchR = math.min(config.scallopRadius > 0 ? config.scallopRadius : 16.0, h * 0.25);
+    final notchR = math.min(
+        config.scallopRadius > 0 ? config.scallopRadius : 16.0, h * 0.25);
 
     path.moveTo(r, 0);
     path.lineTo(w - r, 0);
@@ -1519,9 +1520,12 @@ class Material4PathBuilder {
       final aMid = ((i + 0.5) * 2 * math.pi) / petals;
       final aEnd = ((i + 1) * 2 * math.pi) / petals;
 
-      final pStart = Offset(cx + innerR * math.cos(aStart), cy + innerR * math.sin(aStart));
-      final pTip = Offset(cx + maxR * math.cos(aMid), cy + maxR * math.sin(aMid));
-      final pEnd = Offset(cx + innerR * math.cos(aEnd), cy + innerR * math.sin(aEnd));
+      final pStart = Offset(
+          cx + innerR * math.cos(aStart), cy + innerR * math.sin(aStart));
+      final pTip =
+          Offset(cx + maxR * math.cos(aMid), cy + maxR * math.sin(aMid));
+      final pEnd =
+          Offset(cx + innerR * math.cos(aEnd), cy + innerR * math.sin(aEnd));
 
       if (i == 0) path.moveTo(pStart.dx, pStart.dy);
       path.quadraticBezierTo(pTip.dx, pTip.dy, pEnd.dx, pEnd.dy);
@@ -1535,7 +1539,8 @@ class Material4PathBuilder {
     return Material4CustomShape.star(
       points: math.max(config.petalCount > 0 ? config.petalCount : 12, 6),
       innerRadiusRatio: 0.72,
-      cornerRadius: config.cornerRadius > 0 ? math.min(config.cornerRadius, 6.0) : 4.0,
+      cornerRadius:
+          config.cornerRadius > 0 ? math.min(config.cornerRadius, 6.0) : 4.0,
     ).buildPath(size);
   }
 

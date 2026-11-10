@@ -2,7 +2,7 @@
 // `glassEffect`, HIG Materials, WWDC25 "Meet Liquid Glass").
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:material_4/material_4.dart';
+import '../support/internal.dart';
 
 Widget _host(Widget child, {bool highContrast = false}) => MaterialApp(
       home: MediaQuery(

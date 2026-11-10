@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:material_4/material_4.dart';
+import '../support/internal.dart';
 
 void main() {
   group('Universal Next-Gen Shapes Vector Path Tests', () {

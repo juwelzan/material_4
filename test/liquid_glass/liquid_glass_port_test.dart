@@ -1,11 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:material_4/material_4.dart';
-// LiquidStretch is internal to the glass engine; imported only to assert on it.
-import 'package:material_4/src/liquid_glass/src/engine/stretch.dart'
-    show LiquidStretch;
-import 'package:material_4/src/liquid_glass/utils/glass_quality_adapter.dart';
+import '../support/internal.dart';
 
 Widget _host(Widget child, {bool disableAnimations = false}) => MaterialApp(
       home: MediaQuery(

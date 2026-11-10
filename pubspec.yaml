@@ -1,5 +1,5 @@
 name: material_4
-description: "Material 4 — a single universal Flutter shape container: built-in and custom shapes, unified backgrounds, and a 40-style shape-following border engine."
+description: "Material 4 — a UI library built on one universal container: 41 shapes, custom geometry, layered backgrounds, 40+ animated borders, shape morphing, and real liquid glass, all as parameters of a single widget."
 version: 1.0.0
 homepage: https://github.com/juwelzan/material_4
 repository: https://github.com/juwelzan/material_4
@@ -11,6 +11,7 @@ topics:
   - animation
   - container
   - ui
+  - glassmorphism
 
 environment:
   sdk: ">=3.5.0 <4.0.0"

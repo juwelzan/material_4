@@ -91,4 +91,34 @@ void main() {
     await tester.pumpAndSettle();
     expect(taps, 1);
   });
+
+  testWidgets('opening a context menu on glass with a tooltip does not throw',
+      (tester) async {
+    await tester.pumpWidget(MaterialApp(
+      home: Center(
+        child: Material4Container(
+          width: 120,
+          height: 56,
+          shape: Material4Type.capsule,
+          onTap: () {},
+          liquidGlass: Material4LiquidGlass(
+            tooltip: 'Photo',
+            contextMenu: [
+              GlassContextMenuAction(
+                onPressed: () {},
+                child: const Text('Share'),
+              ),
+            ],
+          ),
+          child: const Center(child: Text('Glass')),
+        ),
+      ),
+    ));
+    await tester.longPress(find.text('Glass'));
+    for (int i = 0; i < 20; i++) {
+      await tester.pump(const Duration(milliseconds: 50));
+    }
+    expect(tester.takeException(), isNull);
+    expect(find.text('Share'), findsWidgets);
+  });
 }

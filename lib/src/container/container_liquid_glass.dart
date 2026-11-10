@@ -956,6 +956,38 @@ class _Material4LiquidGlassSurfaceState
       child: GlassMaterialize(visible: glass.visible, child: body),
     );
 
+    // The context menu re-builds this subtree for its preview (offstage
+    // measurement + lifted card), so it must wrap only the glass: the help
+    // tag's OverlayPortal and the focus node may be attached once only.
+    final menu = glass.contextMenu;
+    if (menu != null && menu.isNotEmpty) {
+      // Right-click / long-press: the glass lifts out of the page and an
+      // iOS 26 glass menu opens beside it.
+      result = GlassContextMenu(
+        actions: menu,
+        menuWidth: glass.contextMenuWidth,
+        previewBorderRadius: widget.config.cornerRadius,
+        previewBuilder: glass.contextMenuPreview,
+        quality: glass.quality,
+        onOpened: () {
+          _hover.value = 0;
+          _hideTip();
+          glass.onContextMenuOpened?.call();
+        },
+        onDismissed: glass.onContextMenuDismissed,
+        child: result,
+      );
+    } else if (glass.onSecondaryTap != null) {
+      result = GestureDetector(
+        behavior: HitTestBehavior.translucent,
+        onSecondaryTapUp: (d) {
+          HapticFeedback.selectionClick();
+          glass.onSecondaryTap!(d.globalPosition);
+        },
+        child: result,
+      );
+    }
+
     if (_focusable) {
       result = FocusableActionDetector(
         focusNode: glass.focusNode,
@@ -1000,35 +1032,6 @@ class _Material4LiquidGlassSurfaceState
             child: result,
           ),
         ),
-      );
-    }
-
-    final menu = glass.contextMenu;
-    if (menu != null && menu.isNotEmpty) {
-      // Right-click / long-press: the glass lifts out of the page and an
-      // iOS 26 glass menu opens beside it.
-      result = GlassContextMenu(
-        actions: menu,
-        menuWidth: glass.contextMenuWidth,
-        previewBorderRadius: widget.config.cornerRadius,
-        previewBuilder: glass.contextMenuPreview,
-        quality: glass.quality,
-        onOpened: () {
-          _hover.value = 0;
-          _hideTip();
-          glass.onContextMenuOpened?.call();
-        },
-        onDismissed: glass.onContextMenuDismissed,
-        child: result,
-      );
-    } else if (glass.onSecondaryTap != null) {
-      result = GestureDetector(
-        behavior: HitTestBehavior.translucent,
-        onSecondaryTapUp: (d) {
-          HapticFeedback.selectionClick();
-          glass.onSecondaryTap!(d.globalPosition);
-        },
-        child: result,
       );
     }
     return result;

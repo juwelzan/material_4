@@ -54,3 +54,8 @@ export 'src/liquid_glass/widgets/overlays/glass_menu_item.dart'
     show GlassMenuDivider, GlassMenuLabel;
 export 'src/liquid_glass/types/glass_specular_sharpness.dart';
 export 'src/liquid_glass/widgets/shared/glass_content_aware_scope.dart';
+
+// --- Responsive layer ---
+export 'src/responsive/material_4_responsive.dart';
+export 'src/responsive/material_4_responsive_layout.dart';
+export 'src/responsive/material_4_adaptive_scaffold.dart';

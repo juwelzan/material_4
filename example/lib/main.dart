@@ -31,6 +31,8 @@ class Material4ExampleApp extends StatelessWidget {
         colorSchemeSeed: const Color(0xFF6366F1),
         scaffoldBackgroundColor: const Color(0xFFF8FAFC),
       ),
+      // Everything below scales to the screen and knows its size class.
+      builder: (context, child) => Material4Responsive(child: child!),
       home: const ContainerGalleryHome(),
     );
   }
@@ -60,25 +62,26 @@ class _ContainerGalleryHomeState extends State<ContainerGalleryHome> {
   Widget build(BuildContext context) {
     final current = _pages[_index];
     final isGlass = current.page is LiquidGlassDemoScreen;
-    return Scaffold(
+    // Bottom bar on phones, a rail on tablets, an extended rail on desktop.
+    return Material4AdaptiveScaffold(
       // The glass screen brings its own app bar.
       appBar: isGlass
           ? null
           : AppBar(title: Text('Material4Container · ${current.title}')),
+      destinations: [
+        for (final p in _pages)
+          Material4Destination(icon: p.icon, label: p.title),
+      ],
+      selectedIndex: _index,
+      onDestinationSelected: (i) => setState(() => _index = i),
+      // Galleries use the full width; their grids reflow per size class.
+      limitBodyWidth: false,
       body: IndexedStack(
         index: _index,
         // Pause animations on hidden tabs.
         children: [
           for (var i = 0; i < _pages.length; i++)
             TickerMode(enabled: i == _index, child: _pages[i].page),
-        ],
-      ),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _index,
-        onDestinationSelected: (i) => setState(() => _index = i),
-        destinations: [
-          for (final p in _pages)
-            NavigationDestination(icon: Icon(p.icon), label: p.title),
         ],
       ),
     );

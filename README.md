@@ -150,6 +150,122 @@ direction for every glass surface below it. See the
 
 ---
 
+## 📱 Responsive layer
+
+Wrap the app once and every widget below becomes responsive, without
+changing its code:
+
+```dart
+MaterialApp(
+  builder: (context, child) => Material4Responsive(child: child!),
+  home: const HomePage(),
+)
+```
+
+**What it does**
+
+- **Scales** the UI to the screen. A layout built with fixed sizes for a
+  390 pt phone keeps its proportions on every phone (360 – 430 pt).
+  Tablets and desktops use their own design width, so they get more room,
+  not a giant phone UI. Taps, `MediaQuery` sizes, safe-area insets and image
+  sharpness all follow the scale.
+- **Classifies** the screen as `compact` (< 600), `medium` (< 840),
+  `expanded` (< 1200) or `large`.
+
+**Where the layout should differ**, ask for a value. Missing values fall
+back to the next smaller size:
+
+```dart
+final screen = context.responsive;
+
+GridView.count(
+  crossAxisCount: screen.value(compact: 1, medium: 2, large: 4),
+  padding: EdgeInsets.all(screen.margin),
+  children: cards,
+);
+
+if (screen.isAtLeast(Material4SizeClass.expanded)) { /* side panel */ }
+```
+
+**Tuning**
+
+```dart
+Material4Responsive(
+  scale: const Material4ResponsiveScale(compact: 375, min: 0.9, max: 1.15),
+  breakpoints: const Material4Breakpoints(medium: 640),
+  child: child,
+)
+
+Material4Responsive(scale: Material4ResponsiveScale.fixed(390), child: child) // scale everywhere
+Material4Responsive.noScale(child: child)                                     // size classes only
+```
+
+Wrapping only part of a page works too: the size class then follows that
+part's width, like a container query.
+
+### Different layouts per device
+
+Five size classes — `compact` (< 600), `medium` (< 840), `expanded`
+(< 1200), `large` (< 1600), `extraLarge` — plus the device type
+(`phone`, `tablet`, `desktop`; a phone turned sideways is still a phone).
+
+**App shell that changes structure** — bottom bar on phones, a rail on
+tablets, an extended rail on desktop, and list + detail side by side from
+tablet landscape up:
+
+```dart
+Material4AdaptiveScaffold(
+  destinations: const [
+    Material4Destination(icon: Icons.inbox, label: 'Inbox'),
+    Material4Destination(icon: Icons.send, label: 'Sent'),
+  ],
+  selectedIndex: index,
+  onDestinationSelected: (i) => setState(() => index = i),
+  body: const MailList(),
+  secondaryBody: selected == null ? null : MailView(selected), // 2nd pane on wide screens
+)
+```
+
+**A different layout per size or per device** (missing ones fall back to
+the next smaller):
+
+```dart
+Material4ResponsiveLayout(
+  compact: (_) => const ProductList(),
+  expanded: (_) => const ProductGridWithFilters(),
+)
+
+Material4ResponsiveLayout.device(
+  phone: (_) => const MobileHome(),
+  desktop: (_) => const DesktopHome(),
+)
+```
+
+**A 12-column grid that reflows** — stacked on phones, 2 per row on small
+tablets, 3 on tablets, 4 on desktop (and centred at a readable width on
+huge screens):
+
+```dart
+Material4ResponsiveGrid(children: [
+  Material4GridItem(span: const Material4Span(compact: 12, expanded: 8), child: Chart()),
+  Material4GridItem(span: const Material4Span(compact: 12, expanded: 4), child: Stats()),
+  for (final p in products) ProductCard(p),
+])
+```
+
+**Show or hide by size**:
+
+```dart
+Material4ResponsiveVisibility(from: Material4SizeClass.expanded, child: FilterPanel())
+Material4ResponsiveVisibility(until: Material4SizeClass.medium, child: FilterButton())
+```
+
+**Values**: `screen.value(...)`, `screen.byDevice(phone:, tablet:, desktop:)`,
+`screen.isPortrait`, `screen.columns`, `screen.margin`,
+`screen.readableWidth`.
+
+---
+
 ## 🧪 Testing
 
 ```bash

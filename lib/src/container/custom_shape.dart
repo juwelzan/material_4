@@ -34,7 +34,9 @@ class Material4CustomShape {
     String? name,
   }) {
     return Material4CustomShape(
-      id: id ?? type.name,
+      // The config is part of the identity: two presets of the same type with
+      // different parameters must not share a cached path.
+      id: id ?? '${type.name}_${(config ?? const Material4Config()).hashCode}',
       name: name ?? type.name,
       pathBuilder: (size) => Material4PathBuilder.buildPath(
         size,
@@ -94,12 +96,10 @@ class Material4CustomShape {
   Path buildPath(Size size) {
     if (size.width <= 0 || size.height <= 0) return Path();
     try {
-      final path = pathBuilder(size);
-      if (!path.getBounds().isEmpty && !path.contains(Offset.zero)) {
-        // ensure path is closed
-      }
-      return path;
+      return pathBuilder(size);
     } catch (_) {
+      // A faulty user builder degrades to the plain bounds instead of
+      // crashing the frame.
       return Path()..addRect(Rect.fromLTWH(0, 0, size.width, size.height));
     }
   }
@@ -114,7 +114,7 @@ class Material4CustomShape {
   }) {
     assert(sides >= 3, 'A polygon must have at least 3 sides');
     return Material4CustomShape(
-      id: id ?? 'polygon_${sides}_r$cornerRadius',
+      id: id ?? 'polygon_${sides}_r${cornerRadius}_a$startAngle',
       name: name ?? '$sides-Sided Polygon',
       pathBuilder: (Size size) {
         final cx = size.width / 2.0;
@@ -184,7 +184,7 @@ class Material4CustomShape {
   }) {
     assert(points >= 3, 'Star must have at least 3 points');
     return Material4CustomShape(
-      id: id ?? 'star_${points}_ratio$innerRadiusRatio',
+      id: id ?? 'star_${points}_ratio${innerRadiusRatio}_r${cornerRadius}_a$startAngle',
       name: name ?? '$points-Point Star',
       pathBuilder: (Size size) {
         final cx = size.width / 2.0;

@@ -139,6 +139,46 @@ enum Material4Type {
 
   /// Fluid organic metaball liquid droplet shape.
   liquid,
+
+  // --- Everyday UI shapes ---
+  /// Ellipse that fills the whole container.
+  ellipse,
+
+  /// Perfect circle centred in the container (avatars, FABs, dots).
+  circle,
+
+  /// Upward-pointing triangle with rounded vertices.
+  triangle,
+
+  /// Trapezoid, narrower at the top (slant follows `skewAngle`).
+  trapezoid,
+
+  /// Symmetric heart (likes, favourites).
+  heart,
+
+  /// Classic five-point star (ratings, highlights).
+  star,
+
+  /// Plus / cross with equal arms.
+  cross,
+
+  /// Right-pointing arrow (rotate via transforms for other directions).
+  arrow,
+
+  /// Chevron / breadcrumb step pointing right.
+  chevron,
+
+  /// Price/label tag pointing left with a punched string hole.
+  tag,
+
+  /// Crescent moon.
+  crescent,
+
+  /// Cog wheel; tooth count follows `petalCount`.
+  gear,
+
+  /// Rectangle with all four corners cut at 45° (cut size = `cornerRadius`).
+  cutCorners,
 }
 
 /// Metallic reflection lustres for metallic borders and backgrounds.
@@ -472,6 +512,9 @@ class Material4Config {
   /// Shear / skew angle for parallelogram in degrees (-45.0 to 45.0).
   final double skewAngle;
 
+  /// Lamé exponent `n` for [Material4Type.superellipse] (2 = ellipse, higher = squarer).
+  final double superellipseExponent;
+
   /// Inward swallowtail cut depth for ribbon and bookmark shapes.
   final double ribbonFoldDepth;
 
@@ -603,6 +646,7 @@ class Material4Config {
     this.waveCount = 3.0,
     this.waveAmplitude = 8.0,
     this.skewAngle = 14.0,
+    this.superellipseExponent = 3.6,
     this.ribbonFoldDepth = 18.0,
     double rotation = 0.0,
     double scaleX = 1.0,
@@ -1270,6 +1314,7 @@ class Material4Config {
     double? waveCount,
     double? waveAmplitude,
     double? skewAngle,
+    double? superellipseExponent,
     double? ribbonFoldDepth,
     double? rotation,
     double? scaleX,
@@ -1347,6 +1392,7 @@ class Material4Config {
       waveCount: waveCount ?? this.waveCount,
       waveAmplitude: waveAmplitude ?? this.waveAmplitude,
       skewAngle: skewAngle ?? this.skewAngle,
+      superellipseExponent: superellipseExponent ?? this.superellipseExponent,
       ribbonFoldDepth: ribbonFoldDepth ?? this.ribbonFoldDepth,
       rotation: rotation ?? _rotation,
       scaleX: scaleX ?? _scaleX,
@@ -1415,6 +1461,7 @@ class Material4Config {
         'waveCount': waveCount,
         'waveAmplitude': waveAmplitude,
         'skewAngle': skewAngle,
+        'superellipseExponent': superellipseExponent,
         'ribbonFoldDepth': ribbonFoldDepth,
         'backgroundEffect': backgroundEffect.name,
         'noiseOpacity': noiseOpacity,
@@ -1491,6 +1538,8 @@ class Material4Config {
         waveCount: (json['waveCount'] as num?)?.toDouble() ?? 3.0,
         waveAmplitude: (json['waveAmplitude'] as num?)?.toDouble() ?? 8.0,
         skewAngle: (json['skewAngle'] as num?)?.toDouble() ?? 14.0,
+        superellipseExponent:
+            (json['superellipseExponent'] as num?)?.toDouble() ?? 3.6,
         ribbonFoldDepth: (json['ribbonFoldDepth'] as num?)?.toDouble() ?? 18.0,
         backgroundEffect: BackgroundEffectType.values.firstWhere(
           (e) => e.name == json['backgroundEffect'],
@@ -1561,6 +1610,7 @@ class Material4Config {
           waveCount == other.waveCount &&
           waveAmplitude == other.waveAmplitude &&
           skewAngle == other.skewAngle &&
+          superellipseExponent == other.superellipseExponent &&
           ribbonFoldDepth == other.ribbonFoldDepth &&
           _rotation == other._rotation &&
           _scaleX == other._scaleX &&
@@ -1635,6 +1685,7 @@ class Material4Config {
         waveCount,
         waveAmplitude,
         skewAngle,
+        superellipseExponent,
         ribbonFoldDepth,
         _rotation,
         _scaleX,
@@ -1693,6 +1744,8 @@ class Material4Config {
       waveAmplitude: lerpD(a.waveAmplitude, b.waveAmplitude),
       waveCount: lerpD(a.waveCount, b.waveCount),
       skewAngle: lerpD(a.skewAngle, b.skewAngle),
+      superellipseExponent:
+          lerpD(a.superellipseExponent, b.superellipseExponent),
       ribbonFoldDepth: lerpD(a.ribbonFoldDepth, b.ribbonFoldDepth),
       borderProgress: lerpD(a.borderProgress, b.borderProgress),
       dashPhase: lerpD(a.dashPhase, b.dashPhase),

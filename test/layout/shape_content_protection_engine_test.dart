@@ -295,7 +295,7 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    test('10. All 28 presets generate valid, non-negative, finite safe insets',
+    test('10. All presets generate valid, non-negative, finite safe insets',
         () {
       const size = Size(240, 140);
       for (final type in Material4Type.values) {

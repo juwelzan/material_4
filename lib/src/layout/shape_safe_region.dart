@@ -11,6 +11,28 @@ import '../material_4_path_builder.dart';
 /// with inward notches, scallops, corner arcs, wave troughs, stepped corners,
 /// and complex organic or custom Bézier contours.
 class ShapeSafeRegion {
+  /// Presets whose interior is essentially their bounding box minus the
+  /// fixed allowances above; every other preset is probed against its path.
+  static const Set<Material4Type> _rectilinearTypes = {
+    Material4Type.folderTab,
+    Material4Type.notchedBadge,
+    Material4Type.sideTab,
+    Material4Type.steppedCorner,
+    Material4Type.ticketScallop,
+    Material4Type.postageStamp,
+    Material4Type.zigzagCut,
+    Material4Type.chamferDiagonal,
+    Material4Type.smoothRounded,
+    Material4Type.asymmetricCard,
+    Material4Type.waveEdge,
+    Material4Type.concaveRounded,
+    Material4Type.squircle,
+    Material4Type.continuousSquircle,
+    Material4Type.ticket,
+    Material4Type.bookmark,
+    Material4Type.cutCorners,
+  };
+
   const ShapeSafeRegion._();
 
   /// Maximum number of cached safe insets entries to keep memory bounded
@@ -387,10 +409,8 @@ class ShapeSafeRegion {
     // For organic blobs, diamonds, custom Béziers, or transformed shapes,
     // verify and iteratively contract insets until all 8 boundary sample points
     // are strictly inside path.contains(point).
-    final needsPathRefinement = config.type == Material4Type.diamond ||
-        config.type == Material4Type.organicBlob ||
-        config.type == Material4Type.customBezier ||
-        config.type == Material4Type.shield ||
+    final needsPathRefinement = config.customShape != null ||
+        !_rectilinearTypes.contains(config.type) ||
         config.resolvedTransform.rotation != 0.0 ||
         config.resolvedTransform.skewX != 0.0 ||
         config.resolvedTransform.skewY != 0.0;
@@ -489,7 +509,18 @@ class ShapeSafeRegion {
       if (ok) break;
     }
 
-    return EdgeInsets.only(left: l, top: t, right: r, bottom: b);
+    // Shapes with a hollow centre (e.g. a crescent) never converge; never let
+    // the probe collapse the content box below a fifth of each axis.
+    double fit(double a, double c, double extent) {
+      final maxTotal = extent * 0.8;
+      final total = a + c;
+      return total <= maxTotal ? 1.0 : maxTotal / total;
+    }
+
+    final kx = fit(l, r, size.width);
+    final ky = fit(t, b, size.height);
+    return EdgeInsets.only(
+        left: l * kx, top: t * ky, right: r * kx, bottom: b * ky);
   }
 
   /// Calculates the largest collision-free inscribed rectangular content box.

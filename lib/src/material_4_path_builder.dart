@@ -200,6 +200,47 @@ class Material4PathBuilder {
         case Material4Type.liquid:
           path = _buildLiquidPath(effectiveSize, config);
           break;
+
+        // --- Everyday UI shapes ---
+        case Material4Type.ellipse:
+          path = _buildEllipsePath(effectiveSize, config);
+          break;
+        case Material4Type.circle:
+          path = _buildCirclePath(effectiveSize, config);
+          break;
+        case Material4Type.triangle:
+          path = _buildTrianglePath(effectiveSize, config);
+          break;
+        case Material4Type.trapezoid:
+          path = _buildTrapezoidPath(effectiveSize, config);
+          break;
+        case Material4Type.heart:
+          path = _buildHeartPath(effectiveSize, config);
+          break;
+        case Material4Type.star:
+          path = _buildStarPath(effectiveSize, config);
+          break;
+        case Material4Type.cross:
+          path = _buildCrossPath(effectiveSize, config);
+          break;
+        case Material4Type.arrow:
+          path = _buildArrowPath(effectiveSize, config);
+          break;
+        case Material4Type.chevron:
+          path = _buildChevronPath(effectiveSize, config);
+          break;
+        case Material4Type.tag:
+          path = _buildTagPath(effectiveSize, config);
+          break;
+        case Material4Type.crescent:
+          path = _buildCrescentPath(effectiveSize, config);
+          break;
+        case Material4Type.gear:
+          path = _buildGearPath(effectiveSize, config);
+          break;
+        case Material4Type.cutCorners:
+          path = _buildCutCornersPath(effectiveSize, config);
+          break;
       }
     }
 
@@ -226,11 +267,21 @@ class Material4PathBuilder {
     final path = Path();
     final w = size.width;
     final h = size.height;
-    final r = math.min(config.cornerRadius, math.min(w, h) / 3);
-    final f = math.min(config.filletRadius, 14.0);
     final tabW = math.min(config.tabWidth, w * 0.65);
     final tabH = math.min(config.tabHeight, h * 0.35);
-
+    final r = math.max(
+      0.0,
+      math.min(
+          config.cornerRadius, math.min(math.min(w, h) / 3, (h - tabH) / 2)),
+    );
+    // The tab's fillets must fit inside the tab and beside the body corners.
+    final f = math.max(
+      0.0,
+      math.min(
+        math.min(config.filletRadius, 14.0),
+        math.min(tabH / 2, math.min((tabW - r) / 2, (w - tabW - r) / 2)),
+      ),
+    );
     if (config.anchor == ShapeAnchor.topRight) {
       path.moveTo(0, tabH + r);
       path.arcToPoint(
@@ -300,11 +351,20 @@ class Material4PathBuilder {
     final path = Path();
     final w = size.width;
     final h = size.height;
-    final r = math.min(config.cornerRadius, 26.0);
-    final f = math.min(config.filletRadius, 14.0);
     final nW = math.min(config.tabWidth, w * 0.55);
     final nH = math.min(config.tabHeight, h * 0.45);
-
+    final f = math.max(
+      0.0,
+      math.min(
+          math.min(config.filletRadius, 14.0), math.min(nH / 2, (w - nW) / 4)),
+    );
+    final r = math.max(
+      0.0,
+      math.min(
+        math.min(config.cornerRadius, 26.0),
+        math.min(math.min((h - nH) / 2, nW / 2), (w - nW - 2 * f) / 2),
+      ),
+    );
     if (config.anchor == ShapeAnchor.topRight) {
       path.moveTo(0, r);
       path.arcToPoint(Offset(r, 0), radius: Radius.circular(r));
@@ -365,35 +425,45 @@ class Material4PathBuilder {
     final path = Path();
     final w = size.width;
     final h = size.height;
-    final r = math.min(config.cornerRadius, 22.0);
-    final f = math.min(config.filletRadius, 10.0);
-    final pDepth = math.min(config.protrusionDepth, 18.0);
+    final pDepth = math.min(math.min(config.protrusionDepth, 18.0), w * 0.25);
     final baseW = w - pDepth;
+    final tabH = config.tabHeight.clamp(0.0, h * 0.6);
+    final tabCenterY = h * 0.52;
+    final tabStartY = tabCenterY - tabH / 2;
+    final tabEndY = tabCenterY + tabH / 2;
+    final f = math.max(
+      0.0,
+      math.min(
+          math.min(config.filletRadius, 10.0), math.min(pDepth / 2, tabH / 4)),
+    );
+    // Tab corners can never be larger than the tab itself.
+    final tabR = math.max(
+      0.0,
+      math.min(
+          math.min(config.cornerRadius, 22.0), math.min(tabH / 2, pDepth - f)),
+    );
+    // Body corners must end before the tab's fillets begin.
+    final r = math.max(
+      0.0,
+      math.min(
+        math.min(config.cornerRadius, 22.0),
+        math.min(
+          baseW / 2,
+          math.min(tabStartY - f, h - tabEndY - f),
+        ),
+      ),
+    );
 
     path.moveTo(0, r);
     path.arcToPoint(Offset(r, 0), radius: Radius.circular(r));
     path.lineTo(baseW - r, 0);
     path.arcToPoint(Offset(baseW, r), radius: Radius.circular(r));
-
-    final tabCenterY = h * 0.52;
-    final halfTabH = config.tabHeight * 0.5;
-    final tabStartY = tabCenterY - halfTabH;
-    final tabEndY = tabCenterY + halfTabH;
-
     path.lineTo(baseW, tabStartY - f);
     path.quadraticBezierTo(baseW, tabStartY, baseW + f, tabStartY);
-    path.lineTo(w - r, tabStartY);
-    path.arcToPoint(
-      Offset(w, tabStartY + r),
-      radius: Radius.circular(r),
-      clockwise: true,
-    );
-    path.lineTo(w, tabEndY - r);
-    path.arcToPoint(
-      Offset(w - r, tabEndY),
-      radius: Radius.circular(r),
-      clockwise: true,
-    );
+    path.lineTo(w - tabR, tabStartY);
+    path.arcToPoint(Offset(w, tabStartY + tabR), radius: Radius.circular(tabR));
+    path.lineTo(w, tabEndY - tabR);
+    path.arcToPoint(Offset(w - tabR, tabEndY), radius: Radius.circular(tabR));
     path.lineTo(baseW + f, tabEndY);
     path.quadraticBezierTo(baseW, tabEndY, baseW, tabEndY + f);
     path.lineTo(baseW, h - r);
@@ -408,10 +478,17 @@ class Material4PathBuilder {
     final path = Path();
     final w = size.width;
     final h = size.height;
-    final r = math.min(config.cornerRadius, 22.0);
-    final f = math.min(config.filletRadius, 14.0);
     final sW = math.min(config.tabWidth, w * 0.42);
     final sH = math.min(config.tabHeight, h * 0.42);
+    final f =
+        math.min(math.min(config.filletRadius, 14.0), math.min(sW, sH) / 2);
+    final r = math.max(
+      0.0,
+      math.min(
+        math.min(config.cornerRadius, 22.0),
+        math.min(math.min(w, h) / 2, math.min(w - sW - f, h - sH - f)),
+      ),
+    );
 
     path.moveTo(0, r);
     path.arcToPoint(Offset(r, 0), radius: Radius.circular(r));
@@ -433,8 +510,9 @@ class Material4PathBuilder {
     final path = Path();
     final w = size.width;
     final h = size.height;
-    final r = math.min(config.cornerRadius, 20.0);
-    final scR = math.min(config.scallopRadius, 12.0);
+    final r = math.min(math.min(config.cornerRadius, 20.0), math.min(w, h) / 4);
+    final scR = math.max(
+        0.0, math.min(math.min(config.scallopRadius, 12.0), h / 2 - r));
 
     path.moveTo(0, r);
     path.arcToPoint(Offset(r, 0), radius: Radius.circular(r));
@@ -466,8 +544,9 @@ class Material4PathBuilder {
     final path = Path();
     final w = size.width;
     final h = size.height;
-    final r = math.min(config.cornerRadius, 16.0);
-    final scR = math.min(config.scallopRadius, 6.0);
+    final r = math.min(math.min(config.cornerRadius, 16.0), math.min(w, h) / 4);
+    final scR =
+        math.min(math.min(config.scallopRadius, 6.0), math.min(w, h) / 8);
     final diameter = scR * 2;
 
     path.moveTo(0, r);
@@ -532,9 +611,10 @@ class Material4PathBuilder {
     final path = Path();
     final w = size.width;
     final h = size.height;
-    final r = math.min(config.cornerRadius, 22.0);
     final tW = math.max(config.toothWidth, 8.0);
-    final tH = math.min(config.toothHeight, 14.0);
+    final tH = math.min(math.min(config.toothHeight, 14.0), h * 0.3);
+    final r = math.min(
+        math.min(config.cornerRadius, 22.0), math.min(w / 2, (h - tH) / 2));
 
     path.moveTo(0, r);
     path.arcToPoint(Offset(r, 0), radius: Radius.circular(r));
@@ -560,71 +640,41 @@ class Material4PathBuilder {
     final path = Path();
     final w = size.width;
     final h = size.height;
-    final bottomR = math.min(config.cornerRadius, 22.0);
-    final domeRadius = w / 2;
+    final bottomR =
+        math.min(math.min(config.cornerRadius, 22.0), math.min(w, h) / 4);
+    // A semicircular dome when there is room; an elliptical dome on wide,
+    // short containers so the arch never grows past the bottom edge.
+    final rx = w / 2;
+    final ry = math.min(w / 2, h - bottomR);
 
-    path.moveTo(0, domeRadius);
-    path.arcToPoint(
-      Offset(w, domeRadius),
-      radius: Radius.circular(domeRadius),
-      clockwise: true,
-    );
+    path.moveTo(0, ry);
+    path.arcToPoint(Offset(w, ry), radius: Radius.elliptical(rx, ry));
     path.lineTo(w, h - bottomR);
     path.arcToPoint(Offset(w - bottomR, h), radius: Radius.circular(bottomR));
     path.lineTo(bottomR, h);
     path.arcToPoint(Offset(0, h - bottomR), radius: Radius.circular(bottomR));
-    path.lineTo(0, domeRadius);
     path.close();
     return path;
   }
 
   static Path _buildHexagonSoftPath(Size size, Material4Config config) {
-    final path = Path();
     final w = size.width;
     final h = size.height;
-    final r = math.min(config.cornerRadius, 14.0);
-
-    final points = <Offset>[
+    return _roundedPolygon(<Offset>[
       Offset(w * 0.5, 0),
       Offset(w, h * 0.25),
       Offset(w, h * 0.75),
       Offset(w * 0.5, h),
       Offset(0, h * 0.75),
       Offset(0, h * 0.25),
-    ];
-
-    for (int i = 0; i < 6; i++) {
-      final pPrev = points[(i - 1 + 6) % 6];
-      final pCurr = points[i];
-      final pNext = points[(i + 1) % 6];
-
-      final v1 = Offset(pCurr.dx - pPrev.dx, pCurr.dy - pPrev.dy);
-      final len1 = math.sqrt(v1.dx * v1.dx + v1.dy * v1.dy);
-      final u1 = len1 > 0 ? Offset(v1.dx / len1, v1.dy / len1) : Offset.zero;
-
-      final v2 = Offset(pNext.dx - pCurr.dx, pNext.dy - pCurr.dy);
-      final len2 = math.sqrt(v2.dx * v2.dx + v2.dy * v2.dy);
-      final u2 = len2 > 0 ? Offset(v2.dx / len2, v2.dy / len2) : Offset.zero;
-
-      final startCurve = Offset(pCurr.dx - u1.dx * r, pCurr.dy - u1.dy * r);
-      final endCurve = Offset(pCurr.dx + u2.dx * r, pCurr.dy + u2.dy * r);
-
-      if (i == 0) {
-        path.moveTo(startCurve.dx, startCurve.dy);
-      } else {
-        path.lineTo(startCurve.dx, startCurve.dy);
-      }
-      path.quadraticBezierTo(pCurr.dx, pCurr.dy, endCurve.dx, endCurve.dy);
-    }
-    path.close();
-    return path;
+    ], math.min(config.cornerRadius, 14.0));
   }
 
   static Path _buildChamferDiagonalPath(Size size, Material4Config config) {
     final path = Path();
     final w = size.width;
     final h = size.height;
-    final r = math.min(config.cornerRadius, 20.0);
+    final r = math.min(math.min(config.cornerRadius, 20.0), math.min(w, h) / 4);
     final cSize = math.min(config.tabWidth, math.min(w, h) * 0.4);
 
     if (config.anchor == ShapeAnchor.topRight) {
@@ -741,9 +791,13 @@ class Material4PathBuilder {
     final path = Path();
     final w = size.width;
     final h = size.height;
-    final r = math.min(config.cornerRadius, 22.0);
     final waves = math.max(config.waveCount, 1.0);
     final amp = math.min(config.waveAmplitude, h * 0.25);
+    final r = math.max(
+      0.0,
+      math.min(
+          math.min(config.cornerRadius, 22.0), math.min(w / 4, (h - amp) / 2)),
+    );
 
     path.moveTo(0, r);
     path.arcToPoint(Offset(r, 0), radius: Radius.circular(r));
@@ -756,8 +810,10 @@ class Material4PathBuilder {
 
     // Wavy bottom edge from right to left
     final waveSpan = (w - r * 2);
-    final step = waveSpan / (waves * 2);
-    for (int i = 0; i < (waves * 2); i++) {
+    // A whole number of half-waves so the crest ends exactly at the corner.
+    final halfWaves = math.max(1, (waves * 2).round());
+    final step = waveSpan / halfWaves;
+    for (int i = 0; i < halfWaves; i++) {
       final nextX = (w - r) - (i + 1) * step;
       final ctrlX = (w - r) - (i + 0.5) * step;
       final ctrlY = (i % 2 == 0) ? h : h - amp * 2;
@@ -771,38 +827,23 @@ class Material4PathBuilder {
   }
 
   /// 4. Cloud shape with overlapping rounded lobes.
+
   static Path _buildCloudPath(Size size, Material4Config config) {
-    final path = Path();
     final w = size.width;
     final h = size.height;
-    final rBottom = h * 0.22;
-
-    // Flat or softly curved base
-    path.moveTo(rBottom, h);
-    path.lineTo(w - rBottom, h);
-    path.arcToPoint(Offset(w, h - rBottom), radius: Radius.circular(rBottom));
-
-    // Right puff lobe
-    path.arcToPoint(
-      Offset(w * 0.85, h * 0.38),
-      radius: Radius.circular(h * 0.38),
-    );
-
-    // Top large cloud puffs
-    path.arcToPoint(
-      Offset(w * 0.52, h * 0.12),
-      radius: Radius.circular(w * 0.26),
-    );
-    path.arcToPoint(
-      Offset(w * 0.22, h * 0.32),
-      radius: Radius.circular(w * 0.22),
-    );
-
-    // Left puff lobe
-    path.arcToPoint(Offset(0, h - rBottom), radius: Radius.circular(h * 0.35));
-    path.arcToPoint(Offset(rBottom, h), radius: Radius.circular(rBottom));
-
-    path.close();
+    // A rounded base plus three overlapping puffs, all kept inside the bounds.
+    final baseR = math.min(h * 0.25, w * 0.15);
+    Path circle(double cx, double cy, double r) =>
+        Path()..addOval(Rect.fromCircle(center: Offset(cx, cy), radius: r));
+    var path = Path()
+      ..addRRect(RRect.fromLTRBR(0, h * 0.5, w, h, Radius.circular(baseR)));
+    for (final puff in [
+      circle(w * 0.25, h * 0.62, math.min(w * 0.2, h * 0.38)),
+      circle(w * 0.5, h * 0.45, math.min(w * 0.26, h * 0.45)),
+      circle(w * 0.74, h * 0.58, math.min(w * 0.2, h * 0.42)),
+    ]) {
+      path = Path.combine(PathOperation.union, path, puff);
+    }
     return path;
   }
 
@@ -814,7 +855,7 @@ class Material4PathBuilder {
     final tailW = math.min(config.speechBubbleTailWidth, w * 0.3);
     final tailH = math.min(config.speechBubbleTailHeight, h * 0.3);
     final bodyH = h - tailH;
-    final r = math.min(config.cornerRadius, bodyH / 3);
+    final r = math.min(config.cornerRadius, math.min(bodyH / 3, w / 4));
 
     path.moveTo(0, r);
     path.arcToPoint(Offset(r, 0), radius: Radius.circular(r));
@@ -847,12 +888,13 @@ class Material4PathBuilder {
     final path = Path();
     final w = size.width;
     final h = size.height;
-    final r = math.min(config.cornerRadius, 20.0);
+    final r = math.min(math.min(config.cornerRadius, 20.0), math.min(w, h) / 4);
+    final dip = math.min(4.0, h * 0.03);
 
     // Top edge with subtle crest dip
     path.moveTo(0, r);
     path.arcToPoint(Offset(r, 0), radius: Radius.circular(r));
-    path.quadraticBezierTo(w * 0.5, 4.0, w - r, 0);
+    path.quadraticBezierTo(w * 0.5, dip, w - r, 0);
     path.arcToPoint(Offset(w, r), radius: Radius.circular(r));
 
     // Vertical upper sides
@@ -866,56 +908,26 @@ class Material4PathBuilder {
   }
 
   /// 7. Diamond / Rhombus with rounded vertices.
+
   static Path _buildDiamondPath(Size size, Material4Config config) {
-    final path = Path();
     final w = size.width;
     final h = size.height;
-    final r = math.min(config.cornerRadius, 14.0);
-
-    final points = <Offset>[
+    return _roundedPolygon(<Offset>[
       Offset(w * 0.5, 0),
       Offset(w, h * 0.5),
       Offset(w * 0.5, h),
       Offset(0, h * 0.5),
-    ];
-
-    for (int i = 0; i < 4; i++) {
-      final pPrev = points[(i - 1 + 4) % 4];
-      final pCurr = points[i];
-      final pNext = points[(i + 1) % 4];
-
-      final v1 = Offset(pCurr.dx - pPrev.dx, pCurr.dy - pPrev.dy);
-      final len1 = math.sqrt(v1.dx * v1.dx + v1.dy * v1.dy);
-      final u1 = len1 > 0 ? Offset(v1.dx / len1, v1.dy / len1) : Offset.zero;
-
-      final v2 = Offset(pNext.dx - pCurr.dx, pNext.dy - pCurr.dy);
-      final len2 = math.sqrt(v2.dx * v2.dx + v2.dy * v2.dy);
-      final u2 = len2 > 0 ? Offset(v2.dx / len2, v2.dy / len2) : Offset.zero;
-
-      final pStart = Offset(pCurr.dx - u1.dx * r, pCurr.dy - u1.dy * r);
-      final pEnd = Offset(pCurr.dx + u2.dx * r, pCurr.dy + u2.dy * r);
-
-      if (i == 0) {
-        path.moveTo(pStart.dx, pStart.dy);
-      } else {
-        path.lineTo(pStart.dx, pStart.dy);
-      }
-      path.quadraticBezierTo(pCurr.dx, pCurr.dy, pEnd.dx, pEnd.dy);
-    }
-    path.close();
-    return path;
+    ], math.min(config.cornerRadius, 14.0));
   }
 
   /// 8. Regular 8-sided Octagon with rounded vertex transitions.
+
   static Path _buildOctagonPath(Size size, Material4Config config) {
-    final path = Path();
     final w = size.width;
     final h = size.height;
-    final r = math.min(config.cornerRadius, 12.0);
     final cW = w * 0.28;
     final cH = h * 0.28;
-
-    final points = <Offset>[
+    return _roundedPolygon(<Offset>[
       Offset(cW, 0),
       Offset(w - cW, 0),
       Offset(w, cH),
@@ -924,53 +936,28 @@ class Material4PathBuilder {
       Offset(cW, h),
       Offset(0, h - cH),
       Offset(0, cH),
-    ];
-
-    for (int i = 0; i < 8; i++) {
-      final pPrev = points[(i - 1 + 8) % 8];
-      final pCurr = points[i];
-      final pNext = points[(i + 1) % 8];
-
-      final v1 = Offset(pCurr.dx - pPrev.dx, pCurr.dy - pPrev.dy);
-      final len1 = math.sqrt(v1.dx * v1.dx + v1.dy * v1.dy);
-      final u1 = len1 > 0 ? Offset(v1.dx / len1, v1.dy / len1) : Offset.zero;
-
-      final v2 = Offset(pNext.dx - pCurr.dx, pNext.dy - pCurr.dy);
-      final len2 = math.sqrt(v2.dx * v2.dx + v2.dy * v2.dy);
-      final u2 = len2 > 0 ? Offset(v2.dx / len2, v2.dy / len2) : Offset.zero;
-
-      final pStart = Offset(pCurr.dx - u1.dx * r, pCurr.dy - u1.dy * r);
-      final pEnd = Offset(pCurr.dx + u2.dx * r, pCurr.dy + u2.dy * r);
-
-      if (i == 0) {
-        path.moveTo(pStart.dx, pStart.dy);
-      } else {
-        path.lineTo(pStart.dx, pStart.dy);
-      }
-      path.quadraticBezierTo(pCurr.dx, pCurr.dy, pEnd.dx, pEnd.dy);
-    }
-    path.close();
-    return path;
+    ], math.min(config.cornerRadius, 12.0));
   }
 
   /// 9. Wave Cut sliced container.
+
   static Path _buildWaveCutPath(Size size, Material4Config config) {
     final path = Path();
     final w = size.width;
     final h = size.height;
-    final r = math.min(config.cornerRadius, 22.0);
-    final amp = math.min(config.waveAmplitude, 20.0);
+    final r = math.min(math.min(config.cornerRadius, 22.0), math.min(w, h) / 4);
+    final cutY = h * 0.65;
+    final amp = math.min(math.min(config.waveAmplitude, 20.0), cutY * 0.5);
 
     path.moveTo(0, r);
     path.arcToPoint(Offset(r, 0), radius: Radius.circular(r));
     path.lineTo(w - r, 0);
     path.arcToPoint(Offset(w, r), radius: Radius.circular(r));
+    path.lineTo(w, cutY);
 
-    // Right edge down to cut
-    path.lineTo(w, h * 0.65);
-
-    // Diagonal organic S-wave cut across to bottom-left
-    path.cubicTo(w * 0.75, h * 0.65 - amp, w * 0.35, h + amp, r, h);
+    // Diagonal S-wave cut to the bottom-left. The last control point sits on
+    // the bottom edge so the curve never dips below the container.
+    path.cubicTo(w * 0.75, cutY - amp, w * 0.35, h, r, h);
     path.arcToPoint(Offset(0, h - r), radius: Radius.circular(r));
     path.close();
     return path;
@@ -1006,22 +993,27 @@ class Material4PathBuilder {
   }
 
   /// 11. Convex Rounded (barrel curved expanding edges).
+
   static Path _buildConvexRoundedPath(Size size, Material4Config config) {
     final path = Path();
     final w = size.width;
     final h = size.height;
-    final cur = math.min(config.waveAmplitude, 14.0);
-    final r = 10.0;
+    // Edges bulge outward by `b`, so the straight frame is inset by `b` and
+    // every bulge just touches the container edge instead of overflowing it.
+    final b =
+        math.min(math.min(config.waveAmplitude, 14.0), math.min(w, h) * 0.12);
+    final l = b, t = b, rt = w - b, bt = h - b;
+    final r = math.min(10.0, (math.min(w, h) - 2 * b) / 4);
 
-    path.moveTo(r, -cur);
-    path.quadraticBezierTo(w * 0.5, -cur * 1.6, w - r, -cur);
-    path.arcToPoint(Offset(w + cur, r), radius: Radius.circular(r));
-    path.quadraticBezierTo(w + cur * 1.6, h * 0.5, w + cur, h - r);
-    path.arcToPoint(Offset(w - r, h + cur), radius: Radius.circular(r));
-    path.quadraticBezierTo(w * 0.5, h + cur * 1.6, r, h + cur);
-    path.arcToPoint(Offset(-cur, h - r), radius: Radius.circular(r));
-    path.quadraticBezierTo(-cur * 1.6, h * 0.5, -cur, r);
-    path.arcToPoint(Offset(r, -cur), radius: Radius.circular(r));
+    path.moveTo(l + r, t);
+    path.quadraticBezierTo(w / 2, t - 2 * b, rt - r, t);
+    path.arcToPoint(Offset(rt, t + r), radius: Radius.circular(r));
+    path.quadraticBezierTo(rt + 2 * b, h / 2, rt, bt - r);
+    path.arcToPoint(Offset(rt - r, bt), radius: Radius.circular(r));
+    path.quadraticBezierTo(w / 2, bt + 2 * b, l + r, bt);
+    path.arcToPoint(Offset(l, bt - r), radius: Radius.circular(r));
+    path.quadraticBezierTo(l - 2 * b, h / 2, l, t + r);
+    path.arcToPoint(Offset(l + r, t), radius: Radius.circular(r));
     path.close();
     return path;
   }
@@ -1048,46 +1040,18 @@ class Material4PathBuilder {
   }
 
   /// 13. Slanted Parallelogram with customizable skew angle.
+
   static Path _buildParallelogramPath(Size size, Material4Config config) {
-    final path = Path();
     final w = size.width;
     final h = size.height;
-    final r = math.min(config.cornerRadius, 14.0);
     final rad = config.skewAngle * (math.pi / 180.0);
     final dx = (math.tan(rad) * h).clamp(-w * 0.35, w * 0.35);
-
-    final p0 = Offset(dx > 0 ? dx : 0, 0);
-    final p1 = Offset(dx > 0 ? w : w + dx, 0);
-    final p2 = Offset(dx > 0 ? w - dx : w, h);
-    final p3 = Offset(dx > 0 ? 0 : -dx, h);
-
-    final points = [p0, p1, p2, p3];
-
-    for (int i = 0; i < 4; i++) {
-      final pPrev = points[(i - 1 + 4) % 4];
-      final pCurr = points[i];
-      final pNext = points[(i + 1) % 4];
-
-      final v1 = Offset(pCurr.dx - pPrev.dx, pCurr.dy - pPrev.dy);
-      final len1 = math.sqrt(v1.dx * v1.dx + v1.dy * v1.dy);
-      final u1 = len1 > 0 ? Offset(v1.dx / len1, v1.dy / len1) : Offset.zero;
-
-      final v2 = Offset(pNext.dx - pCurr.dx, pNext.dy - pCurr.dy);
-      final len2 = math.sqrt(v2.dx * v2.dx + v2.dy * v2.dy);
-      final u2 = len2 > 0 ? Offset(v2.dx / len2, v2.dy / len2) : Offset.zero;
-
-      final pStart = Offset(pCurr.dx - u1.dx * r, pCurr.dy - u1.dy * r);
-      final pEnd = Offset(pCurr.dx + u2.dx * r, pCurr.dy + u2.dy * r);
-
-      if (i == 0) {
-        path.moveTo(pStart.dx, pStart.dy);
-      } else {
-        path.lineTo(pStart.dx, pStart.dy);
-      }
-      path.quadraticBezierTo(pCurr.dx, pCurr.dy, pEnd.dx, pEnd.dy);
-    }
-    path.close();
-    return path;
+    return _roundedPolygon(<Offset>[
+      Offset(dx > 0 ? dx : 0, 0),
+      Offset(dx > 0 ? w : w + dx, 0),
+      Offset(dx > 0 ? w - dx : w, h),
+      Offset(dx > 0 ? 0 : -dx, h),
+    ], math.min(config.cornerRadius, 14.0));
   }
 
   /// 14. Banner Ribbon with triangular swallowtail cutouts.
@@ -1112,7 +1076,7 @@ class Material4PathBuilder {
     final path = Path();
     final w = size.width;
     final h = size.height;
-    final r = math.min(config.cornerRadius, 16.0);
+    final r = math.min(math.min(config.cornerRadius, 16.0), math.min(w, h) / 4);
     final tailCut = math.min(config.ribbonFoldDepth, h * 0.35);
 
     path.moveTo(0, r);
@@ -1377,33 +1341,10 @@ class Material4PathBuilder {
   // =========================================================================
 
   /// 1. Mathematical Lamé curve super-ellipse with configurable exponent.
+
   static Path _buildSuperellipsePath(Size size, Material4Config config) {
-    final a = size.width / 2.0;
-    final b = size.height / 2.0;
-    if (a <= 0 || b <= 0) return Path();
-
-    final path = Path();
-    const steps = 72;
-    const exp = 3.6;
-    const p = 2.0 / exp;
-
-    for (int i = 0; i <= steps; i++) {
-      final t = (i / steps) * 2 * math.pi;
-      final cosT = math.cos(t);
-      final sinT = math.sin(t);
-      final sgnCos = cosT.sign;
-      final sgnSin = sinT.sign;
-      final x = a + a * sgnCos * math.pow(cosT.abs(), p);
-      final y = b + b * sgnSin * math.pow(sinT.abs(), p);
-
-      if (i == 0) {
-        path.moveTo(x, y);
-      } else {
-        path.lineTo(x, y);
-      }
-    }
-    path.close();
-    return path;
+    return Material4CustomShape.superellipse(n: config.superellipseExponent)
+        .buildPath(size);
   }
 
   /// 2. Curvature-continuous C2 squircle arc.
@@ -1427,16 +1368,18 @@ class Material4PathBuilder {
   }
 
   /// 3. Asymmetric procedural multi-control point organic blob.
+
   static Path _buildAsymmetricBlobPath(Size size, Material4Config config) {
     final path = Path();
     final w = size.width;
     final h = size.height;
 
-    path.moveTo(w * 0.08, h * 0.38);
-    path.cubicTo(w * 0.04, h * 0.12, w * 0.28, 0, w * 0.58, 0);
+    // Every joint has collinear control handles, so the outline has no kinks.
+    path.moveTo(0, h * 0.45);
+    path.cubicTo(0, h * 0.15, w * 0.28, 0, w * 0.58, 0);
     path.cubicTo(w * 0.88, 0, w, h * 0.22, w * 0.96, h * 0.54);
     path.cubicTo(w * 0.92, h * 0.82, w * 0.72, h, w * 0.42, h);
-    path.cubicTo(w * 0.18, h, 0, h * 0.78, w * 0.08, h * 0.38);
+    path.cubicTo(w * 0.18, h, 0, h * 0.8, 0, h * 0.45);
     path.close();
     return path;
   }
@@ -1477,7 +1420,7 @@ class Material4PathBuilder {
     final path = Path();
     final w = size.width;
     final h = size.height;
-    final r = math.min(config.cornerRadius, 18.0);
+    final r = math.min(math.min(config.cornerRadius, 18.0), math.min(w, h) / 4);
     final notchR = math.min(
         config.scallopRadius > 0 ? config.scallopRadius : 16.0, h * 0.25);
 
@@ -1584,5 +1527,226 @@ class Material4PathBuilder {
     path.cubicTo(0, h * 0.25, w * 0.05, h * 0.22, w * 0.2, h * 0.15);
     path.close();
     return path;
+  }
+
+  // =========================================================================
+  // SHARED GEOMETRY HELPERS
+  // =========================================================================
+
+  /// Builds a closed polygon whose every vertex is rounded by a quadratic
+  /// fillet. Each fillet is clamped to half of its shorter neighbouring edge,
+  /// so fillets never overlap and the outline never leaves the polygon's hull.
+  static Path _roundedPolygon(List<Offset> points, double radius) {
+    final n = points.length;
+    final path = Path();
+    for (int i = 0; i < n; i++) {
+      final prev = points[(i - 1 + n) % n];
+      final curr = points[i];
+      final next = points[(i + 1) % n];
+      final d1 = curr - prev;
+      final d2 = next - curr;
+      final l1 = d1.distance;
+      final l2 = d2.distance;
+      final r = (l1 == 0 || l2 == 0)
+          ? 0.0
+          : math.max(0.0, math.min(radius, math.min(l1, l2) / 2));
+      final start = l1 == 0 ? curr : curr - d1 / l1 * r;
+      final end = l2 == 0 ? curr : curr + d2 / l2 * r;
+      if (i == 0) {
+        path.moveTo(start.dx, start.dy);
+      } else {
+        path.lineTo(start.dx, start.dy);
+      }
+      path.quadraticBezierTo(curr.dx, curr.dy, end.dx, end.dy);
+    }
+    return path..close();
+  }
+
+  // =========================================================================
+  // EVERYDAY UI SHAPES
+  // =========================================================================
+
+  /// Ellipse filling the whole container.
+  static Path _buildEllipsePath(Size size, Material4Config config) =>
+      Path()..addOval(Offset.zero & size);
+
+  /// Perfect circle centred in the container (diameter = shorter side).
+  static Path _buildCirclePath(Size size, Material4Config config) => Path()
+    ..addOval(Rect.fromCircle(
+      center: size.center(Offset.zero),
+      radius: math.min(size.width, size.height) / 2,
+    ));
+
+  /// Upward-pointing triangle with rounded vertices.
+  static Path _buildTrianglePath(Size size, Material4Config config) {
+    final w = size.width;
+    final h = size.height;
+    return _roundedPolygon(
+      [Offset(w / 2, 0), Offset(w, h), Offset(0, h)],
+      math.min(config.cornerRadius, math.min(w, h) * 0.12),
+    );
+  }
+
+  /// Trapezoid narrower at the top; the slant follows [Material4Config.skewAngle].
+  static Path _buildTrapezoidPath(Size size, Material4Config config) {
+    final w = size.width;
+    final h = size.height;
+    final inset = (math.tan(config.skewAngle.abs() * math.pi / 180) * h)
+        .clamp(w * 0.05, w * 0.35);
+    return _roundedPolygon(
+      [Offset(inset, 0), Offset(w - inset, 0), Offset(w, h), Offset(0, h)],
+      math.min(config.cornerRadius, math.min(w, h) * 0.15),
+    );
+  }
+
+  /// Symmetric heart; the lobes touch the top edge and the tip the bottom.
+  static Path _buildHeartPath(Size size, Material4Config config) {
+    final w = size.width;
+    final h = size.height;
+    return Path()
+      ..moveTo(w * 0.5, h)
+      ..cubicTo(w * 0.5, h, 0, h * 0.68, 0, h * 0.3)
+      ..cubicTo(0, h * 0.12, w * 0.14, 0, w * 0.29, 0)
+      ..cubicTo(w * 0.4, 0, w * 0.47, h * 0.07, w * 0.5, h * 0.16)
+      ..cubicTo(w * 0.53, h * 0.07, w * 0.6, 0, w * 0.71, 0)
+      ..cubicTo(w * 0.86, 0, w, h * 0.12, w, h * 0.3)
+      ..cubicTo(w, h * 0.68, w * 0.5, h, w * 0.5, h)
+      ..close();
+  }
+
+  /// Classic five-point star with softened tips.
+  static Path _buildStarPath(Size size, Material4Config config) {
+    return Material4CustomShape.star(
+      points: 5,
+      innerRadiusRatio: 0.48,
+      cornerRadius: math.min(config.cornerRadius, 4.0),
+    ).buildPath(size);
+  }
+
+  /// Plus / cross with equal arms (arm thickness = 36% of the shorter side).
+  static Path _buildCrossPath(Size size, Material4Config config) {
+    final w = size.width;
+    final h = size.height;
+    final t = math.min(w, h) * 0.36;
+    final cx = w / 2, cy = h / 2, a = t / 2;
+    return _roundedPolygon([
+      Offset(cx - a, 0),
+      Offset(cx + a, 0),
+      Offset(cx + a, cy - a),
+      Offset(w, cy - a),
+      Offset(w, cy + a),
+      Offset(cx + a, cy + a),
+      Offset(cx + a, h),
+      Offset(cx - a, h),
+      Offset(cx - a, cy + a),
+      Offset(0, cy + a),
+      Offset(0, cy - a),
+      Offset(cx - a, cy - a),
+    ], math.min(config.cornerRadius, t * 0.25));
+  }
+
+  /// Right-pointing arrow (rotate with [Material4Config] transforms for other
+  /// directions).
+  static Path _buildArrowPath(Size size, Material4Config config) {
+    final w = size.width;
+    final h = size.height;
+    final head = math.min(w * 0.4, h);
+    final shaft = h * 0.45;
+    final cy = h / 2;
+    return _roundedPolygon([
+      Offset(0, cy - shaft / 2),
+      Offset(w - head, cy - shaft / 2),
+      Offset(w - head, 0),
+      Offset(w, cy),
+      Offset(w - head, h),
+      Offset(w - head, cy + shaft / 2),
+      Offset(0, cy + shaft / 2),
+    ], math.min(config.cornerRadius, h * 0.08));
+  }
+
+  /// Chevron / breadcrumb step pointing right.
+  static Path _buildChevronPath(Size size, Material4Config config) {
+    final w = size.width;
+    final h = size.height;
+    final d = math.min(w * 0.3, h * 0.5);
+    return _roundedPolygon([
+      Offset.zero,
+      Offset(w - d, 0),
+      Offset(w, h / 2),
+      Offset(w - d, h),
+      Offset(0, h),
+      Offset(d, h / 2),
+    ], math.min(config.cornerRadius, h * 0.08));
+  }
+
+  /// Price / label tag pointing left, with a punched string hole.
+  static Path _buildTagPath(Size size, Material4Config config) {
+    final w = size.width;
+    final h = size.height;
+    final d = math.min(h * 0.5, w * 0.3);
+    final body = _roundedPolygon([
+      Offset(d, 0),
+      Offset(w, 0),
+      Offset(w, h),
+      Offset(d, h),
+      Offset(0, h / 2),
+    ], math.min(config.cornerRadius, h * 0.15));
+    final holeR = math.min(h * 0.08, d * 0.25);
+    final hole = Path()
+      ..addOval(
+          Rect.fromCircle(center: Offset(d * 0.75, h / 2), radius: holeR));
+    return Path.combine(PathOperation.difference, body, hole);
+  }
+
+  /// Crescent moon opening toward the top-right.
+  static Path _buildCrescentPath(Size size, Material4Config config) {
+    final c = size.center(Offset.zero);
+    final r = math.min(size.width, size.height) / 2;
+    final outer = Path()..addOval(Rect.fromCircle(center: c, radius: r));
+    final bite = Path()
+      ..addOval(Rect.fromCircle(
+        center: c + Offset(r * 0.45, -r * 0.25),
+        radius: r * 0.82,
+      ));
+    return Path.combine(PathOperation.difference, outer, bite);
+  }
+
+  /// Cog wheel; the tooth count follows [Material4Config.petalCount].
+  static Path _buildGearPath(Size size, Material4Config config) {
+    final c = size.center(Offset.zero);
+    final outer = math.min(size.width, size.height) / 2;
+    final root = outer * 0.8;
+    final teeth = config.petalCount.clamp(6, 24);
+    final step = 2 * math.pi / teeth;
+    Offset at(double radius, double a) =>
+        c + Offset(radius * math.cos(a), radius * math.sin(a));
+    final pts = <Offset>[];
+    for (int i = 0; i < teeth; i++) {
+      final a = -math.pi / 2 + i * step;
+      pts
+        ..add(at(root, a))
+        ..add(at(outer, a + step * 0.15))
+        ..add(at(outer, a + step * 0.45))
+        ..add(at(root, a + step * 0.6));
+    }
+    return _roundedPolygon(pts, math.min(config.cornerRadius, outer * 0.05));
+  }
+
+  /// Rectangle with all four corners cut at 45° (sci-fi / HUD panels);
+  /// the cut size follows [Material4Config.cornerRadius].
+  static Path _buildCutCornersPath(Size size, Material4Config config) {
+    final w = size.width;
+    final h = size.height;
+    final c = math.min(config.cornerRadius, math.min(w, h) * 0.3);
+    return _roundedPolygon([
+      Offset(c, 0),
+      Offset(w - c, 0),
+      Offset(w, c),
+      Offset(w, h - c),
+      Offset(w - c, h),
+      Offset(c, h),
+      Offset(0, h - c),
+      Offset(0, c),
+    ], 0);
   }
 }

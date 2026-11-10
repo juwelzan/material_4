@@ -32,7 +32,7 @@ lib/core/shapes/
 
 ---
 
-## 2. Shape Geometry Catalog (28 Presets + Custom Bézier)
+## 2. Shape Geometry Catalog (54 Presets incl. Custom Bézier)
 
 All shapes automatically adapt to container dimensions and support independent corner radii (`CornerRadii`), multi-notch definitions (`ShapeNotch`), anchor relocation (`ShapeAnchor`), rotation (`rotation`), scale (`scaleX`, `scaleY`), and directional stretch distortion (`stretchOffset`).
 
@@ -52,7 +52,7 @@ All shapes automatically adapt to container dimensions and support independent c
 | **`chamferDiagonal`** | 45-degree corner chamfer with rounded corner fillets. | Examination schedules, urgent bulletins, marked notices. |
 | **`organicBlob`** | Multi-quadrant organic cubic Bézier fluid pebble. | Creative arts cards, kindergarten activities. |
 | **`scallopedPetal`** | Polar rosette with 10–12 smooth petal arcs. | Profile avatars, graduation laurels, medal seals. |
-| **`smoothRounded`** | Mathematical Lamé curve super-ellipse squircle. | Neutral modern cards, clean base panels. |
+| **`smoothRounded`** | Rounded rectangle (circular corners, `cornerRadius`). | Neutral modern cards, clean base panels. |
 | **`asymmetricCard`** | Independent 4-corner radii specification (`CornerRadii`). | Contemporary dashboard stat cards, asymmetric hero cards. |
 | **`capsule`** | Full semicircular pill caps along primary axis. | Timetable slots, status pills, filter chips. |
 | **`waveEdge`** | Multi-frequency harmonic sinusoidal fluid wave crest. | Bottom navigation bars, hero headers, water level cards. |
@@ -69,6 +69,29 @@ All shapes automatically adapt to container dimensions and support independent c
 | **`ribbon`** | Swallowtail notched banner ribbon. | Achievement award banners, contest announcements. |
 | **`bookmark`** | Vertical page marker with bottom inverted V-notch. | Reading lists, saved lessons, syllabus tracking. |
 | **`customBezier`** | Arbitrary user-supplied `Path Function(Size size)` builder. | Bespoke brand identities, custom animated vector paths. |
+| **`superellipse`** | Lamé curve; exponent from `superellipseExponent` (2 = ellipse, higher = squarer). | Icons, avatars, soft panels. |
+| **`continuousSquircle`** | Curvature-smooth squircle corners. | iOS-style cards and app icons. |
+| **`asymmetricBlob`** | Kink-free organic cubic blob. | Playful hero cards, illustrations. |
+| **`softDiamond`** | Diamond with outward-curved facets. | Gem badges, highlight markers. |
+| **`roundedHexagon`** / **`roundedPentagon`** | Regular polygon centred in the box, rounded vertices. | Achievement tokens, rank badges. |
+| **`ticket`** | Rounded voucher with opposing notch bites. | Event passes, coupons. |
+| **`flower`** / **`starburst`** | Radial petals / spikes; count from `petalCount`. | Sale seals, stickers. |
+| **`leaf`**, **`droplet`**, **`liquid`** | Organic natural silhouettes. | Eco themes, status blobs. |
+| **`ellipse`** | Oval filling the whole container. | Avatars, spotlights. |
+| **`circle`** | Perfect circle centred in the container. | Avatars, FABs, dots, counters. |
+| **`triangle`** | Up-pointing triangle with rounded vertices. | Warnings, play buttons, pointers. |
+| **`trapezoid`** | Narrower top; slant from `skewAngle`. | Tabs, perspective panels. |
+| **`heart`** | Symmetric heart touching all four edges. | Likes, favourites. |
+| **`star`** | Classic five-point star. | Ratings, highlights. |
+| **`cross`** | Equal-arm plus with soft corners. | Add buttons, medical/first-aid UI. |
+| **`arrow`** | Right-pointing arrow (rotate via transforms). | Next/CTA buttons, flow diagrams. |
+| **`chevron`** | Breadcrumb / step chevron. | Steppers, breadcrumbs, progress chains. |
+| **`tag`** | Left-pointing label with a punched hole. | Prices, labels, categories. |
+| **`crescent`** | Crescent moon. | Dark-mode toggles, night themes. |
+| **`gear`** | Cog wheel; tooth count from `petalCount`. | Settings entries, tooling. |
+| **`cutCorners`** | All four corners cut at 45° (size = `cornerRadius`). | Sci-fi / HUD panels, game UI. |
+
+> Every preset is guaranteed (and tested) to stay inside its container at any size, from 24×24 to large panels; radii and tab sizes clamp to the available space automatically.
 
 ---
 

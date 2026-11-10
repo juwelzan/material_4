@@ -22,7 +22,7 @@ so any UI element is built by configuring it.
 
 | Capability | Parameter(s) |
 | --- | --- |
-| **41 built-in shapes**: folder tab, ticket scallop, postage stamp, squircle, speech bubble, shield, ribbon, blob, … | `shape`, `config` |
+| **54 built-in shapes**: folder tab, ticket, squircle, speech bubble, shield, ribbon, blob, circle, triangle, heart, star, arrow, tag, gear, … | `shape`, `config` |
 | **Custom geometry** from your own `Path` | `customShape` |
 | **Backgrounds**: color, gradient, frosted glass, patterns, textures, 20 paper styles, stationery and repeating patterns | `background` |
 | **40 border styles + 38 creative borders**: neon, animated gradient, moving dash, torn paper, stitch, rope, … | `border` |

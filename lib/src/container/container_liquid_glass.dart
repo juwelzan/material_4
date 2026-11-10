@@ -2,12 +2,14 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
 import '../liquid_glass/constants/glass_defaults.dart';
+import '../liquid_glass/src/engine/glass_drag_builder.dart';
 import '../liquid_glass/src/engine/glass_glow.dart';
 import '../liquid_glass/src/engine/liquid_glass_settings.dart';
 import '../liquid_glass/src/engine/liquid_shape.dart';
@@ -713,6 +715,16 @@ class Material4LiquidGlassSurface extends StatefulWidget {
   /// glass keeps its appearance, as on iOS.
   static const double smallElementExtent = 120.0;
 
+  /// How far a finger may wander outside interactive glass and still count
+  /// as on it: UIKit's touch-up-inside slop (~70 pt). Further out the press
+  /// lets go, and it comes back if the finger returns.
+  static const double touchSlop = 70.0;
+
+  /// Inside a scroll view the press waits this long before showing, so a
+  /// touch that turns into a scroll never flashes the glass
+  /// (`UIScrollView.delaysContentTouches`).
+  static const Duration scrollPressDelay = Duration(milliseconds: 100);
+
   @override
   State<Material4LiquidGlassSurface> createState() =>
       _Material4LiquidGlassSurfaceState();
@@ -812,6 +824,18 @@ class _Material4LiquidGlassSurfaceState
     _tipTimer?.cancel();
     _tipTimer = null;
     if (_tip.isShowing) _tip.hide();
+  }
+
+  /// The visible press, as tracked by the touch engine (delayed in scroll
+  /// views, released by scrolling or by leaving the [touchSlop]).
+  void _onPressedChanged(bool pressed) {
+    if (!mounted) return;
+    if (pressed) {
+      if (widget.glass.haptics) HapticFeedback.lightImpact();
+      _press.forward();
+    } else {
+      _press.reverse();
+    }
   }
 
   void _activate() {
@@ -1134,6 +1158,7 @@ class _Material4LiquidGlassSurfaceState
         glowRadius: glass.glowRadius ?? 1.6,
         glowBlurRadius: 16.0,
         hitTestBehavior: HitTestBehavior.translucent,
+        releaseOnScroll: true,
         child: content,
       );
     }
@@ -1297,6 +1322,22 @@ class _Material4LiquidGlassSurfaceState
         resistance: glass.resistance,
         hitTestBehavior: HitTestBehavior.translucent,
         anchorStretchSettings: AnchorStretchSettings.nativeTremor,
+        releaseOnScroll: true,
+        scrollPressDelay: Material4LiquidGlassSurface.scrollPressDelay,
+        touchExitDistance: Material4LiquidGlassSurface.touchSlop,
+        onPressedChanged: _onPressedChanged,
+        child: surface,
+      );
+    } else {
+      // No elastic stretch (Reduce Motion / minimal tier), but the press
+      // still follows the same UIKit touch tracking.
+      surface = GlassDragBuilder(
+        behavior: HitTestBehavior.translucent,
+        releaseOnScroll: true,
+        scrollPressDelay: Material4LiquidGlassSurface.scrollPressDelay,
+        touchExitDistance: Material4LiquidGlassSurface.touchSlop,
+        onPressedChanged: _onPressedChanged,
+        builder: (context, _, child) => child!,
         child: surface,
       );
     }
@@ -1306,15 +1347,32 @@ class _Material4LiquidGlassSurfaceState
         minimalTier || (quality == GlassQuality.premium && stretchy) || grouped;
     if (!skipBoundary) surface = RepaintBoundary(child: surface);
 
-    return Listener(
+    surface = Listener(
       behavior: HitTestBehavior.translucent,
-      onPointerDown: (_) {
-        _hideTip();
-        if (glass.haptics) HapticFeedback.lightImpact();
-        _press.forward();
+      onPointerDown: (_) => _hideTip(),
+      child: surface,
+    );
+
+    final onActivate = widget.onActivate;
+    if (onActivate == null) return surface;
+    // UIKit-style touch-up-inside: the glass visibly follows a dragging
+    // finger, so a release anywhere within [touchSlop] still activates it.
+    // (The container's own tap recognizer gives up after 18 px; only one of
+    // the two can win the gesture arena, so a tap never fires twice. A
+    // scroll still wins over both.)
+    return RawGestureDetector(
+      behavior: HitTestBehavior.translucent,
+      gestures: {
+        TapGestureRecognizer:
+            GestureRecognizerFactoryWithHandlers<TapGestureRecognizer>(
+          () => TapGestureRecognizer(
+            debugOwner: this,
+            preAcceptSlopTolerance: Material4LiquidGlassSurface.touchSlop,
+            postAcceptSlopTolerance: Material4LiquidGlassSurface.touchSlop,
+          ),
+          (r) => r.onTap = onActivate,
+        ),
       },
-      onPointerUp: (_) => _press.reverse(),
-      onPointerCancel: (_) => _press.reverse(),
       child: surface,
     );
   }

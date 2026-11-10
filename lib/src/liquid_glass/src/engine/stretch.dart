@@ -112,8 +112,24 @@ class LiquidStretch extends StatelessWidget {
     this.suppressInteractionOnChildren = true,
     this.anchorStretch = true,
     this.anchorStretchSettings = const AnchorStretchSettings(),
+    this.releaseOnScroll = false,
+    this.scrollPressDelay,
+    this.touchExitDistance,
+    this.onPressedChanged,
     super.key,
   });
+
+  /// See [GlassDragBuilder.releaseOnScroll].
+  final bool releaseOnScroll;
+
+  /// See [GlassDragBuilder.scrollPressDelay].
+  final Duration? scrollPressDelay;
+
+  /// See [GlassDragBuilder.touchExitDistance].
+  final double? touchExitDistance;
+
+  /// See [GlassDragBuilder.onPressedChanged].
+  final ValueChanged<bool>? onPressedChanged;
 
   /// The scale factor to apply when the user is interacting with the widget.
   ///
@@ -240,6 +256,10 @@ class LiquidStretch extends StatelessWidget {
     return GlassDragBuilder(
       behavior: hitTestBehavior,
       suppressInteractionOnChildren: suppressInteractionOnChildren,
+      releaseOnScroll: releaseOnScroll,
+      scrollPressDelay: scrollPressDelay,
+      touchExitDistance: touchExitDistance,
+      onPressedChanged: onPressedChanged,
       builder: (context, value, child) {
         final pressed = value != null;
         // With pressGrowth the spring drives a 0→1 progress and the render

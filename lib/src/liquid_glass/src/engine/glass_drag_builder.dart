@@ -9,16 +9,42 @@
 // ignore_for_file: public_member_api_docs
 
 import 'package:flutter/widgets.dart';
+import 'dart:async';
+
 import '../../types/interaction_notification.dart';
+import 'touch_scroll_guard.dart';
 
 class GlassDragBuilder extends StatefulWidget {
   const GlassDragBuilder({
     required this.builder,
     this.behavior = HitTestBehavior.opaque,
     this.suppressInteractionOnChildren = true,
+    this.releaseOnScroll = false,
+    this.scrollPressDelay,
+    this.touchExitDistance,
+    this.onPressedChanged,
     this.child,
     super.key,
   });
+
+  /// Release the press (as if the finger lifted) once the finger starts
+  /// scrolling an enclosing scrollable, like a UIKit control does. The rest
+  /// of that touch is ignored.
+  final bool releaseOnScroll;
+
+  /// Inside a scrollable, wait this long before showing the press, so a
+  /// touch that turns into a scroll never flashes the element
+  /// (`UIScrollView.delaysContentTouches`). A quick tap still shows a short
+  /// press. `null` presses immediately.
+  final Duration? scrollPressDelay;
+
+  /// While the finger is further than this outside the element's bounds the
+  /// press is released, and it returns when the finger comes back — UIKit's
+  /// touch-drag exit / enter (about 70 pt). `null` never releases.
+  final double? touchExitDistance;
+
+  /// Called when the visible pressed state changes.
+  final ValueChanged<bool>? onPressedChanged;
 
   final HitTestBehavior behavior;
   final bool suppressInteractionOnChildren;
@@ -70,6 +96,48 @@ class _GlassDragBuilderState extends State<GlassDragBuilder> {
 
   bool _shouldIgnoreCurrentPointer = false;
 
+  final TouchScrollGuard _scrollGuard = TouchScrollGuard();
+  Timer? _pressDelay;
+  Timer? _flashRelease;
+  // The press is hidden while delayed in a scroll view, after the touch
+  // became a scroll, or while the finger is outside the exit distance.
+  bool _pressShown = true;
+  bool _cancelled = false;
+  bool _outside = false;
+  bool _reportedPressed = false;
+
+  void _report() {
+    final pressed =
+        _rawOffset != null && _pressShown && !_cancelled && !_outside;
+    if (pressed == _reportedPressed) return;
+    _reportedPressed = pressed;
+    widget.onPressedChanged?.call(pressed);
+  }
+
+  void _release() {
+    _pressDelay?.cancel();
+    _pressDelay = null;
+    _shouldIgnoreCurrentPointer = false;
+    _scrollGuard.end();
+    if (!mounted) return;
+    setState(() {
+      _dragEngaged = false;
+      _rawOffset = null;
+      _lastExposedOffset = null;
+      _cancelled = false;
+      _outside = false;
+      _pressShown = true;
+    });
+    _report();
+  }
+
+  @override
+  void dispose() {
+    _pressDelay?.cancel();
+    _flashRelease?.cancel();
+    super.dispose();
+  }
+
   bool get isDragging => _rawOffset != null;
 
   /// Computes the exposed offset with continuous slop subtraction.
@@ -80,7 +148,7 @@ class _GlassDragBuilderState extends State<GlassDragBuilder> {
   /// - `raw * (1 - slop / dist)`: Continuous tracking once engaged.
   Offset? get _exposedOffset {
     final raw = _rawOffset;
-    if (raw == null) return null;
+    if (raw == null || !_pressShown || _cancelled || _outside) return null;
     if (!_dragEngaged) return Offset.zero;
 
     final dist = raw.distance;
@@ -109,16 +177,59 @@ class _GlassDragBuilderState extends State<GlassDragBuilder> {
             return;
           }
           if (!mounted) return;
+          _flashRelease?.cancel();
+          _pressDelay?.cancel();
+          if (widget.releaseOnScroll || widget.scrollPressDelay != null) {
+            _scrollGuard.begin(context);
+          }
+          final delay =
+              _scrollGuard.insideScrollable ? widget.scrollPressDelay : null;
           setState(() {
             _dragEngaged = false;
             _rawOffset = Offset.zero;
             _lastExposedOffset = Offset.zero;
+            _cancelled = false;
+            _outside = false;
+            _pressShown = delay == null;
           });
+          if (delay != null) {
+            _pressDelay = Timer(delay, () {
+              _pressDelay = null;
+              if (!mounted || _rawOffset == null || _cancelled) return;
+              setState(() => _pressShown = true);
+              _report();
+            });
+          }
+          _report();
         },
         onPointerMove: (event) {
-          if (_rawOffset == null) return;
+          if (_rawOffset == null || _cancelled) return;
           if (!mounted) return;
-
+          if (widget.releaseOnScroll && _scrollGuard.scrolled) {
+            // The touch became a scroll: let go, like a UIKit control.
+            _pressDelay?.cancel();
+            _pressDelay = null;
+            setState(() {
+              _cancelled = true;
+              _lastExposedOffset = null;
+            });
+            _report();
+            return;
+          }
+          final exit = widget.touchExitDistance;
+          final box = context.findRenderObject();
+          if (exit != null && box is RenderBox && box.hasSize) {
+            final outside = !(Offset.zero & box.size)
+                .inflate(exit)
+                .contains(event.localPosition);
+            if (outside != _outside) {
+              setState(() {
+                _outside = outside;
+                _lastExposedOffset = _exposedOffset;
+              });
+              _report();
+            }
+          }
           final newRaw = _rawOffset! + event.delta;
           _rawOffset = newRaw;
 
@@ -140,23 +251,19 @@ class _GlassDragBuilderState extends State<GlassDragBuilder> {
           });
         },
         onPointerUp: (event) {
-          _shouldIgnoreCurrentPointer = false;
-          if (!mounted) return;
-          setState(() {
-            _dragEngaged = false;
-            _rawOffset = null;
-            _lastExposedOffset = null;
-          });
+          if (_pressDelay != null && !_cancelled && _rawOffset != null) {
+            // A quick tap inside a scroll view, lifted before the delayed
+            // press appeared: still show a short press, then release.
+            _pressDelay!.cancel();
+            _pressDelay = null;
+            setState(() => _pressShown = true);
+            _report();
+            _flashRelease = Timer(const Duration(milliseconds: 90), _release);
+            return;
+          }
+          _release();
         },
-        onPointerCancel: (event) {
-          _shouldIgnoreCurrentPointer = false;
-          if (!mounted) return;
-          setState(() {
-            _dragEngaged = false;
-            _rawOffset = null;
-            _lastExposedOffset = null;
-          });
-        },
+        onPointerCancel: (event) => _release(),
         child: widget.builder(context, _exposedOffset, widget.child),
       ),
     );

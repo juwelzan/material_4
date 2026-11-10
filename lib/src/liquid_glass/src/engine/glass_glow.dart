@@ -8,6 +8,7 @@
 
 // ignore_for_file: public_member_api_docs
 
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/cupertino.dart';
@@ -15,6 +16,7 @@ import 'package:flutter/rendering.dart';
 import '../../widgets/shared/inherited_liquid_glass.dart';
 import '../../utils/glass_spring.dart';
 import 'rendering/liquid_glass_render_object.dart';
+import 'touch_scroll_guard.dart';
 
 /// {@template glass_glow}
 /// If placed as a descendant of a [GlassGlowLayer], this widget will
@@ -35,6 +37,7 @@ class GlassGlow extends StatefulWidget {
     this.hitTestBehavior = HitTestBehavior.opaque,
     this.enabled = true,
     this.glowOnTapOnly = false,
+    this.releaseOnScroll = false,
     super.key,
   });
 
@@ -119,6 +122,10 @@ class GlassGlow extends StatefulWidget {
   /// Defaults to false (glow always follows the pointer).
   final bool glowOnTapOnly;
 
+  /// Behave like a control inside a scroll view: inside a scrollable the
+  /// touch light appears only after a short delay (a quick tap still
+  /// flashes it), and it goes out as soon as the finger scrolls the content.
+  final bool releaseOnScroll;
   @override
   State<GlassGlow> createState() => _GlassGlowState();
 }
@@ -126,6 +133,18 @@ class GlassGlow extends StatefulWidget {
 class _GlassGlowState extends State<GlassGlow> {
   Offset? _initialPointerDown;
   bool _glowSuppressed = false;
+
+  final TouchScrollGuard _scrollGuard = TouchScrollGuard();
+  Timer? _showDelay;
+  Timer? _flashOff;
+  PointerEvent? _pendingEvent;
+
+  @override
+  void dispose() {
+    _showDelay?.cancel();
+    _flashOff?.cancel();
+    super.dispose();
+  }
 
   // BUG 3 FIX: Reset suppression flag when glowOnTapOnly is toggled off at
   // runtime (e.g. animation-driven state changes). Without this, the glow
@@ -152,9 +171,38 @@ class _GlassGlowState extends State<GlassGlow> {
           onPointerDown: (event) {
             _initialPointerDown = event.localPosition;
             _glowSuppressed = false;
+            _flashOff?.cancel();
+            _showDelay?.cancel();
+            _showDelay = null;
+            if (widget.releaseOnScroll) {
+              _scrollGuard.begin(innerContext);
+              if (_scrollGuard.insideScrollable) {
+                _pendingEvent = event;
+                _showDelay = Timer(const Duration(milliseconds: 100), () {
+                  _showDelay = null;
+                  final e = _pendingEvent;
+                  if (!mounted || e == null || _glowSuppressed) return;
+                  _handlePointer(innerContext, e);
+                });
+                return;
+              }
+            }
             _handlePointer(innerContext, event);
           },
           onPointerMove: (event) {
+            if (widget.releaseOnScroll &&
+                !_glowSuppressed &&
+                _scrollGuard.scrolled) {
+              _glowSuppressed = true;
+              _showDelay?.cancel();
+              _showDelay = null;
+              _removeTouch(innerContext);
+              return;
+            }
+            if (_showDelay != null) {
+              _pendingEvent = event;
+              return;
+            }
             if (widget.glowOnTapOnly && !_glowSuppressed) {
               final delta =
                   event.localPosition - (_initialPointerDown ?? Offset.zero);
@@ -166,8 +214,25 @@ class _GlassGlowState extends State<GlassGlow> {
             }
             if (!_glowSuppressed) _handlePointer(innerContext, event);
           },
-          onPointerUp: (event) => _removeTouch(innerContext),
-          onPointerCancel: (event) => _removeTouch(innerContext),
+          onPointerUp: (event) {
+            _scrollGuard.end();
+            if (_showDelay != null && !_glowSuppressed) {
+              // Quick tap in a scroll view: flash the light briefly.
+              _showDelay!.cancel();
+              _showDelay = null;
+              _handlePointer(innerContext, event);
+              _flashOff = Timer(const Duration(milliseconds: 90),
+                  () => mounted ? _removeTouch(innerContext) : null);
+              return;
+            }
+            _removeTouch(innerContext);
+          },
+          onPointerCancel: (event) {
+            _scrollGuard.end();
+            _showDelay?.cancel();
+            _showDelay = null;
+            _removeTouch(innerContext);
+          },
           child: widget.child,
         ),
       ),
